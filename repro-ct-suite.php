@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Repro CT-Suite
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
- * Description:       Modernes WordPress-Plugin für Repro CT-Suite mit zeitgemäßer Architektur.
+ * Description:       ChurchTools-Integration für WordPress. Synchronisiert Termine und Events aus ChurchTools.
  * Version:           1.0.0
  * Requires at least: 5.0
  * Requires PHP:      7.4

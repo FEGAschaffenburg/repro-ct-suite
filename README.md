@@ -1,19 +1,37 @@
 # Repro CT-Suite
 
-Ein modernes WordPress-Plugin mit zeitgemäßer Architektur nach WordPress Best Practices.
+WordPress-Plugin zur Integration von ChurchTools-Daten in WordPress.
 
 ## Beschreibung
 
-Repro CT-Suite ist ein WordPress-Plugin, das nach modernen WordPress-Standards entwickelt wurde und eine klare Trennung zwischen Admin- und Public-Funktionalität bietet.
+Repro CT-Suite ist ein WordPress-Plugin, das eine Brücke zwischen ChurchTools und Ihrer WordPress-Website herstellt. Es synchronisiert Termin- und Veranstaltungsdaten aus ChurchTools und macht sie in WordPress verfügbar für Kalenderansichten, Widgets und andere Darstellungen.
+
+### Version 1.0 - Hauptfokus
+
+**Termine & Events:**
+- Abruf von Appointments aus ChurchTools
+- Abruf von Event-Daten aus ChurchTools
+- Automatische Synchronisation via Cron
+- Einfache Anzeige über Shortcodes
 
 ## Features
 
+### ChurchTools-Integration
+- ✅ Sichere API-Verbindung zu ChurchTools
+- ✅ Abruf von Terminen (Appointments)
+- ✅ Abruf von Veranstaltungen (Events)
+- ✅ Automatische Synchronisation
+- ✅ Shortcodes für Frontend-Anzeige
+- ✅ Admin-Oberfläche für Konfiguration
+
+### Technische Features
 - ✅ Moderner objektorientierter Aufbau
 - ✅ Trennung von Admin- und Public-Funktionalität
 - ✅ Internationalisierung (i18n) vorbereitet
 - ✅ Hook-basierte Architektur
 - ✅ PHPUnit Tests integriert
 - ✅ Composer-Unterstützung
+- ✅ WordPress Coding Standards
 
 ## Ordnerstruktur
 
@@ -45,11 +63,19 @@ repro-ct-suite/
 
 ## Installation
 
+### Voraussetzungen
+- WordPress 5.0 oder höher
+- PHP 7.4 oder höher
+- ChurchTools-Instanz mit API-Zugang
+- API-Token von ChurchTools
+
 ### Manuell
 
 1. Laden Sie das Plugin herunter
 2. Entpacken Sie es in `wp-content/plugins/`
 3. Aktivieren Sie es im WordPress-Admin unter "Plugins"
+4. Gehen Sie zu "Repro CT-Suite" > "Einstellungen"
+5. Tragen Sie Ihre ChurchTools-URL und API-Token ein
 
 ### Via Git
 
@@ -59,6 +85,35 @@ git clone https://github.com/FEGAschaffenburg/repro-ct-suite.git
 cd repro-ct-suite
 composer install --no-dev
 ```
+
+## Verwendung
+
+### Konfiguration
+
+1. Navigieren Sie zu **WordPress Admin > Repro CT-Suite**
+2. Tragen Sie Ihre ChurchTools-Daten ein:
+   - **ChurchTools URL**: z.B. `https://ihre-gemeinde.church.tools`
+   - **API Token**: Erstellen Sie einen Token in ChurchTools unter Einstellungen
+3. Speichern Sie die Einstellungen
+4. Klicken Sie auf "Jetzt synchronisieren" für die erste Datenabholung
+
+### Shortcodes
+
+**Termine anzeigen:**
+```
+[ct_appointments limit="10"]
+```
+
+**Events anzeigen:**
+```
+[ct_events limit="5"]
+```
+
+**Parameter:**
+- `limit` - Anzahl der anzuzeigenden Einträge (Standard: 10)
+- `category` - Filtert nach Kategorie-ID
+- `from` - Startdatum (Format: YYYY-MM-DD)
+- `to` - Enddatum (Format: YYYY-MM-DD)
 
 ## Entwicklung
 
