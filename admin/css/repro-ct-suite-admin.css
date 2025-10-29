@@ -1,24 +1,691 @@
 /**
- * Admin-specific styles for the plugin.
+ * Admin-spezifische Styles für das Plugin.
+ *
+ * Modernes Design mit Tab-Navigation, Cards und Material Design Elementen.
+ * Responsive und barrierefrei gestaltet.
  *
  * @package Repro_CT_Suite
+ * @version 1.0.0
  */
 
+/* ==========================================================================
+   Layout & Container
+   ========================================================================== */
+
+/**
+ * Haupt-Wrapper für alle Plugin-Seiten
+ * Begrenzt die Breite und zentriert den Inhalt
+ */
 .repro-ct-suite-admin-wrapper {
 	max-width: 1200px;
 	margin: 20px auto;
-	padding: 20px;
+	padding: 0 20px;
 }
 
+/**
+ * Header-Bereich mit Titel und Beschreibung
+ * Visuell hervorgehoben mit Akzentfarbe
+ */
 .repro-ct-suite-header {
 	background: #fff;
-	border-left: 4px solid #2271b1;
-	padding: 20px;
-	margin-bottom: 20px;
-	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	border-left: 4px solid #0073aa;
+	padding: 25px 30px;
+	margin-bottom: 25px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	border-radius: 4px;
 }
 
 .repro-ct-suite-header h1 {
 	margin: 0 0 10px 0;
 	color: #1d2327;
+	font-size: 28px;
+	font-weight: 600;
 }
+
+.repro-ct-suite-header p {
+	margin: 0;
+	color: #646970;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+/* ==========================================================================
+   Tab-Navigation
+   ========================================================================== */
+
+/**
+ * Tab-Navigation Container
+ * Horizontale Tab-Leiste mit Hover- und Active-States
+ */
+.repro-ct-suite-tabs {
+	background: #fff;
+	border-bottom: 2px solid #e5e7eb;
+	margin-bottom: 25px;
+	border-radius: 4px 4px 0 0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.repro-ct-suite-tabs-nav {
+	display: flex;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	gap: 5px;
+	padding: 10px 15px 0;
+}
+
+/**
+ * Einzelner Tab-Button
+ * Mit Icon-Unterstützung und Hover-Effekt
+ */
+.repro-ct-suite-tabs-nav li {
+	margin: 0;
+}
+
+.repro-ct-suite-tabs-nav a {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 20px;
+	text-decoration: none;
+	color: #646970;
+	background: transparent;
+	border: none;
+	border-bottom: 3px solid transparent;
+	transition: all 0.2s ease;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	position: relative;
+	top: 2px;
+}
+
+.repro-ct-suite-tabs-nav a:hover {
+	color: #0073aa;
+	background: rgba(0, 115, 170, 0.05);
+}
+
+/**
+ * Aktiver Tab
+ * Hervorgehoben mit Primärfarbe und Unterstrich
+ */
+.repro-ct-suite-tabs-nav a.active {
+	color: #0073aa;
+	background: #fff;
+	border-bottom-color: #0073aa;
+}
+
+/**
+ * Icons in Tabs
+ * Dashicons-Integration
+ */
+.repro-ct-suite-tabs-nav a .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+/* ==========================================================================
+   Tab-Content
+   ========================================================================== */
+
+/**
+ * Container für Tab-Inhalte
+ * Nur aktive Tabs werden angezeigt
+ */
+.repro-ct-suite-tab-content {
+	display: none;
+}
+
+.repro-ct-suite-tab-content.active {
+	display: block;
+	animation: fadeIn 0.3s ease-in;
+}
+
+/**
+ * Fade-In Animation für Tab-Wechsel
+ */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ==========================================================================
+   Cards & Panels
+   ========================================================================== */
+
+/**
+ * Card-Component
+ * Material Design inspirierte Karten für Content-Bereiche
+ */
+.repro-ct-suite-card {
+	background: #fff;
+	border-radius: 6px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	padding: 25px;
+	margin-bottom: 20px;
+	border: 1px solid #e5e7eb;
+	transition: box-shadow 0.2s ease;
+}
+
+.repro-ct-suite-card:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/**
+ * Card Header mit optionalem Icon
+ */
+.repro-ct-suite-card-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 2px solid #f0f1f3;
+}
+
+.repro-ct-suite-card-header h2,
+.repro-ct-suite-card-header h3 {
+	margin: 0;
+	color: #1d2327;
+	font-size: 18px;
+	font-weight: 600;
+	flex: 1;
+}
+
+.repro-ct-suite-card-header .dashicons {
+	color: #0073aa;
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+}
+
+/**
+ * Card Body
+ */
+.repro-ct-suite-card-body {
+	color: #3c434a;
+	line-height: 1.6;
+}
+
+/**
+ * Card Footer für Aktionen
+ */
+.repro-ct-suite-card-footer {
+	margin-top: 20px;
+	padding-top: 15px;
+	border-top: 1px solid #f0f1f3;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+/**
+ * Primärer Button
+ * Hauptaktion auf der Seite
+ */
+.repro-ct-suite-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 0.2s ease;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.repro-ct-suite-btn:focus {
+	outline: 2px solid #0073aa;
+	outline-offset: 2px;
+}
+
+/**
+ * Button-Varianten
+ */
+.repro-ct-suite-btn-primary {
+	background: #0073aa;
+	color: #fff;
+}
+
+.repro-ct-suite-btn-primary:hover {
+	background: #005a87;
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 3px 8px rgba(0, 115, 170, 0.3);
+}
+
+.repro-ct-suite-btn-success {
+	background: #46b450;
+	color: #fff;
+}
+
+.repro-ct-suite-btn-success:hover {
+	background: #2ea342;
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 3px 8px rgba(70, 180, 80, 0.3);
+}
+
+.repro-ct-suite-btn-secondary {
+	background: #f6f7f7;
+	color: #3c434a;
+	border: 1px solid #dcdcde;
+}
+
+.repro-ct-suite-btn-secondary:hover {
+	background: #f0f0f1;
+	color: #1d2327;
+	border-color: #c3c4c7;
+}
+
+.repro-ct-suite-btn-danger {
+	background: #d63638;
+	color: #fff;
+}
+
+.repro-ct-suite-btn-danger:hover {
+	background: #b32d2e;
+	color: #fff;
+	transform: translateY(-1px);
+	box-shadow: 0 3px 8px rgba(214, 54, 56, 0.3);
+}
+
+/**
+ * Button-Größen
+ */
+.repro-ct-suite-btn-small {
+	padding: 6px 12px;
+	font-size: 13px;
+}
+
+.repro-ct-suite-btn-large {
+	padding: 14px 28px;
+	font-size: 16px;
+}
+
+/**
+ * Icon in Buttons
+ */
+.repro-ct-suite-btn .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+/* ==========================================================================
+   Badges & Status-Indikatoren
+   ========================================================================== */
+
+/**
+ * Badge-Component
+ * Für Status-Anzeigen und Labels
+ */
+.repro-ct-suite-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 12px;
+	font-size: 12px;
+	font-weight: 600;
+	border-radius: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/**
+ * Badge-Varianten
+ */
+.repro-ct-suite-badge-success {
+	background: #d5f5d9;
+	color: #1e8e3e;
+}
+
+.repro-ct-suite-badge-warning {
+	background: #fef3cd;
+	color: #d97706;
+}
+
+.repro-ct-suite-badge-error {
+	background: #fee;
+	color: #d63638;
+}
+
+.repro-ct-suite-badge-info {
+	background: #e5f5ff;
+	color: #0073aa;
+}
+
+.repro-ct-suite-badge-neutral {
+	background: #f0f1f3;
+	color: #646970;
+}
+
+/**
+ * Status-Dot für visuelle Verstärkung
+ */
+.repro-ct-suite-status-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.repro-ct-suite-status-dot.success {
+	background: #1e8e3e;
+}
+
+.repro-ct-suite-status-dot.warning {
+	background: #d97706;
+}
+
+.repro-ct-suite-status-dot.error {
+	background: #d63638;
+}
+
+/* ==========================================================================
+   Forms & Inputs
+   ========================================================================== */
+
+/**
+ * Form-Gruppen für bessere Strukturierung
+ */
+.repro-ct-suite-form-group {
+	margin-bottom: 20px;
+}
+
+.repro-ct-suite-form-group label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: #1d2327;
+	font-size: 14px;
+}
+
+.repro-ct-suite-form-group .description {
+	color: #646970;
+	font-size: 13px;
+	margin-top: 6px;
+	line-height: 1.5;
+}
+
+/**
+ * Input-Felder mit modernem Design
+ */
+.repro-ct-suite-input {
+	width: 100%;
+	padding: 10px 14px;
+	font-size: 14px;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	transition: all 0.2s ease;
+	background: #fff;
+}
+
+.repro-ct-suite-input:focus {
+	outline: none;
+	border-color: #0073aa;
+	box-shadow: 0 0 0 1px #0073aa;
+}
+
+.repro-ct-suite-input:disabled {
+	background: #f6f7f7;
+	color: #a7aaad;
+	cursor: not-allowed;
+}
+
+/**
+ * Toggle-Switch statt Checkbox
+ */
+.repro-ct-suite-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	cursor: pointer;
+}
+
+.repro-ct-suite-toggle input[type="checkbox"] {
+	display: none;
+}
+
+.repro-ct-suite-toggle-switch {
+	position: relative;
+	width: 44px;
+	height: 24px;
+	background: #c3c4c7;
+	border-radius: 12px;
+	transition: background 0.2s ease;
+}
+
+.repro-ct-suite-toggle-switch::after {
+	content: '';
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 20px;
+	height: 20px;
+	background: #fff;
+	border-radius: 50%;
+	transition: transform 0.2s ease;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.repro-ct-suite-toggle input:checked + .repro-ct-suite-toggle-switch {
+	background: #46b450;
+}
+
+.repro-ct-suite-toggle input:checked + .repro-ct-suite-toggle-switch::after {
+	transform: translateX(20px);
+}
+
+/* ==========================================================================
+   Progress Bar
+   ========================================================================== */
+
+/**
+ * Progress Bar für Sync-Fortschritt
+ */
+.repro-ct-suite-progress {
+	width: 100%;
+	height: 8px;
+	background: #f0f1f3;
+	border-radius: 4px;
+	overflow: hidden;
+	margin: 15px 0;
+}
+
+.repro-ct-suite-progress-bar {
+	height: 100%;
+	background: linear-gradient(90deg, #0073aa, #00a0d2);
+	border-radius: 4px;
+	transition: width 0.3s ease;
+	animation: progressAnimation 1.5s ease-in-out infinite;
+}
+
+@keyframes progressAnimation {
+	0%, 100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+/* ==========================================================================
+   Grid System
+   ========================================================================== */
+
+/**
+ * Flexibles Grid für responsive Layouts
+ */
+.repro-ct-suite-grid {
+	display: grid;
+	gap: 20px;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.repro-ct-suite-grid-2 {
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.repro-ct-suite-grid-3 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+/**
+ * Responsive Breakpoints
+ */
+@media (max-width: 782px) {
+	.repro-ct-suite-grid-2,
+	.repro-ct-suite-grid-3 {
+		grid-template-columns: 1fr;
+	}
+
+	.repro-ct-suite-tabs-nav {
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.repro-ct-suite-tabs-nav a {
+		border-bottom: 1px solid #e5e7eb;
+		border-left: 3px solid transparent;
+	}
+
+	.repro-ct-suite-tabs-nav a.active {
+		border-left-color: #0073aa;
+		border-bottom-color: #e5e7eb;
+	}
+}
+
+/* ==========================================================================
+   Notices & Alerts
+   ========================================================================== */
+
+/**
+ * Custom Notices mit Icons
+ */
+.repro-ct-suite-notice {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 15px 18px;
+	border-left: 4px solid;
+	border-radius: 4px;
+	margin-bottom: 20px;
+	background: #fff;
+}
+
+.repro-ct-suite-notice .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+	margin-top: 2px;
+}
+
+.repro-ct-suite-notice-success {
+	border-left-color: #46b450;
+	background: #f0faf1;
+}
+
+.repro-ct-suite-notice-success .dashicons {
+	color: #46b450;
+}
+
+.repro-ct-suite-notice-warning {
+	border-left-color: #d97706;
+	background: #fef9f3;
+}
+
+.repro-ct-suite-notice-warning .dashicons {
+	color: #d97706;
+}
+
+.repro-ct-suite-notice-error {
+	border-left-color: #d63638;
+	background: #fef3f4;
+}
+
+.repro-ct-suite-notice-error .dashicons {
+	color: #d63638;
+}
+
+.repro-ct-suite-notice-info {
+	border-left-color: #0073aa;
+	background: #f0f6fc;
+}
+
+.repro-ct-suite-notice-info .dashicons {
+	color: #0073aa;
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+/**
+ * Spacing Utilities
+ */
+.repro-ct-suite-mt-0 { margin-top: 0 !important; }
+.repro-ct-suite-mt-10 { margin-top: 10px !important; }
+.repro-ct-suite-mt-20 { margin-top: 20px !important; }
+.repro-ct-suite-mb-0 { margin-bottom: 0 !important; }
+.repro-ct-suite-mb-10 { margin-bottom: 10px !important; }
+.repro-ct-suite-mb-20 { margin-bottom: 20px !important; }
+
+/**
+ * Text Alignment
+ */
+.repro-ct-suite-text-center { text-align: center; }
+.repro-ct-suite-text-right { text-align: right; }
+
+/**
+ * Display Utilities
+ */
+.repro-ct-suite-flex {
+	display: flex;
+	gap: 10px;
+}
+
+.repro-ct-suite-flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.repro-ct-suite-flex-between {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+/**
+ * Loading Spinner
+ */
+.repro-ct-suite-spinner {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	border: 3px solid rgba(0, 115, 170, 0.2);
+	border-top-color: #0073aa;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}
+
