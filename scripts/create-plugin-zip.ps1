@@ -49,15 +49,60 @@ foreach($f in $excludeFiles){ Get-ChildItem -Path $pkgFolder -Recurse -Force -In
 $mainFile = Join-Path $pkgFolder 'repro-ct-suite.php'
 if (-not (Test-Path $mainFile)) { throw "Main plugin file not found at $($mainFile)" }
 
-# Build zip (keep top-level folder)
+# Build zip (keep top-level folder) mit Unix-Pfadtrenner
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-Compress-Archive -Path $pkgFolder -DestinationPath $zipPath -CompressionLevel Optimal -Force
+
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+$zip = [System.IO.Compression.ZipFile]::Open($zipPath, [System.IO.Compression.ZipArchiveMode]::Create)
+
+try {
+    # Alle Dateien rekursiv durchgehen
+    $allFiles = Get-ChildItem -Path $pkgFolder -Recurse -File
+    foreach ($file in $allFiles) {
+        # Relativen Pfad berechnen
+        $relativePath = $file.FullName.Substring($stageRoot.Length + 1)
+        # Windows-Pfadtrenner durch Unix-Trenner ersetzen
+        $entryName = $relativePath -replace '\\', '/'
+        
+        # Datei zum ZIP hinzufügen
+        $entry = $zip.CreateEntry($entryName, [System.IO.Compression.CompressionLevel]::Optimal)
+        $entryStream = $entry.Open()
+        $fileStream = [System.IO.File]::OpenRead($file.FullName)
+        $fileStream.CopyTo($entryStream)
+        $fileStream.Close()
+        $entryStream.Close()
+    }
+    
+    # Leere Ordner hinzufügen (wichtig für Struktur)
+    $allDirs = Get-ChildItem -Path $pkgFolder -Recurse -Directory
+    foreach ($dir in $allDirs) {
+        $relativePath = $dir.FullName.Substring($stageRoot.Length + 1)
+        $entryName = ($relativePath -replace '\\', '/') + '/'
+        
+        # Prüfen ob Ordner leer ist
+        if ((Get-ChildItem -Path $dir.FullName -Force).Count -eq 0) {
+            $zip.CreateEntry($entryName) | Out-Null
+        }
+    }
+    
+    Log "ZIP erstellt mit Unix-Pfadtrenner"
+} finally {
+    $zip.Dispose()
+}
 
 # Verify zip listing
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-$zip = [System.IO.Compression.ZipFile]::OpenRead($zipPath)
-$entries = $zip.Entries | Select-Object -First 10 | ForEach-Object { $_.FullName }
-$zip.Dispose()
-Log ("Created: {0}\nEntries (first):\n - {1}" -f $zipPath, ($entries -join "`n - "))
+$zipRead = [System.IO.Compression.ZipFile]::OpenRead($zipPath)
+$entries = $zipRead.Entries | Select-Object -First 10 | ForEach-Object { $_.FullName }
+$mainEntry = $zipRead.Entries | Where-Object { $_.FullName -eq 'repro-ct-suite/repro-ct-suite.php' }
+$zipRead.Dispose()
 
-Write-Host "OK: $zipPath" -ForegroundColor Green
+if ($mainEntry) {
+    Log ("Created: {0}`nEntries (first):`n - {1}" -f $zipPath, ($entries -join "`n - "))
+    Write-Host "OK: ZIP korrekt - repro-ct-suite/repro-ct-suite.php gefunden" -ForegroundColor Green
+    Write-Host "OK: $zipPath" -ForegroundColor Green
+} else {
+    Write-Host "WARNUNG: Hauptdatei nicht an erwarteter Position!" -ForegroundColor Yellow
+    Write-Host "OK: $zipPath" -ForegroundColor Green
+}
