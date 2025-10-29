@@ -1,3 +1,0 @@
-code --list-extensions --show-versions > C:\temp\vscode-extensions.txt
-
-$env:APPDATA\Code\User\settings.json
