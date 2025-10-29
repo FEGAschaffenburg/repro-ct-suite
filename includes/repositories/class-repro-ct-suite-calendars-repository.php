@@ -194,4 +194,19 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 			)
 		);
 	}
+
+	/**
+	 * Holt einen Kalender anhand der internen ID
+	 *
+	 * @param int $id Interne Kalender-ID.
+	 * @return object|null Kalender-Objekt oder null.
+	 */
+	public function get_by_id( $id ) {
+		return $this->db->get_row(
+			$this->db->prepare(
+				"SELECT * FROM {$this->table} WHERE id=%d",
+				(int) $id
+			)
+		);
+	}
 }

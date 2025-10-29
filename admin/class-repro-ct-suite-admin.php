@@ -571,6 +571,7 @@ class Repro_CT_Suite_Admin {
 
 		// Dependencies laden
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-events-repository.php';
@@ -580,7 +581,11 @@ class Repro_CT_Suite_Admin {
 
 		try {
 			// Services instanziieren
-			$ct_client = new Repro_CT_Suite_CT_Client();
+			$tenant = get_option( 'repro_ct_suite_ct_tenant', '' );
+			$username = get_option( 'repro_ct_suite_ct_username', '' );
+			$encrypted_password = get_option( 'repro_ct_suite_ct_password', '' );
+			$password = Repro_CT_Suite_Crypto::decrypt( $encrypted_password );
+			$ct_client = new Repro_CT_Suite_CT_Client( $tenant, $username, $password );
 			$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
 			$events_repo = new Repro_CT_Suite_Events_Repository();
 			$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
@@ -594,16 +599,23 @@ class Repro_CT_Suite_Admin {
 				) );
 			}
 
-			// Events synchronisieren
+			// Zeitraum bestimmen (Standard: heute-7 bis +90 Tage)
+			$from = date( 'Y-m-d', current_time( 'timestamp' ) - 7 * DAY_IN_SECONDS );
+			$to   = date( 'Y-m-d', current_time( 'timestamp' ) + 90 * DAY_IN_SECONDS );
+
+			// Events synchronisieren (zeitbasiert)
 			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo );
 			$events_result = $events_service->sync_events( array(
-				'calendar_ids' => $selected_calendar_ids
+				'from' => $from,
+				'to'   => $to,
 			) );
 
-			// Appointments synchronisieren
-			$appointments_service = new Repro_CT_Suite_Appointments_Sync_Service( $ct_client, $appointments_repo );
+			// Appointments synchronisieren (nur ausgewählte Kalender)
+			$appointments_service = new Repro_CT_Suite_Appointments_Sync_Service( $ct_client, $appointments_repo, $events_repo, $calendars_repo );
 			$appointments_result = $appointments_service->sync_appointments( array(
-				'calendar_ids' => $selected_calendar_ids
+				'calendar_ids' => $selected_calendar_ids,
+				'from' => $from,
+				'to'   => $to,
 			) );
 
 			wp_send_json_success( array(

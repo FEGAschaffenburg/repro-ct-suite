@@ -42,4 +42,20 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 	public function get_by_id( $id ) {
 		return $this->db->get_row( $this->db->prepare( "SELECT * FROM {$this->table} WHERE id=%d", $id ) );
 	}
+
+	/**
+	 * Holt die interne ID eines Events anhand der external_id
+	 *
+	 * @param string $external_id Externe Event-ID aus ChurchTools
+	 * @return int|null Interne ID oder null, wenn nicht gefunden
+	 */
+	public function get_id_by_external_id( $external_id ) {
+		$val = $this->db->get_var(
+			$this->db->prepare(
+				"SELECT id FROM {$this->table} WHERE external_id=%s",
+				$external_id
+			)
+		);
+		return $val !== null ? (int) $val : null;
+	}
 }
