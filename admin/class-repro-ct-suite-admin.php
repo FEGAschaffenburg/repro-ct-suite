@@ -6,6 +6,9 @@
  * @subpackage Repro_CT_Suite/admin
  */
 
+// Logger laden
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-logger.php';
+
 class Repro_CT_Suite_Admin {
 
 	/**
@@ -34,6 +37,46 @@ class Repro_CT_Suite_Admin {
 		
 		// Update-Check Handler
 		add_action( 'admin_init', array( $this, 'check_manual_update_request' ) );
+	}
+
+	/**
+	 * Debug-Logging Helper
+	 * 
+	 * Schreibt Debug-Informationen ins WordPress Debug-Log.
+	 * Funktioniert unabhängig von WP_DEBUG - aktiviert sich selbst wenn nötig.
+	 *
+	 * @param string $message Die Log-Nachricht
+	 * @param string $level   Log-Level: 'info', 'error', 'warning', 'success'
+	 */
+	private function debug_log( $message, $level = 'info' ) {
+		// Stelle sicher, dass Debug-Log aktiviert ist
+		if ( ! defined( 'WP_DEBUG_LOG' ) ) {
+			// Temporär aktivieren für diesen Request
+			if ( ! @ini_get( 'log_errors' ) ) {
+				@ini_set( 'log_errors', '1' );
+			}
+			$log_file = WP_CONTENT_DIR . '/debug.log';
+			if ( ! @ini_get( 'error_log' ) ) {
+				@ini_set( 'error_log', $log_file );
+			}
+		}
+		
+		$prefix = '[REPRO CT-SUITE] ';
+		switch ( $level ) {
+			case 'error':
+				$prefix .= '❌ ERROR: ';
+				break;
+			case 'warning':
+				$prefix .= '⚠️  WARNING: ';
+				break;
+			case 'success':
+				$prefix .= '✅ SUCCESS: ';
+				break;
+			default:
+				$prefix .= 'ℹ️  INFO: ';
+		}
+		
+		error_log( $prefix . $message );
 	}
 
 	/**
@@ -350,23 +393,51 @@ class Repro_CT_Suite_Admin {
 			$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
 			$sync_service = new Repro_CT_Suite_Calendar_Sync_Service( $ct_client, $calendars_repo );
 
-			// DEBUG: Log Request-Details
+			// DEBUG: Log Request-Details ins WordPress Debug-Log
 			$tenant = get_option( 'repro_ct_suite_ct_tenant', '' );
 			$debug_info = array(
 				'tenant' => $tenant,
 				'url' => 'https://' . $tenant . '.church.tools/api/calendars',
 				'timestamp' => current_time( 'mysql' )
 			);
-			error_log( '[REPRO CT-SUITE DEBUG] Calendar Sync Request: ' . print_r( $debug_info, true ) );
+			
+			Repro_CT_Suite_Logger::header( 'KALENDER-SYNCHRONISATION GESTARTET' );
+			Repro_CT_Suite_Logger::log( 'Zeitpunkt: ' . current_time( 'mysql' ) );
+			Repro_CT_Suite_Logger::log( 'Tenant: ' . $tenant );
+			Repro_CT_Suite_Logger::log( 'API-URL: ' . $debug_info['url'] );
+			Repro_CT_Suite_Logger::separator();
 
 			// Synchronisation durchführen
 			$result = $sync_service->sync_calendars();
 
 			// DEBUG: Log Response
-			error_log( '[REPRO CT-SUITE DEBUG] Calendar Sync Result: ' . print_r( $result, true ) );
+			if ( is_wp_error( $result ) ) {
+				Repro_CT_Suite_Logger::log( 'WP_Error aufgetreten!', 'error' );
+				Repro_CT_Suite_Logger::log( 'Error Code: ' . $result->get_error_code(), 'error' );
+				Repro_CT_Suite_Logger::log( 'Error Message: ' . $result->get_error_message(), 'error' );
+				Repro_CT_Suite_Logger::separator( '=', 60 );
+				
+				wp_send_json_error( array(
+					'message' => $result->get_error_message(),
+					'debug' => array(
+						'error_code' => $result->get_error_code(),
+						'error_message' => $result->get_error_message(),
+						'url' => $debug_info['url']
+					)
+				) );
+				return;
+			}
+
+			Repro_CT_Suite_Logger::log( 'Response erhalten - Typ: ' . gettype( $result ) );
+			Repro_CT_Suite_Logger::log( 'Kalender gesamt: ' . ( isset( $result['total'] ) ? $result['total'] : '0' ), 'info' );
+			Repro_CT_Suite_Logger::log( 'Neu eingefügt: ' . ( isset( $result['inserted'] ) ? $result['inserted'] : '0' ), 'success' );
+			Repro_CT_Suite_Logger::log( 'Aktualisiert: ' . ( isset( $result['updated'] ) ? $result['updated'] : '0' ), 'success' );
+			Repro_CT_Suite_Logger::log( 'Fehler: ' . ( isset( $result['errors'] ) ? $result['errors'] : '0' ), ( isset( $result['errors'] ) && $result['errors'] > 0 ? 'warning' : 'success' ) );
 
 			if ( isset( $result['errors'] ) && ! empty( $result['errors'] ) ) {
-				error_log( '[REPRO CT-SUITE DEBUG] Errors occurred: ' . print_r( $result['errors'], true ) );
+				Repro_CT_Suite_Logger::dump( $result['errors'], 'Fehler-Details', 'warning' );
+				Repro_CT_Suite_Logger::header( 'SYNC MIT FEHLERN BEENDET', 'warning' );
+				
 				wp_send_json_error( array(
 					'message' => sprintf(
 						__( 'Synchronisation mit Fehlern abgeschlossen. %d Kalender importiert, %d Fehler aufgetreten.', 'repro-ct-suite' ),
@@ -377,6 +448,8 @@ class Repro_CT_Suite_Admin {
 					'debug' => $debug_info
 				) );
 			}
+
+			Repro_CT_Suite_Logger::header( 'KALENDER-SYNCHRONISATION ERFOLGREICH', 'success' );
 
 			wp_send_json_success( array(
 				'message' => sprintf(
@@ -390,8 +463,16 @@ class Repro_CT_Suite_Admin {
 			) );
 
 		} catch ( Exception $e ) {
-			error_log( '[REPRO CT-SUITE DEBUG] Exception: ' . $e->getMessage() );
-			error_log( '[REPRO CT-SUITE DEBUG] Stack Trace: ' . $e->getTraceAsString() );
+			Repro_CT_Suite_Logger::header( 'EXCEPTION AUFGETRETEN', 'error' );
+			Repro_CT_Suite_Logger::log( 'Exception: ' . $e->getMessage(), 'error' );
+			Repro_CT_Suite_Logger::log( 'File: ' . $e->getFile() . ' (Line ' . $e->getLine() . ')', 'error' );
+			Repro_CT_Suite_Logger::log( 'Stack Trace:', 'error' );
+			$trace_lines = explode( "\n", $e->getTraceAsString() );
+			foreach ( array_slice( $trace_lines, 0, 10 ) as $line ) {
+				Repro_CT_Suite_Logger::log( '  ' . $line, 'error' );
+			}
+			Repro_CT_Suite_Logger::header( 'SYNC FAILED', 'error' );
+			
 			wp_send_json_error( array(
 				'message' => sprintf(
 					__( 'Fehler bei der Synchronisation: %s', 'repro-ct-suite' ),

@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Logger laden
+require_once dirname( __FILE__ ) . '/class-repro-ct-suite-logger.php';
+
 class Repro_CT_Suite_CT_Client {
 
 	/**
@@ -145,19 +148,21 @@ class Repro_CT_Suite_CT_Client {
 	 */
 	public function get( $endpoint, $args = array() ) {
 		// DEBUG: Log Request Start
-		error_log( '[REPRO CT-SUITE DEBUG] CT_Client::get() called' );
-		error_log( '[REPRO CT-SUITE DEBUG] - Endpoint: ' . $endpoint );
-		error_log( '[REPRO CT-SUITE DEBUG] - Args: ' . print_r( $args, true ) );
-		error_log( '[REPRO CT-SUITE DEBUG] - Is Authenticated: ' . ( $this->is_authenticated() ? 'yes' : 'no' ) );
+		Repro_CT_Suite_Logger::log( 'CT_Client::get() called' );
+		Repro_CT_Suite_Logger::log( 'Endpoint: ' . $endpoint );
+		if ( ! empty( $args ) ) {
+			Repro_CT_Suite_Logger::dump( $args, 'Query Args' );
+		}
+		Repro_CT_Suite_Logger::log( 'Is Authenticated: ' . ( $this->is_authenticated() ? 'YES' : 'NO' ) );
 		
 		if ( ! $this->is_authenticated() ) {
-			error_log( '[REPRO CT-SUITE DEBUG] Not authenticated, attempting login...' );
+			Repro_CT_Suite_Logger::log( 'Not authenticated, attempting login...', 'warning' );
 			$login_result = $this->login();
 			if ( is_wp_error( $login_result ) ) {
-				error_log( '[REPRO CT-SUITE DEBUG] Login failed: ' . $login_result->get_error_message() );
+				Repro_CT_Suite_Logger::log( 'Login failed: ' . $login_result->get_error_message(), 'error' );
 				return $login_result;
 			}
-			error_log( '[REPRO CT-SUITE DEBUG] Login successful' );
+			Repro_CT_Suite_Logger::log( 'Login successful', 'success' );
 		}
 
 		$url = $this->get_base_url() . $endpoint;
@@ -165,8 +170,8 @@ class Repro_CT_Suite_CT_Client {
 			$url = add_query_arg( $args, $url );
 		}
 
-		error_log( '[REPRO CT-SUITE DEBUG] Full Request URL: ' . $url );
-		error_log( '[REPRO CT-SUITE DEBUG] Request Headers: ' . print_r( $this->get_headers(), true ) );
+		Repro_CT_Suite_Logger::log( 'Full Request URL: ' . $url );
+		Repro_CT_Suite_Logger::log( 'Sending HTTP GET request...' );
 
 		$response = wp_remote_get(
 			$url,
@@ -177,46 +182,49 @@ class Repro_CT_Suite_CT_Client {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			error_log( '[REPRO CT-SUITE DEBUG] HTTP Request failed: ' . $response->get_error_message() );
+			Repro_CT_Suite_Logger::log( 'HTTP Request failed: ' . $response->get_error_message(), 'error' );
 			return $response;
 		}
 
 		$status = wp_remote_retrieve_response_code( $response );
-		error_log( '[REPRO CT-SUITE DEBUG] Response Status Code: ' . $status );
+		Repro_CT_Suite_Logger::log( 'Response Status Code: ' . $status );
 		
 		if ( $status === 401 ) {
-			error_log( '[REPRO CT-SUITE DEBUG] 401 Unauthorized - Session expired, re-login and retry' );
+			Repro_CT_Suite_Logger::log( '401 Unauthorized - Session expired, attempting re-login', 'warning' );
 			// Session abgelaufen, neu einloggen
 			$this->clear_cookies();
 			$login_result = $this->login();
 			if ( is_wp_error( $login_result ) ) {
-				error_log( '[REPRO CT-SUITE DEBUG] Re-login failed: ' . $login_result->get_error_message() );
+				Repro_CT_Suite_Logger::log( 'Re-login failed: ' . $login_result->get_error_message(), 'error' );
 				return $login_result;
 			}
 			// Retry
-			error_log( '[REPRO CT-SUITE DEBUG] Re-login successful, retrying request' );
+			Repro_CT_Suite_Logger::log( 'Re-login successful, retrying request', 'success' );
 			return $this->get( $endpoint, $args );
 		}
 
 		if ( $status !== 200 ) {
 			$body = wp_remote_retrieve_body( $response );
-			error_log( '[REPRO CT-SUITE DEBUG] API Error - Status: ' . $status . ', Body: ' . $body );
+			Repro_CT_Suite_Logger::log( 'API Error - Status: ' . $status, 'error' );
+			Repro_CT_Suite_Logger::log( 'Response Body: ' . substr( $body, 0, 500 ), 'error' );
 			return new WP_Error( 'ct_api_error', sprintf( 'API Error: %d - %s', $status, $body ), array( 'status' => $status ) );
 		}
 
 		$body = wp_remote_retrieve_body( $response );
-		error_log( '[REPRO CT-SUITE DEBUG] Response Body Length: ' . strlen( $body ) . ' bytes' );
-		error_log( '[REPRO CT-SUITE DEBUG] Response Body (first 500 chars): ' . substr( $body, 0, 500 ) );
+		Repro_CT_Suite_Logger::log( 'Response Body Length: ' . strlen( $body ) . ' bytes', 'success' );
+		Repro_CT_Suite_Logger::log( 'Response preview (first 500 chars): ' . substr( $body, 0, 500 ) );
 		
 		$data = json_decode( $body, true );
 		
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
-			error_log( '[REPRO CT-SUITE DEBUG] JSON Decode Error: ' . json_last_error_msg() );
+			Repro_CT_Suite_Logger::log( 'JSON Decode Error: ' . json_last_error_msg(), 'error' );
 			return new WP_Error( 'json_decode_error', 'Failed to decode JSON response: ' . json_last_error_msg() );
 		}
 		
-		error_log( '[REPRO CT-SUITE DEBUG] Successfully decoded JSON response' );
-		error_log( '[REPRO CT-SUITE DEBUG] Response has keys: ' . print_r( array_keys( $data ), true ) );
+		Repro_CT_Suite_Logger::log( 'Successfully decoded JSON response', 'success' );
+		if ( is_array( $data ) ) {
+			Repro_CT_Suite_Logger::log( 'Response has keys: ' . implode( ', ', array_keys( $data ) ) );
+		}
 
 		return $data;
 	}

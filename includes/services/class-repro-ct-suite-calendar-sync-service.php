@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Logger laden
+require_once dirname( dirname( __FILE__ ) ) . '/class-repro-ct-suite-logger.php';
+
 class Repro_CT_Suite_Calendar_Sync_Service {
 
 	/**
@@ -49,25 +52,26 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 	 */
 	public function sync_calendars() {
 		// DEBUG: Log API Call
-		error_log( '[REPRO CT-SUITE DEBUG] Calendar Sync Service: Calling CT API /calendars endpoint' );
+		Repro_CT_Suite_Logger::log( 'Calendar Sync Service: Calling CT API /calendars endpoint' );
 		
 		$response = $this->ct_client->get( '/calendars' );
 
 		// DEBUG: Log Response
-		error_log( '[REPRO CT-SUITE DEBUG] API Response Type: ' . gettype( $response ) );
+		Repro_CT_Suite_Logger::log( 'API Response Type: ' . gettype( $response ) );
+		
 		if ( is_wp_error( $response ) ) {
-			error_log( '[REPRO CT-SUITE DEBUG] WP_Error detected:' );
-			error_log( '[REPRO CT-SUITE DEBUG] - Error Code: ' . $response->get_error_code() );
-			error_log( '[REPRO CT-SUITE DEBUG] - Error Message: ' . $response->get_error_message() );
-			error_log( '[REPRO CT-SUITE DEBUG] - Error Data: ' . print_r( $response->get_error_data(), true ) );
+			Repro_CT_Suite_Logger::log( 'WP_Error detected', 'error' );
+			Repro_CT_Suite_Logger::log( 'Error Code: ' . $response->get_error_code(), 'error' );
+			Repro_CT_Suite_Logger::log( 'Error Message: ' . $response->get_error_message(), 'error' );
+			Repro_CT_Suite_Logger::dump( $response->get_error_data(), 'Error Data', 'error' );
 			return $response;
 		}
 		
-		error_log( '[REPRO CT-SUITE DEBUG] API Response Structure: ' . print_r( array_keys( $response ), true ) );
+		Repro_CT_Suite_Logger::log( 'API Response Structure: ' . implode( ', ', array_keys( $response ) ) );
 
 		if ( ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
-			error_log( '[REPRO CT-SUITE DEBUG] Invalid response structure - data array missing or not an array' );
-			error_log( '[REPRO CT-SUITE DEBUG] Full Response: ' . print_r( $response, true ) );
+			Repro_CT_Suite_Logger::log( 'Invalid response structure - data array missing or not an array', 'error' );
+			Repro_CT_Suite_Logger::dump( $response, 'Full Response', 'error' );
 			return new WP_Error(
 				'invalid_response',
 				__( 'Ungültige API-Antwort: data-Array fehlt', 'repro-ct-suite' )
@@ -75,7 +79,7 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 		}
 
 		$calendars = $response['data'];
-		error_log( '[REPRO CT-SUITE DEBUG] Found ' . count( $calendars ) . ' calendars in response' );
+		Repro_CT_Suite_Logger::log( 'Found ' . count( $calendars ) . ' calendars in response', 'success' );
 		
 		$stats = array(
 			'total'    => count( $calendars ),
@@ -85,22 +89,22 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 		);
 
 		foreach ( $calendars as $index => $calendar_data ) {
-			error_log( '[REPRO CT-SUITE DEBUG] Processing calendar ' . ( $index + 1 ) . ': ' . 
-				( isset( $calendar_data['name'] ) ? $calendar_data['name'] : 'Unknown' ) );
+			$calendar_name = isset( $calendar_data['name'] ) ? $calendar_data['name'] : 'Unknown';
+			Repro_CT_Suite_Logger::log( 'Processing calendar ' . ( $index + 1 ) . ': ' . $calendar_name );
 			
 			$result = $this->import_calendar( $calendar_data );
 			
 			if ( is_wp_error( $result ) ) {
-				error_log( '[REPRO CT-SUITE DEBUG] Import failed for calendar: ' . $result->get_error_message() );
+				Repro_CT_Suite_Logger::log( 'Import failed for calendar: ' . $result->get_error_message(), 'error' );
 				$stats['errors']++;
 				continue;
 			}
 
 			if ( $result['action'] === 'insert' ) {
-				error_log( '[REPRO CT-SUITE DEBUG] Calendar inserted with ID: ' . $result['id'] );
+				Repro_CT_Suite_Logger::log( 'Calendar inserted with ID: ' . $result['id'], 'success' );
 				$stats['inserted']++;
 			} else {
-				error_log( '[REPRO CT-SUITE DEBUG] Calendar updated with ID: ' . $result['id'] );
+				Repro_CT_Suite_Logger::log( 'Calendar updated with ID: ' . $result['id'], 'success' );
 				$stats['updated']++;
 			}
 		}
@@ -108,7 +112,9 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 		// Sync-Zeitpunkt speichern
 		update_option( 'repro_ct_suite_calendars_last_sync', current_time( 'mysql' ), false );
 
-		error_log( '[REPRO CT-SUITE DEBUG] Sync completed - Stats: ' . print_r( $stats, true ) );
+		Repro_CT_Suite_Logger::log( 'Sync completed', 'success' );
+		Repro_CT_Suite_Logger::dump( $stats, 'Final Stats', 'success' );
+		
 		return $stats;
 	}
 

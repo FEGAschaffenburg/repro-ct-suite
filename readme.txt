@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.2.1
+Stable tag: 0.3.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,17 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.2.2 =
+* Feature: Zentrale Logger-Klasse für einheitliches Debug-Logging
+* Direktes Schreiben ins wp-content/debug.log (unabhängig von WP_DEBUG)
+* Kompatibel mit Debug-Log-Manager-Plugins für einfache Log-Anzeige
+* Millisekunden-genaue Timestamps in allen Log-Einträgen
+* Farbcodierte Icons (✅ ✗ ⚠️ ℹ️) für bessere Lesbarkeit in Logs
+* Strukturierte Logs: header(), separator(), dump() Helper-Methoden
+* Logging auf 3 Ebenen: AJAX Handler, Service Layer, CT Client
+* Automatische Aktivierung von error_log falls nicht konfiguriert
+* Log-Einträge mit Prefix "[REPRO CT-SUITE]" für einfaches Filtern
 
 = 0.3.2.1 =
 * Feature: Live-Debug-Panel direkt im Admin-Bereich (Settings-Tab)
