@@ -127,7 +127,6 @@ class Repro_CT_Suite_Appointments_Repository extends Repro_CT_Suite_Repository_B
 				e.status,
 				c.name AS calendar_name,
 				c.color AS calendar_color,
-				a.created_at,
 				a.updated_at
 			FROM {$this->table} a
 			LEFT JOIN {$events_table} e ON a.event_id = e.id
