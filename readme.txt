@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,12 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.2.3 =
+* Bugfix: Redirect nach Connection-Test bleibt nun im Settings-Tab
+* Bugfix: Dashboard zeigt korrekten Verbindungsstatus basierend auf gespeicherten Credentials
+* UI: Status-Punkt wechselt von gelb (nicht konfiguriert) zu grün (konfiguriert)
+* UI: Button-Text passt sich dynamisch an ("Jetzt einrichten" vs "Einstellungen ändern")
 
 = 0.2.2 =
 * Bugfix: Headers-Already-Sent-Fehler beim Connection-Test behoben
