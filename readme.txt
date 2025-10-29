@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,11 +58,30 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 
 == Changelog ==
 
-= 1.0.0 =
+= 0.2.0 =
+* Datenbankschema: benutzerdefinierte Tabellen für Events, Appointments und Services
+* Repository-Pattern: Event, Appointment, EventServices Repositories mit Upsert-Logik
+* Sichere Credentials: verschlüsseltes Speichern von ChurchTools-Passwörtern (Crypto-Klasse)
+* Admin-Seite "Termine": konsolidierte Übersicht aller Events und Appointments ohne Event-Zuordnung
+* Einstellungsseite: ChurchTools Basis-URL, Benutzername und Passwort konfigurierbar
+* DB-Migrationen: automatische Schema-Installation und Upgrade-Hooks
+* Vorbereitung für Sync-Service: Repository-Schicht implementiert
+
+= 0.1.0.3 =
+* Auto-Update-Funktion hinzugefügt (opt-in via Admin-UI)
+* Update-Info-Seite mit Statusanzeige und Auto-Update-Toggle
+* Versionsnummer-Support für 4-stellige Versionen (Major.Minor.Patch.Build)
+
+= 0.1.0.2 =
+* i18n-Kompatibilität mit WordPress 6.7.0 (Textdomain auf init geladen)
+* GitHub-Updater: Versionsnormalisierung und Präferenz für Release-ZIP-Assets
+
+= 0.1.0 =
 * Initiales Release
-* ChurchTools API-Integration
-* Appointments-Synchronisation
-* Events-Synchronisation
-* Admin-Konfigurationsseite
-* Shortcodes für Frontend-Anzeige
-* Automatische Cron-Synchronisation
+* GitHub-Updater für automatische Plugin-Updates
+* Material Design-inspirierte Admin-Oberfläche
+* Template-basierte View-Architektur
+* OOP-Struktur mit Loader-Pattern
+
+= 1.0.0 =
+* Legacy-Placeholder (veraltet)

@@ -84,6 +84,15 @@ class Repro_CT_Suite_Admin {
 
 		add_submenu_page(
 			'repro-ct-suite',
+			__( 'Termine', 'repro-ct-suite' ),
+			__( 'Termine', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-appointments',
+			array( $this, 'display_appointments_page' )
+		);
+
+		add_submenu_page(
+			'repro-ct-suite',
 			__( 'Update-Info', 'repro-ct-suite' ),
 			__( 'Update-Info', 'repro-ct-suite' ),
 			'manage_options',
@@ -107,6 +116,13 @@ class Repro_CT_Suite_Admin {
 	}
 
 	/**
+	 * Display the appointments consolidated page.
+	 */
+	public function display_appointments_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-appointments.php';
+	}
+
+	/**
 	 * Register plugin settings.
 	 */
 	public function register_settings() {
@@ -120,5 +136,44 @@ class Repro_CT_Suite_Admin {
 				'default'           => 0,
 			)
 		);
+
+		// ChurchTools Einstellungen: Basis-URL, Benutzername, Passwort (verschlüsselt)
+		register_setting(
+			'repro_ct_suite',
+			'repro_ct_suite_ct_base_url',
+			array(
+				'type'              => 'string',
+				'description'       => __( 'ChurchTools Basis-URL (z.B. https://gemeinde.church.tools)', 'repro-ct-suite' ),
+				'sanitize_callback' => function ( $value ) { return esc_url_raw( trim( $value ) ); },
+				'default'           => '',
+			)
+		);
+
+		register_setting(
+			'repro_ct_suite',
+			'repro_ct_suite_ct_username',
+			array(
+				'type'              => 'string',
+				'description'       => __( 'ChurchTools Benutzername', 'repro-ct-suite' ),
+				'sanitize_callback' => function ( $value ) { return sanitize_text_field( $value ); },
+				'default'           => '',
+			)
+		);
+
+		register_setting(
+			'repro_ct_suite',
+			'repro_ct_suite_ct_password',
+			array(
+				'type'              => 'string',
+				'description'       => __( 'ChurchTools Passwort (wird verschlüsselt gespeichert)', 'repro-ct-suite' ),
+				'sanitize_callback' => function ( $value ) {
+					require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
+					$value = (string) $value;
+					return Repro_CT_Suite_Crypto::encrypt( $value );
+				},
+				'default'           => '',
+			)
+		);
+
 	}
 }

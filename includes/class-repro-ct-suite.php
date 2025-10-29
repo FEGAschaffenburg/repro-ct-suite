@@ -52,6 +52,9 @@ class Repro_CT_Suite {
 	private function load_dependencies() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-loader.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-migrations.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-repro-ct-suite-admin.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-repro-ct-suite-public.php';
 
@@ -76,6 +79,9 @@ class Repro_CT_Suite {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_admin_menu' );
+
+		// DB-Upgrades auf admin_init prüfen (sicheres Timing)
+		$this->loader->add_action( 'admin_init', 'Repro_CT_Suite_Migrations', 'maybe_upgrade' );
 	}
 
 	/**
