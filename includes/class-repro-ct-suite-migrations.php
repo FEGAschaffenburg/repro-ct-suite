@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Migrations {
 
-	const DB_VERSION = '1';
+	const DB_VERSION = '2';
 	const OPTION_KEY = 'repro_ct_suite_db_version';
 
 	/**
@@ -27,13 +27,32 @@ class Repro_CT_Suite_Migrations {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
+		$calendars_table    = $wpdb->prefix . 'rcts_calendars';
 		$events_table       = $wpdb->prefix . 'rcts_events';
 		$appointments_table = $wpdb->prefix . 'rcts_appointments';
 		$services_table     = $wpdb->prefix . 'rcts_event_services';
 
+		// Calendars (Kalender aus ChurchTools)
+		$sql_calendars = "CREATE TABLE {$calendars_table} (
+			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			external_id VARCHAR(64) NOT NULL,
+			name VARCHAR(255) NOT NULL,
+			name_translated VARCHAR(255) NULL,
+			color VARCHAR(7) NULL,
+			is_public TINYINT(1) NOT NULL DEFAULT 0,
+			is_selected TINYINT(1) NOT NULL DEFAULT 0,
+			sort_order INT(11) NULL,
+			updated_at DATETIME NOT NULL,
+			raw_payload LONGTEXT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY external_id (external_id),
+			KEY is_selected (is_selected)
+		) {$charset_collate};";
+
 		$sql_events = "CREATE TABLE {$events_table} (
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			external_id VARCHAR(64) NOT NULL,
+			calendar_id BIGINT(20) UNSIGNED NULL,
 			title VARCHAR(255) NOT NULL,
 			description LONGTEXT NULL,
 			start_datetime DATETIME NOT NULL,
@@ -44,6 +63,7 @@ class Repro_CT_Suite_Migrations {
 			raw_payload LONGTEXT NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY external_id (external_id),
+			KEY calendar_id (calendar_id),
 			KEY start_datetime (start_datetime),
 			KEY end_datetime (end_datetime)
 		) {$charset_collate};";
@@ -52,6 +72,7 @@ class Repro_CT_Suite_Migrations {
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			external_id VARCHAR(64) NOT NULL,
 			event_id BIGINT(20) UNSIGNED NULL,
+			calendar_id BIGINT(20) UNSIGNED NULL,
 			title VARCHAR(255) NOT NULL,
 			description LONGTEXT NULL,
 			start_datetime DATETIME NOT NULL,
@@ -62,6 +83,7 @@ class Repro_CT_Suite_Migrations {
 			PRIMARY KEY  (id),
 			UNIQUE KEY external_id (external_id),
 			KEY event_id (event_id),
+			KEY calendar_id (calendar_id),
 			KEY start_datetime (start_datetime)
 		) {$charset_collate};";
 
@@ -80,6 +102,7 @@ class Repro_CT_Suite_Migrations {
 			KEY service_name (service_name)
 		) {$charset_collate};";
 
+		dbDelta( $sql_calendars );
 		dbDelta( $sql_events );
 		dbDelta( $sql_appointments );
 		dbDelta( $sql_services );

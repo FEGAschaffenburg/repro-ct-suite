@@ -15,6 +15,7 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 	public function upsert_by_external_id( $data ) {
 		$defaults = array(
 			'external_id'   => '',
+			'calendar_id'   => null,
 			'title'         => '',
 			'description'   => null,
 			'start_datetime'=> null,
