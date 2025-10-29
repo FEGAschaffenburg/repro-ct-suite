@@ -749,11 +749,42 @@ class Repro_CT_Suite_Admin {
 				'to'   => $to,
 			) );
 
+			// Fehler aus den Services robust behandeln
+			if ( is_wp_error( $events_result ) || is_wp_error( $appointments_result ) ) {
+				$which = is_wp_error( $events_result ) ? 'events' : 'appointments';
+				$err   = is_wp_error( $events_result ) ? $events_result : $appointments_result;
+
+				Repro_CT_Suite_Logger::header( 'SYNC FEHLGESCHLAGEN: ' . strtoupper( $which ), 'error' );
+				Repro_CT_Suite_Logger::log( 'Error Code: ' . $err->get_error_code(), 'error' );
+				Repro_CT_Suite_Logger::log( 'Error Message: ' . $err->get_error_message(), 'error' );
+				$error_data = $err->get_error_data();
+				if ( ! empty( $error_data ) ) {
+					Repro_CT_Suite_Logger::dump( $error_data, 'Error Data', 'error' );
+				}
+
+				wp_send_json_error( array(
+					'message' => sprintf(
+						__( 'Fehler bei der Synchronisation (%s): %s', 'repro-ct-suite' ),
+						$which,
+						$err->get_error_message()
+					),
+					'debug' => array(
+						'stage' => $which,
+						'error_code' => $err->get_error_code(),
+						'error_message' => $err->get_error_message(),
+						'error_data' => $error_data,
+						'period' => array( 'from' => $from, 'to' => $to ),
+						'selected_calendar_ids' => $selected_calendar_ids,
+					),
+				) );
+				return;
+			}
+
 			wp_send_json_success( array(
 				'message' => sprintf(
 					__( 'Synchronisation abgeschlossen: %d Events, %d Termine importiert.', 'repro-ct-suite' ),
-					$events_result['inserted'] + $events_result['updated'],
-					$appointments_result['inserted'] + $appointments_result['updated']
+					( isset( $events_result['inserted'] ) ? (int) $events_result['inserted'] : 0 ) + ( isset( $events_result['updated'] ) ? (int) $events_result['updated'] : 0 ),
+					( isset( $appointments_result['inserted'] ) ? (int) $appointments_result['inserted'] : 0 ) + ( isset( $appointments_result['updated'] ) ? (int) $appointments_result['updated'] : 0 )
 				),
 				'stats' => array(
 					'events' => $events_result,
