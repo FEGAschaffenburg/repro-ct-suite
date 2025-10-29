@@ -35,7 +35,8 @@ $update_available = false;
 $latest_version = $current_version;
 
 if ( $release_info && ! is_wp_error( $release_info ) ) {
-	$latest_version = isset( $release_info['tag_name'] ) ? ltrim( $release_info['tag_name'], 'v' ) : $current_version;
+	// $release_info ist ein Objekt von der GitHub API
+	$latest_version = isset( $release_info->tag_name ) ? ltrim( $release_info->tag_name, 'v' ) : $current_version;
 	$update_available = version_compare( $latest_version, $current_version, '>' );
 }
 ?>
@@ -163,29 +164,29 @@ if ( $release_info && ! is_wp_error( $release_info ) ) {
 	</div>
 
 	<!-- Release-Informationen -->
-	<?php if ( $release_info && ! is_wp_error( $release_info ) && isset( $release_info['body'] ) ) : ?>
+	<?php if ( $release_info && ! is_wp_error( $release_info ) && isset( $release_info->body ) ) : ?>
 		<div class="repro-ct-suite-card repro-ct-suite-mt-20">
 			<div class="repro-ct-suite-card-header">
 				<span class="dashicons dashicons-megaphone"></span>
 				<h3><?php esc_html_e( 'Was ist neu?', 'repro-ct-suite' ); ?></h3>
 			</div>
 			<div class="repro-ct-suite-card-body">
-				<?php if ( isset( $release_info['name'] ) ) : ?>
-					<h4><?php echo esc_html( $release_info['name'] ); ?></h4>
+				<?php if ( isset( $release_info->name ) ) : ?>
+					<h4><?php echo esc_html( $release_info->name ); ?></h4>
 				<?php endif; ?>
-				<?php if ( isset( $release_info['published_at'] ) ) : ?>
+				<?php if ( isset( $release_info->published_at ) ) : ?>
 					<p class="description">
 						<?php 
 						/* translators: %s: Date */
-						printf( esc_html__( 'Veröffentlicht am %s', 'repro-ct-suite' ), esc_html( date_i18n( get_option( 'date_format' ), strtotime( $release_info['published_at'] ) ) ) ); 
+						printf( esc_html__( 'Veröffentlicht am %s', 'repro-ct-suite' ), esc_html( date_i18n( get_option( 'date_format' ), strtotime( $release_info->published_at ) ) ) ); 
 						?>
 					</p>
 				<?php endif; ?>
 				<div class="repro-ct-suite-mt-15">
-					<?php echo wp_kses_post( wpautop( $release_info['body'] ) ); ?>
+					<?php echo wp_kses_post( wpautop( $release_info->body ) ); ?>
 				</div>
-				<?php if ( isset( $release_info['html_url'] ) ) : ?>
-					<a href="<?php echo esc_url( $release_info['html_url'] ); ?>" target="_blank" class="repro-ct-suite-btn repro-ct-suite-btn-secondary repro-ct-suite-btn-small repro-ct-suite-mt-15">
+				<?php if ( isset( $release_info->html_url ) ) : ?>
+					<a href="<?php echo esc_url( $release_info->html_url ); ?>" target="_blank" class="repro-ct-suite-btn repro-ct-suite-btn-secondary repro-ct-suite-btn-small repro-ct-suite-mt-15">
 						<span class="dashicons dashicons-external"></span>
 						<?php esc_html_e( 'Auf GitHub ansehen', 'repro-ct-suite' ); ?>
 					</a>
