@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,14 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.2.1 =
+* ChurchTools Login-Service: Authentifizierung via Username/Passwort
+* Tenant-basierte URL-Konstruktion (z.B. "gemeinde" → gemeinde.church.tools)
+* Cookie-basierte Session-Verwaltung mit automatischem Re-Login
+* Settings-UI: Tenant-Eingabe, Verbindungstest-Button
+* Passwort-Eingabe: leer lassen behält gespeichertes Passwort bei
+* API-Client mit GET-Methode und Fehlerbehandlung (401 → Re-Auth)
 
 = 0.2.0 =
 * Datenbankschema: benutzerdefinierte Tabellen für Events, Appointments und Services

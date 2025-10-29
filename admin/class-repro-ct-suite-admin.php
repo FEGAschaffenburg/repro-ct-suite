@@ -137,14 +137,14 @@ class Repro_CT_Suite_Admin {
 			)
 		);
 
-		// ChurchTools Einstellungen: Basis-URL, Benutzername, Passwort (verschlüsselt)
+		// ChurchTools Einstellungen: Tenant, Benutzername, Passwort (verschlüsselt)
 		register_setting(
 			'repro_ct_suite',
-			'repro_ct_suite_ct_base_url',
+			'repro_ct_suite_ct_tenant',
 			array(
 				'type'              => 'string',
-				'description'       => __( 'ChurchTools Basis-URL (z.B. https://gemeinde.church.tools)', 'repro-ct-suite' ),
-				'sanitize_callback' => function ( $value ) { return esc_url_raw( trim( $value ) ); },
+				'description'       => __( 'ChurchTools Tenant (z.B. "gemeinde" für gemeinde.church.tools)', 'repro-ct-suite' ),
+				'sanitize_callback' => function ( $value ) { return sanitize_text_field( trim( $value ) ); },
 				'default'           => '',
 			)
 		);
@@ -169,6 +169,10 @@ class Repro_CT_Suite_Admin {
 				'sanitize_callback' => function ( $value ) {
 					require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
 					$value = (string) $value;
+					// Leer = bestehendes Passwort beibehalten
+					if ( empty( $value ) ) {
+						return get_option( 'repro_ct_suite_ct_password', '' );
+					}
 					return Repro_CT_Suite_Crypto::encrypt( $value );
 				},
 				'default'           => '',
