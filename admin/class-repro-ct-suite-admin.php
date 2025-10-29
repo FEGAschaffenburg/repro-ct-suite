@@ -661,15 +661,46 @@ class Repro_CT_Suite_Admin {
 			) );
 		}
 
-		// Dependencies laden
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-events-repository.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-events-sync-service.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-appointments-sync-service.php';
+		// Dependencies laden (mit robuster Fehlerbehandlung)
+		try {
+			// Logger zuerst laden, damit wir früh loggen können
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-logger.php';
+			Repro_CT_Suite_Logger::header( 'AJAX: TERMINE-SYNC HANDLER START' );
+			Repro_CT_Suite_Logger::log( 'Lade Dependencies...' );
+
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-events-repository.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-events-sync-service.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-appointments-sync-service.php';
+
+			Repro_CT_Suite_Logger::log( 'Dependencies geladen.' );
+		} catch ( Exception $e ) {
+			error_log( '[REPRO CT-SUITE] FEHLER beim Laden der Dependencies (appointments): ' . $e->getMessage() );
+			wp_send_json_error( array(
+				'message' => 'Fehler beim Laden: ' . $e->getMessage(),
+				'debug'   => array(
+					'file' => $e->getFile(),
+					'line' => $e->getLine(),
+					'trace' => $e->getTraceAsString(),
+				),
+			) );
+			return;
+		} catch ( Error $e ) {
+			error_log( '[REPRO CT-SUITE] PHP ERROR beim Laden (appointments): ' . $e->getMessage() );
+			wp_send_json_error( array(
+				'message' => 'PHP Error: ' . $e->getMessage(),
+				'debug'   => array(
+					'file' => $e->getFile(),
+					'line' => $e->getLine(),
+					'trace' => $e->getTraceAsString(),
+				),
+			) );
+			return;
+		}
 
 		try {
 			// Services instanziieren
@@ -682,8 +713,13 @@ class Repro_CT_Suite_Admin {
 			$events_repo = new Repro_CT_Suite_Events_Repository();
 			$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
 
+			// Debug-Kontext
+			Repro_CT_Suite_Logger::log( 'Tenant: ' . $tenant );
+			Repro_CT_Suite_Logger::log( 'Username: ' . ( $username ? '[gesetzt]' : '[leer]' ) );
+
 			// Nur ausgewählte Kalender synchronisieren
 			$selected_calendar_ids = $calendars_repo->get_selected_ids();
+			Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (lokale IDs): ' . ( $selected_calendar_ids ? implode( ',', $selected_calendar_ids ) : '[keine]' ) );
 
 			if ( empty( $selected_calendar_ids ) ) {
 				wp_send_json_error( array(
@@ -696,6 +732,7 @@ class Repro_CT_Suite_Admin {
 			$sync_to_days   = get_option( 'repro_ct_suite_sync_to_days', 90 );
 			$from = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_from_days * DAY_IN_SECONDS ) );
 			$to   = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_to_days * DAY_IN_SECONDS ) );
+			Repro_CT_Suite_Logger::log( 'Zeitraum: von ' . $from . ' bis ' . $to );
 
 			// Events synchronisieren (zeitbasiert)
 			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo );
@@ -725,10 +762,28 @@ class Repro_CT_Suite_Admin {
 			) );
 
 		} catch ( Exception $e ) {
+			Repro_CT_Suite_Logger::header( 'EXCEPTION IM TERMINE-SYNC', 'error' );
+			Repro_CT_Suite_Logger::log( 'Message: ' . $e->getMessage(), 'error' );
+			Repro_CT_Suite_Logger::log( 'File: ' . $e->getFile() . ' Line: ' . $e->getLine(), 'error' );
 			wp_send_json_error( array(
 				'message' => sprintf(
 					__( 'Fehler bei der Synchronisation: %s', 'repro-ct-suite' ),
 					$e->getMessage()
+				),
+				'debug' => array(
+					'file' => $e->getFile(),
+					'line' => $e->getLine(),
+				)
+			) );
+		} catch ( Error $e ) {
+			Repro_CT_Suite_Logger::header( 'PHP ERROR IM TERMINE-SYNC', 'error' );
+			Repro_CT_Suite_Logger::log( 'Message: ' . $e->getMessage(), 'error' );
+			Repro_CT_Suite_Logger::log( 'File: ' . $e->getFile() . ' Line: ' . $e->getLine(), 'error' );
+			wp_send_json_error( array(
+				'message' => 'PHP Error: ' . $e->getMessage(),
+				'debug' => array(
+					'file' => $e->getFile(),
+					'line' => $e->getLine(),
 				)
 			) );
 		}
