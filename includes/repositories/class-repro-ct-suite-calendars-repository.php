@@ -18,7 +18,8 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 	 * Konstruktor
 	 */
 	public function __construct() {
-		parent::__construct( $this->db->prefix . 'rcts_calendars' );
+		global $wpdb;
+		parent::__construct( $wpdb->prefix . 'rcts_calendars' );
 	}
 
 	/**

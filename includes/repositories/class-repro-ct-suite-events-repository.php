@@ -9,7 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 	public function __construct() {
-		parent::__construct( $this->db->prefix . 'rcts_events' );
+		global $wpdb;
+		parent::__construct( $wpdb->prefix . 'rcts_events' );
 	}
 
 	public function upsert_by_external_id( $data ) {
