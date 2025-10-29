@@ -63,13 +63,18 @@ require_once REPRO_CT_SUITE_PATH . 'includes/class-repro-ct-suite-updater.php';
 
 /**
  * Initialize the updater
+ * 
+ * Hinweis: Für private Repositories kann ein GitHub Token als vierter Parameter
+ * übergeben werden. Für öffentliche Repositories ist dies nicht erforderlich.
  */
 if ( is_admin() ) {
+	$github_token = ''; // Leer lassen für öffentliche Repositories
+	
 	new Repro_CT_Suite_Updater(
 		__FILE__,
 		'FEGAschaffenburg',
 		'repro-ct-suite',
-		'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' // GitHub Token für privates Repository
+		$github_token
 	);
 }
 
@@ -79,6 +84,9 @@ if ( is_admin() ) {
  * WordPress kann standardmäßig keine privaten GitHub Assets herunterladen,
  * da die Download-URL eine Authentifizierung erfordert. Dieser Filter fügt
  * den Authorization-Header hinzu, damit der Download funktioniert.
+ *
+ * Hinweis: Dieser Filter wird nur benötigt, wenn das Repository privat ist.
+ * Bei öffentlichen Repositories kann dieser Code entfernt werden.
  *
  * @since 0.2.4.3
  */
@@ -90,10 +98,15 @@ add_filter(
 			return $reply;
 		}
 
-		// GitHub Token
-		$github_token = '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';
+		// GitHub Token (nur für private Repositories erforderlich)
+		$github_token = ''; // Leer lassen für öffentliche Repositories
 
-		// Download mit Authorization Header
+		// Wenn kein Token vorhanden, normalen Download verwenden
+		if ( empty( $github_token ) ) {
+			return $reply;
+		}
+
+		// Download mit Authorization Header (nur für private Repos)
 		$temp_file = download_url(
 			$package,
 			300,

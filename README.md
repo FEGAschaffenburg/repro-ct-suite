@@ -1,39 +1,98 @@
 # Repro CT-Suite
 
+[![Version](https://img.shields.io/github/v/release/FEGAschaffenburg/repro-ct-suite)](https://github.com/FEGAschaffenburg/repro-ct-suite/releases)
+[![WordPress](https://img.shields.io/badge/WordPress-5.0%2B-blue)](https://wordpress.org/)
+[![PHP](https://img.shields.io/badge/PHP-7.4%2B-purple)](https://www.php.net/)
+[![License](https://img.shields.io/github/license/FEGAschaffenburg/repro-ct-suite)](LICENSE)
+
 WordPress-Plugin zur Integration von ChurchTools-Daten in WordPress.
 
-## Beschreibung
+## 📋 Beschreibung
 
 Repro CT-Suite ist ein WordPress-Plugin, das eine Brücke zwischen ChurchTools und Ihrer WordPress-Website herstellt. Es synchronisiert Termin- und Veranstaltungsdaten aus ChurchTools und macht sie in WordPress verfügbar für Kalenderansichten, Widgets und andere Darstellungen.
 
-### Version 1.0 - Hauptfokus
-
-**Termine & Events:**
-- Abruf von Appointments aus ChurchTools
-- Abruf von Event-Daten aus ChurchTools
-- Automatische Synchronisation via Cron
-- Einfache Anzeige über Shortcodes
-
-## Features
+## ✨ Features
 
 ### ChurchTools-Integration
-- ✅ Sichere API-Verbindung zu ChurchTools
-- ✅ Abruf von Terminen (Appointments)
-- ✅ Abruf von Veranstaltungen (Events)
-- ✅ Automatische Synchronisation
-- ✅ Shortcodes für Frontend-Anzeige
-- ✅ Admin-Oberfläche für Konfiguration
+- ✅ **Sichere API-Verbindung** zu ChurchTools mit Cookie-basierter Authentifizierung
+- ✅ **Kalender-Verwaltung**: Auswahl der zu synchronisierenden Kalender
+- ✅ **Termine (Appointments)**: Abruf und Synchronisation von Terminen
+- ✅ **Veranstaltungen (Events)**: Abruf und Synchronisation von Events
+- ✅ **AJAX-Synchronisation**: Sync ohne Seitenneuladen
+- ✅ **Kombinierte Ansicht**: Termine und Events in einer Übersicht
+- ✅ **Dashboard**: Übersichtliche Anzeige der nächsten Termine
 
 ### Technische Features
-- ✅ Moderner objektorientierter Aufbau
-- ✅ Trennung von Admin- und Public-Funktionalität
-- ✅ Internationalisierung (i18n) vorbereitet
-- ✅ Hook-basierte Architektur
-- ✅ PHPUnit Tests integriert
-- ✅ Composer-Unterstützung
-- ✅ WordPress Coding Standards
+- ✅ **Moderner Code**: Objektorientierte PHP-Architektur
+- ✅ **Repository Pattern**: Saubere Datenbankabstraktion
+- ✅ **Service Layer**: Geschäftslogik getrennt von Präsentation
+- ✅ **Migrationen**: Automatische Datenbank-Updates
+- ✅ **AJAX-API**: Asynchrone Datenaktualisierung
+- ✅ **GitHub Updater**: Automatische Updates direkt von GitHub
+- ✅ **Internationalisierung**: i18n-ready
+- ✅ **WordPress Standards**: Folgt WordPress Coding Standards
 
-## Ordnerstruktur
+## 🚀 Installation
+
+### Voraussetzungen
+- WordPress 5.0 oder höher
+- PHP 7.4 oder höher  
+- ChurchTools-Instanz mit Zugang
+- MySQL/MariaDB
+
+### Automatische Installation (empfohlen)
+
+1. Laden Sie die neueste Version von [Releases](https://github.com/FEGAschaffenburg/repro-ct-suite/releases) herunter
+2. Gehen Sie zu **WordPress Admin → Plugins → Installieren**
+3. Klicken Sie auf **Plugin hochladen**
+4. Wählen Sie die ZIP-Datei aus
+5. Aktivieren Sie das Plugin
+
+### Manuelle Installation
+
+```bash
+cd wp-content/plugins/
+git clone https://github.com/FEGAschaffenburg/repro-ct-suite.git
+cd repro-ct-suite
+```
+
+## ⚙️ Konfiguration
+
+### Erste Schritte
+
+1. Navigieren Sie zu **WordPress Admin → Repro CT-Suite**
+2. Tragen Sie Ihre ChurchTools-Zugangsdaten ein:
+   - **Tenant**: Ihr ChurchTools-Subdomain (z.B. `ihre-gemeinde` für `ihre-gemeinde.church.tools`)
+   - **Benutzername**: Ihr ChurchTools-Benutzername
+   - **Passwort**: Ihr ChurchTools-Passwort (wird verschlüsselt gespeichert)
+3. Klicken Sie auf **Verbindung testen**
+4. Wechseln Sie zum Tab **Settings**
+5. Klicken Sie auf **Kalender jetzt synchronisieren**
+6. Wählen Sie die gewünschten Kalender aus
+7. Speichern Sie die Auswahl
+8. Synchronisieren Sie die Termine im **Dashboard**
+
+### Kalender-Auswahl
+
+Im Settings-Tab können Sie:
+- Alle verfügbaren Kalender aus ChurchTools sehen
+- Kalender auswählen/abwählen für die Synchronisation
+- Status (Öffentlich/Privat) einsehen
+- Kalenderfarben sehen
+- Auswahl speichern und Kalender neu laden
+
+### Synchronisation
+
+**Manuell:**
+- Dashboard → **Jetzt synchronisieren** (für Termine)
+- Settings → **Kalender jetzt synchronisieren** (für Kalender)
+
+**Automatisch:**
+- Implementierung via WP-Cron geplant (zukünftige Version)
+
+## 📊 Dashboard
+
+Das Dashboard zeigt:
 
 ```
 repro-ct-suite/
@@ -59,152 +118,182 @@ repro-ct-suite/
 ├── composer.json
 ├── phpunit.xml.dist
 └── repro-ct-suite.php         # Haupt-Plugin-Datei
+## 📊 Dashboard
+
+Das Dashboard zeigt:
+- **Termine-Statistik**: Anzahl synchronisierter Termine
+- **Verbindungsstatus**: Status der ChurchTools-Verbindung
+- **Nächste Termine**: Die 5 nächsten anstehenden Termine mit:
+  - Datum & Uhrzeit
+  - Titel
+  - Ort
+  - Quelle (Event/Termin Badge)
+  - Kalenderfarbe
+
+## 🗂️ Ordnerstruktur
+
+```
+repro-ct-suite/
+├── .github/
+│   └── workflows/
+│       └── release.yml          # GitHub Actions für Releases
+├── admin/                        # Admin-Bereich
+│   ├── css/                      # Admin-Styles
+│   ├── js/                       # Admin-JavaScript (AJAX)
+│   ├── views/
+│   │   ├── admin.php            # Haupt-Admin-Template
+│   │   └── tabs/                # Tab-Templates
+│   │       ├── tab-dashboard.php
+│   │       ├── tab-settings.php
+│   │       └── tab-test-connection.php
+│   └── class-repro-ct-suite-admin.php
+├── includes/                     # Core-Klassen
+│   ├── repositories/            # Repository Pattern
+│   │   ├── class-repro-ct-suite-repository-base.php
+│   │   ├── class-repro-ct-suite-calendars-repository.php
+│   │   ├── class-repro-ct-suite-events-repository.php
+│   │   └── class-repro-ct-suite-appointments-repository.php
+│   ├── services/                # Business Logic
+│   │   ├── class-repro-ct-suite-calendar-sync-service.php
+│   │   ├── class-repro-ct-suite-events-sync-service.php
+│   │   └── class-repro-ct-suite-appointments-sync-service.php
+│   ├── class-repro-ct-suite.php
+│   ├── class-repro-ct-suite-ct-client.php  # ChurchTools API Client
+│   ├── class-repro-ct-suite-crypto.php     # Verschlüsselung
+│   ├── class-repro-ct-suite-migrations.php # DB-Migrationen
+│   └── class-repro-ct-suite-updater.php    # GitHub Updater
+├── public/                       # Frontend
+│   ├── css/
+│   ├── js/
+│   └── class-repro-ct-suite-public.php
+├── tests/                        # PHPUnit Tests
+├── scripts/                      # Build-Scripts
+│   └── create-plugin-zip.ps1    # ZIP-Erstellung
+├── composer.json
+├── phpunit.xml.dist
+└── repro-ct-suite.php           # Haupt-Plugin-Datei
 ```
 
-## Installation
+## 🔧 Entwicklung
 
-### Voraussetzungen
-- WordPress 5.0 oder höher
-- PHP 7.4 oder höher
-- ChurchTools-Instanz mit API-Zugang
-- API-Token von ChurchTools
-
-### Manuell
-
-1. Laden Sie das Plugin herunter
-2. Entpacken Sie es in `wp-content/plugins/`
-3. Aktivieren Sie es im WordPress-Admin unter "Plugins"
-4. Gehen Sie zu "Repro CT-Suite" > "Einstellungen"
-5. Tragen Sie Ihre ChurchTools-URL und API-Token ein
-
-### Via Git
+### Setup
 
 ```bash
-cd wp-content/plugins/
+# Repository clonen
 git clone https://github.com/FEGAschaffenburg/repro-ct-suite.git
 cd repro-ct-suite
-composer install --no-dev
+
+# Abhängigkeiten installieren (optional, für Tests)
+composer install
 ```
 
-## Verwendung
+### Datenbank-Schema
 
-### Konfiguration
+**Tabellen:**
+- `wp_rcts_calendars` - ChurchTools-Kalender
+- `wp_rcts_events` - Events aus ChurchTools
+- `wp_rcts_appointments` - Termine aus ChurchTools
 
-1. Navigieren Sie zu **WordPress Admin > Repro CT-Suite**
-2. Tragen Sie Ihre ChurchTools-Daten ein:
-   - **ChurchTools URL**: z.B. `https://ihre-gemeinde.church.tools`
-   - **API Token**: Erstellen Sie einen Token in ChurchTools unter Einstellungen
-3. Speichern Sie die Einstellungen
-4. Klicken Sie auf "Jetzt synchronisieren" für die erste Datenabholung
+**Migrationen:** Automatisch bei Plugin-Aktivierung via `class-repro-ct-suite-migrations.php`
 
-### Shortcodes
-
-**Termine anzeigen:**
-```
-[ct_appointments limit="10"]
-```
-
-**Events anzeigen:**
-```
-[ct_events limit="5"]
-```
-
-**Parameter:**
-- `limit` - Anzahl der anzuzeigenden Einträge (Standard: 10)
-- `category` - Filtert nach Kategorie-ID
-- `from` - Startdatum (Format: YYYY-MM-DD)
-- `to` - Enddatum (Format: YYYY-MM-DD)
-
-## Entwicklung
-
-### Voraussetzungen
-
-- PHP 7.4 oder höher
-- WordPress 5.0 oder höher
-- Composer
-
-### Setup für Entwicklung
+### Tests ausführen
 
 ```bash
-# Abhängigkeiten installieren
-composer install
-
-# Tests ausführen
 composer test
 # oder
 ./vendor/bin/phpunit
 ```
 
-### Coding Standards
+### Neue Version veröffentlichen
 
-Das Plugin folgt den [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/).
+1. Versionsnummer in `repro-ct-suite.php` aktualisieren
+2. Änderungen committen
+3. Git-Tag erstellen:
+   ```bash
+   git tag v0.3.1
+   git push origin v0.3.1
+   ```
+4. GitHub Actions erstellt automatisch:
+   - Release
+   - Plugin-ZIP
+   - Release Notes
 
-## Updates
+## 📡 API-Endpunkte (AJAX)
 
-### Automatische Updates von GitHub
+Das Plugin stellt folgende AJAX-Endpunkte bereit:
+
+- `wp_ajax_repro_ct_suite_sync_calendars` - Kalender synchronisieren
+- `wp_ajax_repro_ct_suite_sync_appointments` - Termine synchronisieren
+
+Alle Endpunkte sind durch Nonces gesichert.
+
+## 🔐 Sicherheit
+
+- **Passwort-Verschlüsselung**: ChurchTools-Passwörter werden verschlüsselt gespeichert
+- **Nonce-Validierung**: Alle AJAX-Requests sind CSRF-geschützt
+- **Capability-Checks**: Nur Admins (`manage_options`) können Einstellungen ändern
+- **Prepared Statements**: Alle DB-Queries nutzen `$wpdb->prepare()`
+- **Input-Sanitization**: Alle Eingaben werden validiert und bereinigt
+
+## 🔄 Automatische Updates
 
 Das Plugin unterstützt automatische Updates direkt von GitHub:
 
-- WordPress prüft alle 12 Stunden auf neue Versionen
-- Updates erscheinen auf der Plugin-Seite wie bei WordPress.org-Plugins
-- Einfache Installation mit einem Klick
+1. WordPress prüft auf neue Versionen
+2. Updates erscheinen wie bei WordPress.org-Plugins
+3. Ein-Klick-Installation
 
-### Neue Version veröffentlichen
+**Hinweis**: Bei öffentlichem Repository funktioniert dies ohne zusätzliche Konfiguration.
 
-1. Aktualisieren Sie die Versionsnummer in:
-   - `repro-ct-suite.php` (Plugin Header)
-   - `readme.txt` (Stable tag)
-2. Committen und pushen Sie die Änderungen
-3. Erstellen Sie ein neues Release auf GitHub:
-   - Tag: `v1.0.1` (mit "v" Präfix)
-   - Release-Titel: z.B. "Version 1.0.1"
-   - Beschreibung: Changelog-Eintrag
-4. WordPress erkennt das Update automatisch
+## 📝 Changelog
 
-### Manueller Update-Check
+### 0.3.0.1 (2025-10-29)
+- **Bugfix**: Download-Filter für öffentliche Repositories entfernt
+- Token aus Code entfernt (vorbereitet für öffentliches Repo)
 
-Im WordPress-Admin unter **Repro CT-Suite > Update-Info** können Sie:
-- Aktuelle Version einsehen
-- Manuell auf Updates prüfen
-- Update-Informationen anzeigen
+### 0.3.0 (2025-10-29)
+- **Feature**: AJAX-Integration für Kalender-Sync
+- **Feature**: AJAX-Integration für Termine-Sync  
+- **Feature**: Sync-Button im Dashboard
+- **Feature**: Bestätigungsdialog für Kalender-Sync
+- **UI**: Loading-State während Synchronisation
+- **UI**: Auto-Reload nach erfolgreicher Sync
+- **UI**: Detaillierte Sync-Statistiken
 
-## Architektur
+### 0.2.4.3 (2025-10-29)
+- **Feature**: Kalender-Verwaltung im Settings-Tab
+- **Feature**: Kalender-Auswahl für gefilterte Synchronisation
+- **Feature**: Dashboard-Konsolidierung (kombinierte Termine-Ansicht)
+- **Database**: Schema v2 mit Calendars-Tabelle
+- **Repository**: Calendars Repository mit full CRUD
+- **Service**: Calendar Sync Service
 
-Das Plugin verwendet eine moderne, objektorientierte Architektur:
+## 🤝 Beitragen
 
-- **Loader**: Verwaltet alle WordPress Hooks zentral
-- **i18n**: Kümmert sich um Internationalisierung
-- **Admin**: Alle Admin-spezifischen Funktionen
-- **Public**: Alle Frontend-spezifischen Funktionen
-- **Activator/Deactivator**: Aktivierungs- und Deaktivierungslogik
+Pull Requests sind willkommen! Für größere Änderungen:
 
-## Lizenz
+1. Forken Sie das Repository
+2. Erstellen Sie einen Feature-Branch (`git checkout -b feature/AmazingFeature`)
+3. Committen Sie Ihre Änderungen (`git commit -m 'Add: AmazingFeature'`)
+4. Pushen Sie zum Branch (`git push origin feature/AmazingFeature`)
+5. Öffnen Sie einen Pull Request
 
-GPL v2 or later
+## 📄 Lizenz
 
-## Changelog
+GPL v2 or later - siehe [LICENSE](LICENSE) Datei
 
-### 1.0.0
-- Initiales Release mit moderner Plugin-Architektur
-- ChurchTools API-Integration vorbereitet
-- GitHub-basierter Update-Mechanismus
-- Admin-Bereich implementiert
-- Public-Bereich implementiert
-- Internationalisierung vorbereitet
-- PHPUnit Tests integriert
-- Automatische Updates von GitHub
-- Update-Info-Seite im Admin
-
-## Support
-
-Bei Fragen oder Problemen öffnen Sie bitte ein Issue auf GitHub:
-https://github.com/FEGAschaffenburg/repro-ct-suite/issues
-
-## Beitragen
-
-Pull Requests sind willkommen! Für größere Änderungen öffnen Sie bitte zuerst ein Issue.
-
-## Autor
+## 👥 Autor
 
 **FEGAschaffenburg**
 - GitHub: [@FEGAschaffenburg](https://github.com/FEGAschaffenburg)
+- Repository: [repro-ct-suite](https://github.com/FEGAschaffenburg/repro-ct-suite)
+
+## 🆘 Support
+
+Bei Fragen oder Problemen:
+- [Issue erstellen](https://github.com/FEGAschaffenburg/repro-ct-suite/issues)
+- [Releases ansehen](https://github.com/FEGAschaffenburg/repro-ct-suite/releases)
+
+---
+
+Made with ❤️ for ChurchTools & WordPress
