@@ -79,6 +79,7 @@ class Repro_CT_Suite {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_admin_menu' );
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_test_connection' );
 
 		// DB-Upgrades auf admin_init prüfen (sicheres Timing)
 		$this->loader->add_action( 'admin_init', 'Repro_CT_Suite_Migrations', 'maybe_upgrade' );

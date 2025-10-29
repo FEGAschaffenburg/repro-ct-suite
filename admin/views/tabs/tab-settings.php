@@ -15,29 +15,10 @@ $tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
 $username = get_option( 'repro_ct_suite_ct_username', '' );
 $enc_pw   = get_option( 'repro_ct_suite_ct_password', '' );
 
-// Test-Verbindung ausführen, wenn angefordert
-$test_result = null;
-if ( isset( $_GET['test_connection'] ) && check_admin_referer( 'repro_ct_suite_test_connection' ) ) {
-	require_once plugin_dir_path( dirname( dirname( __DIR__ ) ) ) . 'includes/class-repro-ct-suite-crypto.php';
-	require_once plugin_dir_path( dirname( dirname( __DIR__ ) ) ) . 'includes/class-repro-ct-suite-ct-client.php';
-
-	$test_tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
-	$test_username = get_option( 'repro_ct_suite_ct_username', '' );
-	$test_password_enc = get_option( 'repro_ct_suite_ct_password', '' );
-	$test_password = Repro_CT_Suite_Crypto::decrypt( $test_password_enc );
-
-	if ( empty( $test_tenant ) || empty( $test_username ) || empty( $test_password ) ) {
-		$test_result = new WP_Error( 'missing_credentials', __( 'Bitte alle Felder ausfüllen.', 'repro-ct-suite' ) );
-	} else {
-		$client = new Repro_CT_Suite_CT_Client( $test_tenant, $test_username, $test_password );
-		$login = $client->login();
-		if ( is_wp_error( $login ) ) {
-			$test_result = $login;
-		} else {
-			$whoami = $client->whoami();
-			$test_result = is_wp_error( $whoami ) ? $whoami : true;
-		}
-	}
+// Test-Ergebnis aus Transient abrufen (wird von handle_test_connection() gesetzt)
+$test_result = get_transient( 'repro_ct_suite_test_result' );
+if ( $test_result !== false ) {
+	delete_transient( 'repro_ct_suite_test_result' );
 }
 ?>
 

@@ -123,6 +123,44 @@ class Repro_CT_Suite_Admin {
 	}
 
 	/**
+	 * Handle test connection request.
+	 */
+	public function handle_test_connection() {
+		if ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'repro-ct-suite' ) {
+			return;
+		}
+
+		if ( ! isset( $_GET['test_connection'] ) || ! check_admin_referer( 'repro_ct_suite_test_connection' ) ) {
+			return;
+		}
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
+
+		$test_tenant       = get_option( 'repro_ct_suite_ct_tenant', '' );
+		$test_username     = get_option( 'repro_ct_suite_ct_username', '' );
+		$test_password_enc = get_option( 'repro_ct_suite_ct_password', '' );
+		$test_password     = Repro_CT_Suite_Crypto::decrypt( $test_password_enc );
+
+		if ( empty( $test_tenant ) || empty( $test_username ) || empty( $test_password ) ) {
+			set_transient( 'repro_ct_suite_test_result', new WP_Error( 'missing_credentials', __( 'Bitte alle Felder ausfüllen.', 'repro-ct-suite' ) ), 30 );
+		} else {
+			$client = new Repro_CT_Suite_CT_Client( $test_tenant, $test_username, $test_password );
+			$login  = $client->login();
+			if ( is_wp_error( $login ) ) {
+				set_transient( 'repro_ct_suite_test_result', $login, 30 );
+			} else {
+				$whoami = $client->whoami();
+				set_transient( 'repro_ct_suite_test_result', is_wp_error( $whoami ) ? $whoami : true, 30 );
+			}
+		}
+
+		// Redirect zurück ohne test_connection Parameter
+		wp_safe_redirect( remove_query_arg( array( 'test_connection', '_wpnonce' ) ) );
+		exit;
+	}
+
+	/**
 	 * Register plugin settings.
 	 */
 	public function register_settings() {
