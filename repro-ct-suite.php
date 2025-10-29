@@ -68,7 +68,8 @@ if ( is_admin() ) {
 	new Repro_CT_Suite_Updater(
 		__FILE__,
 		'FEGAschaffenburg',
-		'repro-ct-suite'
+		'repro-ct-suite',
+		'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' // GitHub Token für privates Repository
 	);
 }
 
