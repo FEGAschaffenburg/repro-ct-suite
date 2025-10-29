@@ -85,6 +85,7 @@ class Repro_CT_Suite_Updater {
 		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
 		add_filter( 'plugins_api', array( $this, 'plugin_info' ), 20, 3 );
 		add_filter( 'upgrader_post_install', array( $this, 'after_install' ), 10, 3 );
+		add_filter( 'upgrader_pre_download', array( $this, 'download_package' ), 10, 3 );
 	}
 
 	/**
@@ -304,5 +305,58 @@ class Repro_CT_Suite_Updater {
 		// Markdown in HTML konvertieren (einfache Konvertierung).
 		$body = wpautop( $body );
 		return $body;
+	}
+
+	/**
+	 * Lädt das Update-Paket mit GitHub-Token herunter
+	 *
+	 * Dieser Filter ermöglicht den Download von privaten GitHub-Assets mit Authentifizierung.
+	 *
+	 * @param bool   $reply Ob der Download durch einen Filter bereits erledigt wurde.
+	 * @param string $package Die URL des Pakets.
+	 * @param object $upgrader Der Upgrader-Instanz.
+	 * @return bool|string Pfad zur heruntergeladenen Datei oder false.
+	 */
+	public function download_package( $reply, $package, $upgrader ) {
+		// Nur für GitHub-Downloads von diesem Repository.
+		if ( empty( $this->access_token ) || 
+		     strpos( $package, 'github.com/' . $this->username . '/' . $this->repository ) === false ) {
+			return $reply;
+		}
+
+		// Temporäre Datei erstellen.
+		$tmpfile = wp_tempnam( $package );
+		if ( ! $tmpfile ) {
+			return new WP_Error( 'temp_file_failed', 'Could not create temporary file.' );
+		}
+
+		// Download mit Authorization-Header.
+		$args = array(
+			'timeout' => 300,
+			'stream'  => true,
+			'filename' => $tmpfile,
+			'headers' => array(
+				'Authorization' => 'token ' . $this->access_token,
+				'Accept'        => 'application/octet-stream',
+			),
+		);
+
+		$response = wp_remote_get( $package, $args );
+
+		if ( is_wp_error( $response ) ) {
+			@unlink( $tmpfile );
+			return $response;
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $response_code ) {
+			@unlink( $tmpfile );
+			return new WP_Error( 
+				'download_failed', 
+				sprintf( 'Download failed with HTTP code %d', $response_code ) 
+			);
+		}
+
+		return $tmpfile;
 	}
 }
