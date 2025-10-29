@@ -205,7 +205,7 @@
 		 * @since 1.0.0
 		 */
 		initAjaxActions: function() {
-			// Sync-Button
+			// Allgemeiner Sync-Button (mit data-action)
 			$('.repro-ct-suite-sync-btn').on('click', function(e) {
 				e.preventDefault();
 				
@@ -253,6 +253,107 @@
 					},
 					complete: function() {
 						// Loading-State deaktivieren
+						ReproCTSuiteAdmin.setButtonLoading($button, false);
+					}
+				});
+			});
+
+			// Kalender synchronisieren (spezieller Handler)
+			$('.repro-ct-suite-sync-calendars-btn').on('click', function(e) {
+				e.preventDefault();
+				
+				const $button = $(this);
+				
+				// Bestätigungsdialog
+				if (!confirm('Möchten Sie die Kalender jetzt von ChurchTools laden?')) {
+					return;
+				}
+				
+				// Loading-State aktivieren
+				ReproCTSuiteAdmin.setButtonLoading($button, true);
+				
+				// AJAX-Request
+				$.ajax({
+					url: ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'repro_ct_suite_sync_calendars',
+						nonce: reproCTSuiteAdmin.nonce
+					},
+					success: function(response) {
+						if (response.success) {
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message,
+								'success'
+							);
+							
+							// Seite neu laden um aktualisierte Kalender anzuzeigen
+							setTimeout(function() {
+								location.reload();
+							}, 1500);
+						} else {
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message || 'Fehler bei der Synchronisation.',
+								'error'
+							);
+						}
+					},
+					error: function(xhr, status, error) {
+						console.error('AJAX Error:', xhr.responseText);
+						ReproCTSuiteAdmin.showNotice(
+							'Verbindungsfehler: ' + error,
+							'error'
+						);
+					},
+					complete: function() {
+						ReproCTSuiteAdmin.setButtonLoading($button, false);
+					}
+				});
+			});
+
+			// Termine synchronisieren (Dashboard)
+			$('.repro-ct-suite-sync-appointments-btn').on('click', function(e) {
+				e.preventDefault();
+				
+				const $button = $(this);
+				
+				// Loading-State aktivieren
+				ReproCTSuiteAdmin.setButtonLoading($button, true);
+				
+				// AJAX-Request
+				$.ajax({
+					url: ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'repro_ct_suite_sync_appointments',
+						nonce: reproCTSuiteAdmin.nonce
+					},
+					success: function(response) {
+						if (response.success) {
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message,
+								'success'
+							);
+							
+							// Seite neu laden um aktualisierte Termine anzuzeigen
+							setTimeout(function() {
+								location.reload();
+							}, 1500);
+						} else {
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message || 'Fehler bei der Synchronisation.',
+								'error'
+							);
+						}
+					},
+					error: function(xhr, status, error) {
+						console.error('AJAX Error:', xhr.responseText);
+						ReproCTSuiteAdmin.showNotice(
+							'Verbindungsfehler: ' + error,
+							'error'
+						);
+					},
+					complete: function() {
 						ReproCTSuiteAdmin.setButtonLoading($button, false);
 					}
 				});

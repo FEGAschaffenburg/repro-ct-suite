@@ -110,6 +110,12 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 	<div class="repro-ct-suite-card-header">
 		<span class="dashicons dashicons-calendar"></span>
 		<h3><?php esc_html_e( 'Nächste Termine', 'repro-ct-suite' ); ?></h3>
+		<?php if ( ! empty( $ct_tenant ) && ! empty( $ct_username ) && ! empty( $ct_password ) ) : ?>
+			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-sm repro-ct-suite-sync-appointments-btn" style="margin-left: auto;">
+				<span class="dashicons dashicons-update"></span>
+				<?php esc_html_e( 'Jetzt synchronisieren', 'repro-ct-suite' ); ?>
+			</button>
+		<?php endif; ?>
 	</div>
 	<div class="repro-ct-suite-card-body">
 		<?php if ( ! empty( $upcoming_appointments ) ) : ?>
