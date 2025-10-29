@@ -6,6 +6,10 @@
  * @subpackage Repro_CT_Suite/admin
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 // Logger laden
 require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-logger.php';
 
@@ -381,7 +385,8 @@ class Repro_CT_Suite_Admin {
 			) );
 		}
 
-		// Dependencies laden
+		// Dependencies laden (Logger zuerst)
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-logger.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
