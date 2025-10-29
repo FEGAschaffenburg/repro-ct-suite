@@ -1,0 +1,10 @@
+/**
+ * Public-facing styles for the plugin.
+ *
+ * @package Repro_CT_Suite
+ */
+
+.repro-ct-suite-container {
+	max-width: 100%;
+	margin: 0 auto;
+}
