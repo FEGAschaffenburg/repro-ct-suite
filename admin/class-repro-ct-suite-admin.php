@@ -385,17 +385,47 @@ class Repro_CT_Suite_Admin {
 			) );
 		}
 
-		// Dependencies laden (Logger zuerst)
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-logger.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-calendar-sync-service.php';
+		// Fehlerbehandlung aktivieren
+		error_log( '[REPRO CT-SUITE] AJAX Handler gestartet: ajax_sync_calendars' );
+
+		try {
+			// Dependencies laden (Logger zuerst)
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-logger.php';
+			
+			error_log( '[REPRO CT-SUITE] Logger geladen' );
+			
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-calendar-sync-service.php';
+			
+			error_log( '[REPRO CT-SUITE] Alle Dependencies geladen' );
+
+		} catch ( Exception $e ) {
+			error_log( '[REPRO CT-SUITE] FEHLER beim Laden der Dependencies: ' . $e->getMessage() );
+			error_log( '[REPRO CT-SUITE] Stack: ' . $e->getTraceAsString() );
+			wp_send_json_error( array(
+				'message' => 'Fehler beim Laden: ' . $e->getMessage()
+			) );
+			return;
+		} catch ( Error $e ) {
+			error_log( '[REPRO CT-SUITE] PHP ERROR beim Laden: ' . $e->getMessage() );
+			error_log( '[REPRO CT-SUITE] File: ' . $e->getFile() . ' Line: ' . $e->getLine() );
+			wp_send_json_error( array(
+				'message' => 'PHP Error: ' . $e->getMessage()
+			) );
+			return;
+		}
 
 		try {
 			// Service instanziieren
+			error_log( '[REPRO CT-SUITE] Instanziiere CT_Client...' );
 			$ct_client = new Repro_CT_Suite_CT_Client();
+			
+			error_log( '[REPRO CT-SUITE] Instanziiere Calendars_Repository...' );
 			$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
+			
+			error_log( '[REPRO CT-SUITE] Instanziiere Calendar_Sync_Service...' );
 			$sync_service = new Repro_CT_Suite_Calendar_Sync_Service( $ct_client, $calendars_repo );
 
 			// DEBUG: Log Request-Details ins WordPress Debug-Log
@@ -406,6 +436,7 @@ class Repro_CT_Suite_Admin {
 				'timestamp' => current_time( 'mysql' )
 			);
 			
+			error_log( '[REPRO CT-SUITE] Rufe Logger::header() auf...' );
 			Repro_CT_Suite_Logger::header( 'KALENDER-SYNCHRONISATION GESTARTET' );
 			Repro_CT_Suite_Logger::log( 'Zeitpunkt: ' . current_time( 'mysql' ) );
 			Repro_CT_Suite_Logger::log( 'Tenant: ' . $tenant );
@@ -468,6 +499,10 @@ class Repro_CT_Suite_Admin {
 			) );
 
 		} catch ( Exception $e ) {
+			error_log( '[REPRO CT-SUITE] EXCEPTION: ' . $e->getMessage() );
+			error_log( '[REPRO CT-SUITE] File: ' . $e->getFile() . ' Line: ' . $e->getLine() );
+			error_log( '[REPRO CT-SUITE] Trace: ' . $e->getTraceAsString() );
+			
 			Repro_CT_Suite_Logger::header( 'EXCEPTION AUFGETRETEN', 'error' );
 			Repro_CT_Suite_Logger::log( 'Exception: ' . $e->getMessage(), 'error' );
 			Repro_CT_Suite_Logger::log( 'File: ' . $e->getFile() . ' (Line ' . $e->getLine() . ')', 'error' );
@@ -485,6 +520,22 @@ class Repro_CT_Suite_Admin {
 				),
 				'debug' => array(
 					'error' => $e->getMessage(),
+					'file' => $e->getFile(),
+					'line' => $e->getLine(),
+					'trace' => $e->getTraceAsString()
+				)
+			) );
+		} catch ( Error $e ) {
+			error_log( '[REPRO CT-SUITE] PHP ERROR: ' . $e->getMessage() );
+			error_log( '[REPRO CT-SUITE] File: ' . $e->getFile() . ' Line: ' . $e->getLine() );
+			error_log( '[REPRO CT-SUITE] Trace: ' . $e->getTraceAsString() );
+			
+			wp_send_json_error( array(
+				'message' => 'PHP Error: ' . $e->getMessage(),
+				'debug' => array(
+					'error' => $e->getMessage(),
+					'file' => $e->getFile(),
+					'line' => $e->getLine(),
 					'trace' => $e->getTraceAsString()
 				)
 			) );
