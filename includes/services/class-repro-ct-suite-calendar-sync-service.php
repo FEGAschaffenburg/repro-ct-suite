@@ -48,13 +48,26 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 	 * @return array|WP_Error Array mit Statistiken oder WP_Error bei Fehler.
 	 */
 	public function sync_calendars() {
+		// DEBUG: Log API Call
+		error_log( '[REPRO CT-SUITE DEBUG] Calendar Sync Service: Calling CT API /calendars endpoint' );
+		
 		$response = $this->ct_client->get( '/calendars' );
 
+		// DEBUG: Log Response
+		error_log( '[REPRO CT-SUITE DEBUG] API Response Type: ' . gettype( $response ) );
 		if ( is_wp_error( $response ) ) {
+			error_log( '[REPRO CT-SUITE DEBUG] WP_Error detected:' );
+			error_log( '[REPRO CT-SUITE DEBUG] - Error Code: ' . $response->get_error_code() );
+			error_log( '[REPRO CT-SUITE DEBUG] - Error Message: ' . $response->get_error_message() );
+			error_log( '[REPRO CT-SUITE DEBUG] - Error Data: ' . print_r( $response->get_error_data(), true ) );
 			return $response;
 		}
+		
+		error_log( '[REPRO CT-SUITE DEBUG] API Response Structure: ' . print_r( array_keys( $response ), true ) );
 
 		if ( ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
+			error_log( '[REPRO CT-SUITE DEBUG] Invalid response structure - data array missing or not an array' );
+			error_log( '[REPRO CT-SUITE DEBUG] Full Response: ' . print_r( $response, true ) );
 			return new WP_Error(
 				'invalid_response',
 				__( 'Ungültige API-Antwort: data-Array fehlt', 'repro-ct-suite' )
@@ -62,6 +75,8 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 		}
 
 		$calendars = $response['data'];
+		error_log( '[REPRO CT-SUITE DEBUG] Found ' . count( $calendars ) . ' calendars in response' );
+		
 		$stats = array(
 			'total'    => count( $calendars ),
 			'inserted' => 0,
@@ -69,17 +84,23 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 			'errors'   => 0,
 		);
 
-		foreach ( $calendars as $calendar_data ) {
+		foreach ( $calendars as $index => $calendar_data ) {
+			error_log( '[REPRO CT-SUITE DEBUG] Processing calendar ' . ( $index + 1 ) . ': ' . 
+				( isset( $calendar_data['name'] ) ? $calendar_data['name'] : 'Unknown' ) );
+			
 			$result = $this->import_calendar( $calendar_data );
 			
 			if ( is_wp_error( $result ) ) {
+				error_log( '[REPRO CT-SUITE DEBUG] Import failed for calendar: ' . $result->get_error_message() );
 				$stats['errors']++;
 				continue;
 			}
 
 			if ( $result['action'] === 'insert' ) {
+				error_log( '[REPRO CT-SUITE DEBUG] Calendar inserted with ID: ' . $result['id'] );
 				$stats['inserted']++;
 			} else {
+				error_log( '[REPRO CT-SUITE DEBUG] Calendar updated with ID: ' . $result['id'] );
 				$stats['updated']++;
 			}
 		}
@@ -87,6 +108,7 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 		// Sync-Zeitpunkt speichern
 		update_option( 'repro_ct_suite_calendars_last_sync', current_time( 'mysql' ), false );
 
+		error_log( '[REPRO CT-SUITE DEBUG] Sync completed - Stats: ' . print_r( $stats, true ) );
 		return $stats;
 	}
 

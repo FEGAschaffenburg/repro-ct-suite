@@ -269,6 +269,8 @@
 					return;
 				}
 				
+				console.log('[DEBUG] Kalender-Synchronisation gestartet...');
+				
 				// Loading-State aktivieren
 				ReproCTSuiteAdmin.setButtonLoading($button, true);
 				
@@ -281,31 +283,72 @@
 						nonce: reproCTSuiteAdmin.nonce
 					},
 					success: function(response) {
+						console.log('[DEBUG] AJAX Response:', response);
+						
 						if (response.success) {
+							console.log('[DEBUG] Erfolgreiche Synchronisation:');
+							console.log('- Statistik:', response.data.stats);
+							console.log('- Debug-Info:', response.data.debug);
+							
+							// Debug-Informationen anzeigen
+							let debugMessage = response.data.message;
+							if (response.data.debug) {
+								debugMessage += '\n\n[DEBUG]\n';
+								debugMessage += 'URL: ' + response.data.debug.url + '\n';
+								debugMessage += 'Tenant: ' + response.data.debug.tenant + '\n';
+								debugMessage += 'Zeitstempel: ' + response.data.debug.timestamp;
+							}
+							
 							ReproCTSuiteAdmin.showNotice(
-								response.data.message,
+								debugMessage.replace(/\n/g, '<br>'),
 								'success'
 							);
 							
 							// Seite neu laden um aktualisierte Kalender anzuzeigen
 							setTimeout(function() {
 								location.reload();
-							}, 1500);
+							}, 3000);
 						} else {
+							console.error('[DEBUG] Fehler bei der Synchronisation:');
+							console.error('- Nachricht:', response.data.message);
+							console.error('- Debug-Info:', response.data.debug);
+							console.error('- Vollständige Response:', response);
+							
+							// Detaillierte Fehlermeldung
+							let errorMessage = response.data.message || 'Fehler bei der Synchronisation.';
+							if (response.data.debug) {
+								errorMessage += '<br><br><strong>Debug-Informationen:</strong><br>';
+								if (response.data.debug.url) {
+									errorMessage += 'URL: ' + response.data.debug.url + '<br>';
+								}
+								if (response.data.debug.error) {
+									errorMessage += 'Fehler: ' + response.data.debug.error + '<br>';
+								}
+							}
+							
 							ReproCTSuiteAdmin.showNotice(
-								response.data.message || 'Fehler bei der Synchronisation.',
+								errorMessage,
 								'error'
 							);
 						}
 					},
 					error: function(xhr, status, error) {
-						console.error('AJAX Error:', xhr.responseText);
+						console.error('[DEBUG] AJAX-Fehler:');
+						console.error('- Status:', status);
+						console.error('- Fehler:', error);
+						console.error('- Response Text:', xhr.responseText);
+						console.error('- Status Code:', xhr.status);
+						console.error('- Vollständiges XHR:', xhr);
+						
 						ReproCTSuiteAdmin.showNotice(
-							'Verbindungsfehler: ' + error,
+							'Verbindungsfehler: ' + error + '<br>' +
+							'Status: ' + xhr.status + '<br>' +
+							'Bitte prüfen Sie die Browser-Konsole (F12) für weitere Details.',
 							'error'
 						);
 					},
 					complete: function() {
+						console.log('[DEBUG] AJAX-Request abgeschlossen');
 						ReproCTSuiteAdmin.setButtonLoading($button, false);
 					}
 				});

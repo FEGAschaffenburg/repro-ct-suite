@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.2.4.3
+Stable tag: 0.3.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,7 +58,18 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 
 == Changelog ==
 
-= 0.2.4.3 =
+= 0.3.2.0 =
+* DEBUG: Umfangreiche Debug-Ausgaben für Kalender-Synchronisation hinzugefügt
+* Browser-Konsole: Detaillierte AJAX-Request/Response-Logs mit Debug-Informationen
+* WordPress Debug-Log: Vollständige Protokollierung auf 3 Ebenen (AJAX Handler, Service Layer, CT Client)
+* CT Client: HTTP-Request/Response-Details, Status-Codes, Headers, JSON-Decode-Fehler
+* Calendar Sync Service: API-Call-Tracking, Response-Struktur, Import-Status pro Kalender
+* AJAX Handler: Request-URL, Tenant, Zeitstempel, vollständige Statistiken und Fehler-Traces
+* DEBUG.md: Ausführliche Dokumentation für Fehlerdiagnose und Support
+* Debug-Informationen werden in AJAX-Response zurückgegeben für Frontend-Anzeige
+* Alle Logs verwenden Prefix "[REPRO CT-SUITE DEBUG]" für einfaches Filtern
+
+= 0.3.1.3 =
 * Fix: Private GitHub-Assets können jetzt mit Token-Authentifizierung heruntergeladen werden
 * Automatische Updates funktionieren jetzt vollständig bei privaten Repositories
 * Download-Filter mit Authorization-Header für sichere Asset-Downloads

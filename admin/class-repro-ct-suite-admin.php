@@ -350,17 +350,31 @@ class Repro_CT_Suite_Admin {
 			$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
 			$sync_service = new Repro_CT_Suite_Calendar_Sync_Service( $ct_client, $calendars_repo );
 
+			// DEBUG: Log Request-Details
+			$tenant = get_option( 'repro_ct_suite_ct_tenant', '' );
+			$debug_info = array(
+				'tenant' => $tenant,
+				'url' => 'https://' . $tenant . '.church.tools/api/calendars',
+				'timestamp' => current_time( 'mysql' )
+			);
+			error_log( '[REPRO CT-SUITE DEBUG] Calendar Sync Request: ' . print_r( $debug_info, true ) );
+
 			// Synchronisation durchführen
 			$result = $sync_service->sync_calendars();
 
+			// DEBUG: Log Response
+			error_log( '[REPRO CT-SUITE DEBUG] Calendar Sync Result: ' . print_r( $result, true ) );
+
 			if ( isset( $result['errors'] ) && ! empty( $result['errors'] ) ) {
+				error_log( '[REPRO CT-SUITE DEBUG] Errors occurred: ' . print_r( $result['errors'], true ) );
 				wp_send_json_error( array(
 					'message' => sprintf(
 						__( 'Synchronisation mit Fehlern abgeschlossen. %d Kalender importiert, %d Fehler aufgetreten.', 'repro-ct-suite' ),
 						$result['inserted'] + $result['updated'],
 						count( $result['errors'] )
 					),
-					'stats' => $result
+					'stats' => $result,
+					'debug' => $debug_info
 				) );
 			}
 
@@ -371,14 +385,21 @@ class Repro_CT_Suite_Admin {
 					$result['inserted'],
 					$result['updated']
 				),
-				'stats' => $result
+				'stats' => $result,
+				'debug' => $debug_info
 			) );
 
 		} catch ( Exception $e ) {
+			error_log( '[REPRO CT-SUITE DEBUG] Exception: ' . $e->getMessage() );
+			error_log( '[REPRO CT-SUITE DEBUG] Stack Trace: ' . $e->getTraceAsString() );
 			wp_send_json_error( array(
 				'message' => sprintf(
 					__( 'Fehler bei der Synchronisation: %s', 'repro-ct-suite' ),
 					$e->getMessage()
+				),
+				'debug' => array(
+					'error' => $e->getMessage(),
+					'trace' => $e->getTraceAsString()
 				)
 			) );
 		}
