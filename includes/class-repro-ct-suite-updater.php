@@ -105,25 +105,56 @@ class Repro_CT_Suite_Updater {
 			return $transient;
 		}
 
-		// Versionen vergleichen.
+		// Versionen vergleichen (unterstützt 4-stellige Versionsnummern).
 		$current_version = $this->plugin_data['Version'];
 		$latest_version  = ltrim( $release_info->tag_name, 'v' );
 
-		if ( version_compare( $current_version, $latest_version, '<' ) ) {
+		// Normalisiere Versionen für Vergleich (4-stellige Format: x.y.z.w).
+		$current_normalized = $this->normalize_version( $current_version );
+		$latest_normalized  = $this->normalize_version( $latest_version );
+
+		if ( version_compare( $current_normalized, $latest_normalized, '<' ) ) {
+			// Hole das erste Asset (sollte die ZIP-Datei sein).
+			$package_url = $release_info->zipball_url;
+			
+			// Wenn Assets existieren, nutze das erste ZIP-Asset.
+			if ( ! empty( $release_info->assets ) && is_array( $release_info->assets ) ) {
+				foreach ( $release_info->assets as $asset ) {
+					if ( isset( $asset->browser_download_url ) && strpos( $asset->name, '.zip' ) !== false ) {
+						$package_url = $asset->browser_download_url;
+						break;
+					}
+				}
+			}
+
 			$plugin_data = array(
 				'slug'        => $this->plugin_slug,
 				'new_version' => $latest_version,
 				'url'         => $this->plugin_data['PluginURI'],
-				'package'     => $release_info->zipball_url,
+				'package'     => $package_url,
 				'icons'       => array(),
 				'banners'     => array(),
-				'tested'      => $this->plugin_data['RequiresWP'] ?? '',
+				'tested'      => '6.7',
 			);
 
 			$transient->response[ $this->plugin_basename ] = (object) $plugin_data;
 		}
 
 		return $transient;
+	}
+
+	/**
+	 * Normalisiert Versionsnummer auf 4-stelliges Format
+	 *
+	 * @param string $version Versionsnummer.
+	 * @return string Normalisierte Version.
+	 */
+	private function normalize_version( $version ) {
+		$parts = explode( '.', $version );
+		while ( count( $parts ) < 4 ) {
+			$parts[] = '0';
+		}
+		return implode( '.', array_slice( $parts, 0, 4 ) );
 	}
 
 	/**
@@ -205,10 +236,11 @@ class Repro_CT_Suite_Updater {
 	 */
 	private function get_release_info() {
 		$cache_key   = 'repro_ct_suite_release_info';
-		$cache_time  = 12 * HOUR_IN_SECONDS;
+		$cache_time  = 1 * HOUR_IN_SECONDS; // Kürzere Cache-Zeit für schnellere Updates
 		$cached_data = get_transient( $cache_key );
 
-		if ( false !== $cached_data ) {
+		// Cache nur in Produktion nutzen, in Debug-Modus immer frisch abrufen
+		if ( false !== $cached_data && ! defined( 'WP_DEBUG' ) ) {
 			return $cached_data;
 		}
 
@@ -218,6 +250,7 @@ class Repro_CT_Suite_Updater {
 			'headers' => array(
 				'Accept' => 'application/vnd.github.v3+json',
 			),
+			'timeout' => 15, // Timeout für API-Anfrage
 		);
 
 		if ( ! empty( $this->access_token ) ) {
@@ -227,6 +260,18 @@ class Repro_CT_Suite_Updater {
 		$response = wp_remote_get( $url, $args );
 
 		if ( is_wp_error( $response ) ) {
+			// Logge Fehler für Debugging
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( 'Repro CT-Suite Update Check Fehler: ' . $response->get_error_message() );
+			}
+			return false;
+		}
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $response_code ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( 'Repro CT-Suite Update Check HTTP Error: ' . $response_code );
+			}
 			return false;
 		}
 
@@ -234,6 +279,9 @@ class Repro_CT_Suite_Updater {
 		$data = json_decode( $body );
 
 		if ( ! $data || isset( $data->message ) ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( 'Repro CT-Suite Update Check JSON Error: ' . ( $data->message ?? 'Invalid JSON' ) );
+			}
 			return false;
 		}
 
