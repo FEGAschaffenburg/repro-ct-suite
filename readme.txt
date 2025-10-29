@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.2.4
+Stable tag: 0.2.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,17 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.2.4.2 =
+* Auto-Cleanup: Alte Plugin-Installationen werden bei Aktivierung automatisch bereinigt
+* Entfernt alte Ordner wie "repro-ct-suite-clean", "-old", "-backup" automatisch
+* Sicherheitsprüfungen: Nur inaktive Duplikate werden gelöscht
+* Verbesserte Installationsstabilität
+
+= 0.2.4.1 =
+* Packaging: ZIP entspricht WP-Vorgaben (Top-Level-Ordner immer "repro-ct-suite")
+* Build: Release-Asset ohne Versionsnummer (repro-ct-suite.zip)
+* Intern: Versionierung weiterhin im Plugin enthalten (Header + Konstante), kein ?ver in CSS/JS-URLs
 
 = 0.2.4 =
 * Fix: GitHub-Token für Updates bei privatem Repository hinzugefügt

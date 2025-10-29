@@ -41,7 +41,7 @@ class Repro_CT_Suite_Admin {
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/repro-ct-suite-admin.css',
 			array(),
-			$this->version,
+			null,
 			'all'
 		);
 	}
@@ -54,7 +54,7 @@ class Repro_CT_Suite_Admin {
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'js/repro-ct-suite-admin.js',
 			array( 'jquery' ),
-			$this->version,
+			null,
 			false
 		);
 	}

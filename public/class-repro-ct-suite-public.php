@@ -41,7 +41,7 @@ class Repro_CT_Suite_Public {
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/repro-ct-suite-public.css',
 			array(),
-			$this->version,
+			null,
 			'all'
 		);
 	}
@@ -54,7 +54,7 @@ class Repro_CT_Suite_Public {
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'js/repro-ct-suite-public.js',
 			array( 'jquery' ),
-			$this->version,
+			null,
 			false
 		);
 	}
