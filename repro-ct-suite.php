@@ -3,7 +3,7 @@
  * Plugin Name:       Repro CT-Suite
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
  * Description:       ChurchTools-Integration für WordPress. Synchronisiert Termine und Events aus ChurchTools.
- * Version:           0.3.0
+ * Version:           0.3.0.1
  * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            FEGAschaffenburg
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Version mit 4 Zahlen: Major.Minor.Patch.Build
  * Build-Nummer erhöhen bei minimalen Änderungen
  */
-define( 'REPRO_CT_SUITE_VERSION', '0.3.0' );
+define( 'REPRO_CT_SUITE_VERSION', '0.3.0.1' );
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 define( 'REPRO_CT_SUITE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'REPRO_CT_SUITE_URL', plugin_dir_url( __FILE__ ) );
@@ -72,6 +72,49 @@ if ( is_admin() ) {
 		'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' // GitHub Token für privates Repository
 	);
 }
+
+/**
+ * Fix für private GitHub Repository Downloads
+ *
+ * WordPress kann standardmäßig keine privaten GitHub Assets herunterladen,
+ * da die Download-URL eine Authentifizierung erfordert. Dieser Filter fügt
+ * den Authorization-Header hinzu, damit der Download funktioniert.
+ *
+ * @since 0.2.4.3
+ */
+add_filter(
+	'upgrader_pre_download',
+	function ( $reply, $package, $upgrader ) {
+		// Nur für unsere GitHub Releases
+		if ( strpos( $package, 'github.com/FEGAschaffenburg/repro-ct-suite' ) === false ) {
+			return $reply;
+		}
+
+		// GitHub Token
+		$github_token = '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';
+
+		// Download mit Authorization Header
+		$temp_file = download_url(
+			$package,
+			300,
+			false,
+			array(
+				'headers' => array(
+					'Authorization' => 'token ' . $github_token,
+					'Accept'        => 'application/octet-stream',
+				),
+			)
+		);
+
+		if ( is_wp_error( $temp_file ) ) {
+			return $temp_file;
+		}
+
+		return $temp_file;
+	},
+	10,
+	3
+);
 
 /**
  * Auto-Updates für dieses Plugin erlauben (opt-in über Option)
