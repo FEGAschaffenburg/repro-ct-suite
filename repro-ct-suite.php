@@ -3,7 +3,7 @@
  * Plugin Name:       Repro CT-Suite
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
  * Description:       ChurchTools-Integration für WordPress. Synchronisiert Termine und Events aus ChurchTools.
- * Version:           0.1.0.2
+ * Version:           0.1.0.3
  * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            FEGAschaffenburg
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Version mit 4 Zahlen: Major.Minor.Patch.Build
  * Build-Nummer erhöhen bei minimalen Änderungen
  */
-define( 'REPRO_CT_SUITE_VERSION', '0.1.0.2' );
+define( 'REPRO_CT_SUITE_VERSION', '0.1.0.3' );
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 define( 'REPRO_CT_SUITE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'REPRO_CT_SUITE_URL', plugin_dir_url( __FILE__ ) );
@@ -71,6 +71,33 @@ if ( is_admin() ) {
 		'repro-ct-suite'
 	);
 }
+
+/**
+ * Auto-Updates für dieses Plugin erlauben (opt-in über Option)
+ *
+ * Wenn die Option 'repro_ct_suite_auto_update' aktiv ist, gibt dieser Filter
+ * für dieses Plugin true zurück. Damit führt WordPress im Hintergrund automatische
+ * Updates aus, sobald im Transient ein Update vorhanden ist.
+ */
+add_filter(
+	'auto_update_plugin',
+	function ( $update, $item ) {
+		if ( empty( $item ) || empty( $item->plugin ) ) {
+			return $update;
+		}
+
+		if ( $item->plugin === plugin_basename( __FILE__ ) ) {
+			$enabled = (bool) get_option( 'repro_ct_suite_auto_update', 0 );
+			if ( $enabled ) {
+				return true;
+			}
+		}
+
+		return $update;
+	},
+	10,
+	2
+);
 
 /**
  * Begins execution of the plugin.

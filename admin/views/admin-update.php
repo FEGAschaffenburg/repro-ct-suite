@@ -33,6 +33,7 @@ $release_info = $updater->get_release_info();
 $current_version = REPRO_CT_SUITE_VERSION;
 $update_available = false;
 $latest_version = $current_version;
+$auto_update_enabled = (bool) get_option( 'repro_ct_suite_auto_update', 0 );
 
 if ( $release_info && ! is_wp_error( $release_info ) ) {
 	// $release_info ist ein Objekt von der GitHub API
@@ -160,6 +161,39 @@ if ( $release_info && ! is_wp_error( $release_info ) ) {
 					<?php esc_html_e( 'Zu den Plugins', 'repro-ct-suite' ); ?>
 				</a>
 			</div>
+		</div>
+	</div>
+
+	<!-- Auto-Update Einstellung -->
+	<div class="repro-ct-suite-card repro-ct-suite-mt-20">
+		<div class="repro-ct-suite-card-header">
+			<span class="dashicons dashicons-backup"></span>
+			<h3><?php esc_html_e( 'Automatische Updates', 'repro-ct-suite' ); ?></h3>
+		</div>
+		<div class="repro-ct-suite-card-body">
+			<p class="description"><?php esc_html_e( 'Wenn aktiviert, aktualisiert WordPress dieses Plugin automatisch im Hintergrund, sobald ein neues Release verfügbar ist.', 'repro-ct-suite' ); ?></p>
+			<div class="repro-ct-suite-mt-10">
+				<strong><?php esc_html_e( 'Status:', 'repro-ct-suite' ); ?></strong>
+				<span class="repro-ct-suite-badge <?php echo $auto_update_enabled ? 'repro-ct-suite-badge-success' : 'repro-ct-suite-badge-info'; ?>">
+					<?php echo $auto_update_enabled ? esc_html__( 'Aktiviert', 'repro-ct-suite' ) : esc_html__( 'Deaktiviert', 'repro-ct-suite' ); ?>
+				</span>
+			</div>
+
+			<form method="post" action="options.php" class="repro-ct-suite-mt-15">
+				<?php settings_fields( 'repro_ct_suite' ); ?>
+				<input type="hidden" name="repro_ct_suite_auto_update" value="0" />
+				<label>
+					<input type="checkbox" name="repro_ct_suite_auto_update" value="1" <?php checked( $auto_update_enabled ); ?> />
+					<?php esc_html_e( 'Automatische Updates aktivieren', 'repro-ct-suite' ); ?>
+				</label>
+				<p class="description repro-ct-suite-mt-5"><?php esc_html_e( 'Hinweis: Auto-Updates erfordern ein gültiges GitHub-Release mit ZIP-Asset. Die Einstellung wirkt sich nur auf dieses Plugin aus.', 'repro-ct-suite' ); ?></p>
+				<p class="repro-ct-suite-mt-10">
+					<button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-primary">
+						<span class="dashicons dashicons-yes"></span>
+						<?php esc_html_e( 'Einstellung speichern', 'repro-ct-suite' ); ?>
+					</button>
+				</p>
+			</form>
 		</div>
 	</div>
 

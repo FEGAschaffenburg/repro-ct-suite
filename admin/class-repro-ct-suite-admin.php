@@ -105,4 +105,20 @@ class Repro_CT_Suite_Admin {
 	public function display_update_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-update.php';
 	}
+
+	/**
+	 * Register plugin settings.
+	 */
+	public function register_settings() {
+		register_setting(
+			'repro_ct_suite',
+			'repro_ct_suite_auto_update',
+			array(
+				'type'              => 'boolean',
+				'description'       => __( 'Automatische Updates für Repro CT-Suite aktivieren', 'repro-ct-suite' ),
+				'sanitize_callback' => function ( $value ) { return (int) ( ! empty( $value ) ); },
+				'default'           => 0,
+			)
+		);
+	}
 }
