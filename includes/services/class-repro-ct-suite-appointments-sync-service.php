@@ -66,15 +66,26 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 
 		// Endpunkt + Fallbacks
 		$attempts = array(
-			array( 'endpoint' => '/calendars/appointments', 'params' => array( 'calendarIds' => $external_calendar_ids ) ),
-			array( 'endpoint' => '/calendars/appointments', 'params' => array( 'calendars'   => $external_calendar_ids ) ),
+			// Versuch 1: GET mit camelCase 'calendarIds'
+			array( 'method' => 'GET', 'endpoint' => '/calendars/appointments', 'params' => array( 'calendarIds' => $external_calendar_ids ) ),
+			// Versuch 2: GET mit 'calendars'
+			array( 'method' => 'GET', 'endpoint' => '/calendars/appointments', 'params' => array( 'calendars'   => $external_calendar_ids ) ),
+			// Versuch 3: POST mit snake_case 'calendar_ids' als JSON-Body (wie vom Fehler gemeldet)
+			array( 'method' => 'POST', 'endpoint' => '/calendars/appointments', 'body'   => array( 'calendar_ids' => array_map( 'intval', $external_calendar_ids ) ) ),
 		);
 
 		$response = null;
 		foreach ( $attempts as $i => $try ) {
-			$params = array_merge( array( 'from' => $args['from'], 'to' => $args['to'] ), $try['params'] );
-			Repro_CT_Suite_Logger::log( 'Try endpoint: ' . $try['endpoint'] . ' with params keys [' . implode( ',', array_keys( $try['params'] ) ) . ']' );
-			$response = $this->ct_client->get( $try['endpoint'], $params );
+			if ( strtoupper( $try['method'] ) === 'GET' ) {
+				$params = array_merge( array( 'from' => $args['from'], 'to' => $args['to'] ), $try['params'] );
+				Repro_CT_Suite_Logger::log( 'Try GET ' . $try['endpoint'] . ' with params keys [' . implode( ',', array_keys( $try['params'] ) ) . ']' );
+				$response = $this->ct_client->get( $try['endpoint'], $params );
+			} else {
+				$body = array_merge( array( 'from' => $args['from'], 'to' => $args['to'] ), $try['body'] );
+				Repro_CT_Suite_Logger::log( 'Try POST ' . $try['endpoint'] . ' with body keys [' . implode( ',', array_keys( $try['body'] ) ) . ']' );
+				$response = $this->ct_client->post( $try['endpoint'], $body );
+			}
+
 			if ( is_wp_error( $response ) ) {
 				$code = $response->get_error_data()['status'] ?? null;
 				Repro_CT_Suite_Logger::log( 'Endpoint failed (status=' . ( $code ?? 'n/a' ) . '): ' . $response->get_error_message(), 'warning' );

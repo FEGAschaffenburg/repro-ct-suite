@@ -230,6 +230,88 @@ class Repro_CT_Suite_CT_Client {
 	}
 
 	/**
+	 * API POST-Request mit JSON-Body und Cookie-basierter Authentifizierung
+	 *
+	 * @param string $endpoint API-Endpunkt (z.B. '/calendars/appointments')
+	 * @param array  $body     Assoziatives Array, wird als JSON gesendet
+	 * @return array|WP_Error  Array mit 'data' und 'meta', oder WP_Error
+	 */
+	public function post( $endpoint, $body = array() ) {
+		Repro_CT_Suite_Logger::log( 'CT_Client::post() called' );
+		Repro_CT_Suite_Logger::log( 'Endpoint: ' . $endpoint );
+		if ( ! empty( $body ) ) {
+			Repro_CT_Suite_Logger::dump( $body, 'POST Body' );
+		}
+		Repro_CT_Suite_Logger::log( 'Is Authenticated: ' . ( $this->is_authenticated() ? 'YES' : 'NO' ) );
+
+		if ( ! $this->is_authenticated() ) {
+			Repro_CT_Suite_Logger::log( 'Not authenticated, attempting login...', 'warning' );
+			$login_result = $this->login();
+			if ( is_wp_error( $login_result ) ) {
+				Repro_CT_Suite_Logger::log( 'Login failed: ' . $login_result->get_error_message(), 'error' );
+				return $login_result;
+			}
+			Repro_CT_Suite_Logger::log( 'Login successful', 'success' );
+		}
+
+		$url = $this->get_base_url() . $endpoint;
+		Repro_CT_Suite_Logger::log( 'Full Request URL: ' . $url );
+
+		$response = wp_remote_post(
+			$url,
+			array(
+				'headers' => $this->get_headers(),
+				'body'    => wp_json_encode( $body ),
+				'timeout' => 30,
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			Repro_CT_Suite_Logger::log( 'HTTP POST failed: ' . $response->get_error_message(), 'error' );
+			return $response;
+		}
+
+		$status = wp_remote_retrieve_response_code( $response );
+		Repro_CT_Suite_Logger::log( 'POST Response Status Code: ' . $status );
+
+		if ( $status === 401 ) {
+			Repro_CT_Suite_Logger::log( '401 Unauthorized on POST - attempting re-login', 'warning' );
+			$this->clear_cookies();
+			$login_result = $this->login();
+			if ( is_wp_error( $login_result ) ) {
+				Repro_CT_Suite_Logger::log( 'Re-login failed: ' . $login_result->get_error_message(), 'error' );
+				return $login_result;
+			}
+			Repro_CT_Suite_Logger::log( 'Re-login successful, retrying POST', 'success' );
+			return $this->post( $endpoint, $body );
+		}
+
+		if ( $status !== 200 ) {
+			$resp_body = wp_remote_retrieve_body( $response );
+			Repro_CT_Suite_Logger::log( 'API Error (POST) - Status: ' . $status, 'error' );
+			Repro_CT_Suite_Logger::log( 'Response Body: ' . substr( $resp_body, 0, 500 ), 'error' );
+			return new WP_Error( 'ct_api_error', sprintf( 'API Error: %d - %s', $status, $resp_body ), array( 'status' => $status ) );
+		}
+
+		$resp_body = wp_remote_retrieve_body( $response );
+		Repro_CT_Suite_Logger::log( 'POST Response Body Length: ' . strlen( $resp_body ) . ' bytes', 'success' );
+		Repro_CT_Suite_Logger::log( 'Response preview (first 500 chars): ' . substr( $resp_body, 0, 500 ) );
+
+		$data = json_decode( $resp_body, true );
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			Repro_CT_Suite_Logger::log( 'JSON Decode Error (POST): ' . json_last_error_msg(), 'error' );
+			return new WP_Error( 'json_decode_error', 'Failed to decode JSON response: ' . json_last_error_msg() );
+		}
+
+		Repro_CT_Suite_Logger::log( 'Successfully decoded JSON POST response', 'success' );
+		if ( is_array( $data ) ) {
+			Repro_CT_Suite_Logger::log( 'Response has keys: ' . implode( ', ', array_keys( $data ) ) );
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Headers für API-Requests (inkl. Cookies)
 	 *
 	 * @return array
