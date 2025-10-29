@@ -155,8 +155,15 @@ class Repro_CT_Suite_Admin {
 			}
 		}
 
-		// Redirect zurück ohne test_connection Parameter
-		wp_safe_redirect( remove_query_arg( array( 'test_connection', '_wpnonce' ) ) );
+		// Redirect zurück zum Settings-Tab ohne test_connection Parameter
+		$redirect_url = add_query_arg(
+			array(
+				'page' => 'repro-ct-suite',
+				'tab'  => 'settings',
+			),
+			admin_url( 'admin.php' )
+		);
+		wp_safe_redirect( $redirect_url );
 		exit;
 	}
 

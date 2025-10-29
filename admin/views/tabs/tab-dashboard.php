@@ -18,9 +18,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 $appointments_count = 0;
 $events_count = 0;
 $last_sync_time = __( 'Nie', 'repro-ct-suite' );
-$connection_status = 'not_configured';
-$connection_label = __( 'Nicht konfiguriert', 'repro-ct-suite' );
-$connection_description = __( 'ChurchTools-API noch nicht eingerichtet', 'repro-ct-suite' );
+
+// Verbindungsstatus prüfen
+$ct_tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
+$ct_username = get_option( 'repro_ct_suite_ct_username', '' );
+$ct_password = get_option( 'repro_ct_suite_ct_password', '' );
+
+if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
+	$connection_status      = 'not_configured';
+	$connection_label       = __( 'Nicht konfiguriert', 'repro-ct-suite' );
+	$connection_description = __( 'ChurchTools-API noch nicht eingerichtet', 'repro-ct-suite' );
+} else {
+	$connection_status      = 'configured';
+	$connection_label       = __( 'Konfiguriert', 'repro-ct-suite' );
+	$connection_description = sprintf(
+		/* translators: %s: ChurchTools tenant name */
+		__( 'Verbunden mit: %s.church.tools', 'repro-ct-suite' ),
+		esc_html( $ct_tenant )
+	);
+}
 ?>
 
 <!-- Statistik-Grid -->
@@ -78,15 +94,21 @@ $connection_description = __( 'ChurchTools-API noch nicht eingerichtet', 'repro-
 		</div>
 		<div class="repro-ct-suite-card-body">
 			<div class="repro-ct-suite-flex" style="margin-bottom: 10px;">
-				<span class="repro-ct-suite-status-dot warning"></span>
+				<span class="repro-ct-suite-status-dot <?php echo $connection_status === 'configured' ? 'success' : 'warning'; ?>"></span>
 				<strong><?php echo esc_html( $connection_label ); ?></strong>
 			</div>
 			<p class="description"><?php echo esc_html( $connection_description ); ?></p>
 		</div>
 		<div class="repro-ct-suite-card-footer">
+			<?php if ( $connection_status === 'not_configured' ) : ?>
 			<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite&tab=settings' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-primary repro-ct-suite-btn-small">
 				<?php esc_html_e( 'Jetzt einrichten', 'repro-ct-suite' ); ?>
 			</a>
+			<?php else : ?>
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite&tab=settings' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-secondary repro-ct-suite-btn-small">
+				<?php esc_html_e( 'Einstellungen ändern', 'repro-ct-suite' ); ?>
+			</a>
+			<?php endif; ?>
 		</div>
 	</div>
 </div>
