@@ -31,6 +31,33 @@ class Repro_CT_Suite_Admin {
 	public function __construct( $plugin_name, $version ) {
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		
+		// Update-Check Handler
+		add_action( 'admin_init', array( $this, 'check_manual_update_request' ) );
+	}
+
+	/**
+	 * Behandelt manuelle Update-Check-Anfragen
+	 */
+	public function check_manual_update_request() {
+		if ( isset( $_GET['repro_ct_suite_check_update'] ) && current_user_can( 'update_plugins' ) ) {
+			// Lösche alle Update-bezogenen Transients
+			delete_transient( 'repro_ct_suite_release_info' );
+			delete_site_transient( 'update_plugins' );
+			
+			// Redirect zurück zur Plugins-Seite
+			wp_safe_redirect( admin_url( 'plugins.php?repro_ct_suite_update_checked=1' ) );
+			exit;
+		}
+		
+		// Zeige Erfolgs-Notice
+		if ( isset( $_GET['repro_ct_suite_update_checked'] ) ) {
+			add_action( 'admin_notices', function() {
+				echo '<div class="notice notice-success is-dismissible"><p>';
+				esc_html_e( 'Update-Check durchgeführt. Bitte Seite neu laden um Updates zu sehen.', 'repro-ct-suite' );
+				echo '</p></div>';
+			} );
+		}
 	}
 
 	/**

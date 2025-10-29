@@ -90,6 +90,27 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 				<strong><?php echo esc_html( $connection_label ); ?></strong>
 			</div>
 			<p class="description"><?php echo esc_html( $connection_description ); ?></p>
+			
+			<!-- Plugin-Version und Update-Check -->
+			<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f1f3;">
+				<div class="repro-ct-suite-flex" style="align-items: center; gap: 10px;">
+					<span class="description">
+						<?php 
+						printf( 
+							/* translators: %s: Plugin version */
+							esc_html__( 'Plugin-Version: %s', 'repro-ct-suite' ), 
+							'<strong>' . esc_html( REPRO_CT_SUITE_VERSION ) . '</strong>' 
+						); 
+						?>
+					</span>
+					<a href="<?php echo esc_url( admin_url( 'plugins.php?repro_ct_suite_check_update=1' ) ); ?>" 
+					   class="repro-ct-suite-btn repro-ct-suite-btn-sm repro-ct-suite-btn-secondary"
+					   style="margin-left: auto;">
+						<span class="dashicons dashicons-update" style="font-size: 14px; margin-top: 2px;"></span>
+						<?php esc_html_e( 'Updates prüfen', 'repro-ct-suite' ); ?>
+					</a>
+				</div>
+			</div>
 		</div>
 		<div class="repro-ct-suite-card-footer">
 			<?php if ( $connection_status === 'not_configured' ) : ?>
