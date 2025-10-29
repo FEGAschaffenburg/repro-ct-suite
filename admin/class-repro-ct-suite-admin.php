@@ -420,7 +420,17 @@ class Repro_CT_Suite_Admin {
 		try {
 			// Service instanziieren
 			error_log( '[REPRO CT-SUITE] Instanziiere CT_Client...' );
-			$ct_client = new Repro_CT_Suite_CT_Client();
+			
+			// Credentials aus WordPress Optionen laden
+			$tenant = get_option( 'repro_ct_suite_ct_tenant', '' );
+			$username = get_option( 'repro_ct_suite_ct_username', '' );
+			$encrypted_password = get_option( 'repro_ct_suite_ct_password', '' );
+			
+			// Passwort entschlüsseln
+			$password = Repro_CT_Suite_Crypto::decrypt( $encrypted_password );
+			
+			// CT_Client mit Credentials instanziieren
+			$ct_client = new Repro_CT_Suite_CT_Client( $tenant, $username, $password );
 			
 			error_log( '[REPRO CT-SUITE] Instanziiere Calendars_Repository...' );
 			$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
@@ -429,7 +439,6 @@ class Repro_CT_Suite_Admin {
 			$sync_service = new Repro_CT_Suite_Calendar_Sync_Service( $ct_client, $calendars_repo );
 
 			// DEBUG: Log Request-Details ins WordPress Debug-Log
-			$tenant = get_option( 'repro_ct_suite_ct_tenant', '' );
 			$debug_info = array(
 				'tenant' => $tenant,
 				'url' => 'https://' . $tenant . '.church.tools/api/calendars',

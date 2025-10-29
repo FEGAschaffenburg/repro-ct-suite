@@ -268,6 +268,10 @@ if ( $test_result !== false ) {
 			<div style="color: #666;"><?php esc_html_e( 'Warte auf Debug-Ausgaben...', 'repro-ct-suite' ); ?></div>
 		</div>
 		<p class="repro-ct-suite-mt-10">
+			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-primary" onclick="reproCTSuiteCopyDebugLog();">
+				<span class="dashicons dashicons-clipboard"></span>
+				<?php esc_html_e( 'Debug-Log kopieren', 'repro-ct-suite' ); ?>
+			</button>
 			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-secondary" onclick="jQuery('#repro-ct-suite-debug-content').html('<div style=\'color: #666;\'><?php esc_html_e( 'Debug-Log gelöscht', 'repro-ct-suite' ); ?></div>');">
 				<span class="dashicons dashicons-trash"></span>
 				<?php esc_html_e( 'Debug-Log löschen', 'repro-ct-suite' ); ?>
@@ -277,6 +281,41 @@ if ( $test_result !== false ) {
 				<?php esc_html_e( 'Debug-Panel schließen', 'repro-ct-suite' ); ?>
 			</button>
 		</p>
+		
+		<script>
+		function reproCTSuiteCopyDebugLog() {
+			var debugContent = jQuery('#repro-ct-suite-debug-content').text();
+			
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(debugContent).then(function() {
+					alert('<?php esc_html_e( 'Debug-Log wurde in die Zwischenablage kopiert!', 'repro-ct-suite' ); ?>');
+				}).catch(function(err) {
+					console.error('Fehler beim Kopieren:', err);
+					fallbackCopyDebugLog(debugContent);
+				});
+			} else {
+				fallbackCopyDebugLog(debugContent);
+			}
+		}
+		
+		function fallbackCopyDebugLog(text) {
+			var textarea = document.createElement('textarea');
+			textarea.value = text;
+			textarea.style.position = 'fixed';
+			textarea.style.opacity = '0';
+			document.body.appendChild(textarea);
+			textarea.select();
+			try {
+				document.execCommand('copy');
+				alert('<?php esc_html_e( 'Debug-Log wurde in die Zwischenablage kopiert!', 'repro-ct-suite' ); ?>');
+			} catch (err) {
+				console.error('Fehler beim Kopieren:', err);
+				alert('<?php esc_html_e( 'Kopieren fehlgeschlagen. Bitte markieren Sie den Text manuell und kopieren Sie ihn.', 'repro-ct-suite' ); ?>');
+			}
+			document.body.removeChild(textarea);
+		}
+		</script>
+		
 		<p class="description">
 			<?php esc_html_e( 'Diese Informationen zeigen detailliert, was beim Kalender-Sync passiert. Öffnen Sie außerdem die Browser-Konsole (F12) für weitere Details.', 'repro-ct-suite' ); ?>
 		</p>

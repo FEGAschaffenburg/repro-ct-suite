@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.2.4
+Stable tag: 0.3.2.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,13 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.2.5 =
+* Fix: CT_Client wird jetzt korrekt mit Credentials (tenant, username, password) instanziiert
+* Fix: Behebt "Too few arguments to function" Fehler bei Kalender-Synchronisation
+* Feature: Kopierfunktion für Debug-Log im Admin-Panel hinzugefügt
+* Feature: Fallback-Kopiermethode für ältere Browser
+* Verbessert: Passwort-Entschlüsselung wird im AJAX-Handler durchgeführt
 
 = 0.3.2.4 =
 * Debug: Erweiterte Fehlerbehandlung mit Try-Catch für Dependencies und PHP Errors
