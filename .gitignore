@@ -16,6 +16,8 @@ wp-content/plugins/hello.php
 /vendor/
 composer.phar
 composer.lock
+Composer-Setup.exe
+composer-setup.php
 
 # PHPUnit
 .phpunit.result.cache
