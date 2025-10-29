@@ -72,6 +72,24 @@ class Repro_CT_Suite_Admin {
 			'dashicons-admin-generic',
 			30
 		);
+
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Einstellungen', 'repro-ct-suite' ),
+			__( 'Einstellungen', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite',
+			array( $this, 'display_admin_page' )
+		);
+
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Update-Info', 'repro-ct-suite' ),
+			__( 'Update-Info', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-update',
+			array( $this, 'display_update_page' )
+		);
 	}
 
 	/**
@@ -79,5 +97,12 @@ class Repro_CT_Suite_Admin {
 	 */
 	public function display_admin_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-display.php';
+	}
+
+	/**
+	 * Display the update info page.
+	 */
+	public function display_update_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-update.php';
 	}
 }

@@ -139,6 +139,35 @@ composer test
 
 Das Plugin folgt den [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/).
 
+## Updates
+
+### Automatische Updates von GitHub
+
+Das Plugin unterstützt automatische Updates direkt von GitHub:
+
+- WordPress prüft alle 12 Stunden auf neue Versionen
+- Updates erscheinen auf der Plugin-Seite wie bei WordPress.org-Plugins
+- Einfache Installation mit einem Klick
+
+### Neue Version veröffentlichen
+
+1. Aktualisieren Sie die Versionsnummer in:
+   - `repro-ct-suite.php` (Plugin Header)
+   - `readme.txt` (Stable tag)
+2. Committen und pushen Sie die Änderungen
+3. Erstellen Sie ein neues Release auf GitHub:
+   - Tag: `v1.0.1` (mit "v" Präfix)
+   - Release-Titel: z.B. "Version 1.0.1"
+   - Beschreibung: Changelog-Eintrag
+4. WordPress erkennt das Update automatisch
+
+### Manueller Update-Check
+
+Im WordPress-Admin unter **Repro CT-Suite > Update-Info** können Sie:
+- Aktuelle Version einsehen
+- Manuell auf Updates prüfen
+- Update-Informationen anzeigen
+
 ## Architektur
 
 Das Plugin verwendet eine moderne, objektorientierte Architektur:
@@ -157,10 +186,14 @@ GPL v2 or later
 
 ### 1.0.0
 - Initiales Release mit moderner Plugin-Architektur
+- ChurchTools API-Integration vorbereitet
+- GitHub-basierter Update-Mechanismus
 - Admin-Bereich implementiert
 - Public-Bereich implementiert
 - Internationalisierung vorbereitet
 - PHPUnit Tests integriert
+- Automatische Updates von GitHub
+- Update-Info-Seite im Admin
 
 ## Support
 

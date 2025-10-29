@@ -55,6 +55,22 @@ register_deactivation_hook( __FILE__, 'deactivate_repro_ct_suite' );
 require_once REPRO_CT_SUITE_PATH . 'includes/class-repro-ct-suite.php';
 
 /**
+ * GitHub Updater für automatische Updates
+ */
+require_once REPRO_CT_SUITE_PATH . 'includes/class-repro-ct-suite-updater.php';
+
+/**
+ * Initialize the updater
+ */
+if ( is_admin() ) {
+	new Repro_CT_Suite_Updater(
+		__FILE__,
+		'FEGAschaffenburg',
+		'repro-ct-suite'
+	);
+}
+
+/**
  * Begins execution of the plugin.
  */
 function run_repro_ct_suite() {
