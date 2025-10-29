@@ -257,6 +257,32 @@ if ( $test_result !== false ) {
 	</div>
 </div>
 
+<!-- Debug-Anzeige -->
+<div class="repro-ct-suite-card repro-ct-suite-mt-20" id="repro-ct-suite-debug-panel" style="display: none;">
+	<div class="repro-ct-suite-card-header" style="background: #f0f0f1;">
+		<span class="dashicons dashicons-admin-generic"></span>
+		<h3><?php esc_html_e( 'Debug-Informationen', 'repro-ct-suite' ); ?></h3>
+	</div>
+	<div class="repro-ct-suite-card-body">
+		<div id="repro-ct-suite-debug-content" style="font-family: 'Courier New', monospace; font-size: 12px; max-height: 400px; overflow-y: auto; background: #fff; border: 1px solid #ddd; padding: 10px; border-radius: 3px;">
+			<div style="color: #666;"><?php esc_html_e( 'Warte auf Debug-Ausgaben...', 'repro-ct-suite' ); ?></div>
+		</div>
+		<p class="repro-ct-suite-mt-10">
+			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-secondary" onclick="jQuery('#repro-ct-suite-debug-content').html('<div style=\'color: #666;\'><?php esc_html_e( 'Debug-Log gelöscht', 'repro-ct-suite' ); ?></div>');">
+				<span class="dashicons dashicons-trash"></span>
+				<?php esc_html_e( 'Debug-Log löschen', 'repro-ct-suite' ); ?>
+			</button>
+			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-secondary" onclick="jQuery('#repro-ct-suite-debug-panel').hide();">
+				<span class="dashicons dashicons-no"></span>
+				<?php esc_html_e( 'Debug-Panel schließen', 'repro-ct-suite' ); ?>
+			</button>
+		</p>
+		<p class="description">
+			<?php esc_html_e( 'Diese Informationen zeigen detailliert, was beim Kalender-Sync passiert. Öffnen Sie außerdem die Browser-Konsole (F12) für weitere Details.', 'repro-ct-suite' ); ?>
+		</p>
+	</div>
+</div>
+
 <div class="repro-ct-suite-card repro-ct-suite-mt-20">
 	<div class="repro-ct-suite-card-header">
 		<span class="dashicons dashicons-info"></span>

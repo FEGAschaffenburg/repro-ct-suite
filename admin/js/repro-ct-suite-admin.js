@@ -205,6 +205,62 @@
 		 * @since 1.0.0
 		 */
 		initAjaxActions: function() {
+			// Debug-Log Helper
+			const debugLog = function(message, type) {
+				type = type || 'info';
+				const colors = {
+					info: '#0073aa',
+					success: '#46b450',
+					error: '#dc3232',
+					warning: '#f56e28'
+				};
+				const icons = {
+					info: 'ℹ️',
+					success: '✓',
+					error: '✗',
+					warning: '⚠'
+				};
+				
+				console.log('[DEBUG] ' + message);
+				
+				const $debugPanel = $('#repro-ct-suite-debug-panel');
+				const $debugContent = $('#repro-ct-suite-debug-content');
+				
+				if ($debugContent.length) {
+					// Panel anzeigen
+					$debugPanel.show();
+					
+					// Erste Nachricht? Dann altes "Warte..." entfernen
+					if ($debugContent.find('.debug-entry').length === 0) {
+						$debugContent.empty();
+					}
+					
+					// Timestamp
+					const now = new Date();
+					const timestamp = now.toLocaleTimeString('de-DE') + '.' + now.getMilliseconds().toString().padStart(3, '0');
+					
+					// Neue Nachricht hinzufügen
+					const $entry = $('<div>')
+						.addClass('debug-entry')
+						.css({
+							padding: '5px',
+							borderBottom: '1px solid #f0f0f1',
+							marginBottom: '5px',
+							color: colors[type]
+						})
+						.html(
+							'<strong style="color:#666;">[' + timestamp + ']</strong> ' +
+							'<span style="font-size:14px;">' + icons[type] + '</span> ' +
+							message
+						);
+					
+					$debugContent.append($entry);
+					
+					// Auto-Scroll nach unten
+					$debugContent.scrollTop($debugContent[0].scrollHeight);
+				}
+			};
+			
 			// Allgemeiner Sync-Button (mit data-action)
 			$('.repro-ct-suite-sync-btn').on('click', function(e) {
 				e.preventDefault();
@@ -269,10 +325,17 @@
 					return;
 				}
 				
+				debugLog('=== KALENDER-SYNCHRONISATION GESTARTET ===', 'info');
+				debugLog('Zeitpunkt: ' + new Date().toLocaleString('de-DE'), 'info');
+				
 				console.log('[DEBUG] Kalender-Synchronisation gestartet...');
 				
 				// Loading-State aktivieren
 				ReproCTSuiteAdmin.setButtonLoading($button, true);
+				
+				debugLog('AJAX-Request wird gesendet...', 'info');
+				debugLog('Action: repro_ct_suite_sync_calendars', 'info');
+				debugLog('URL: ' + ajaxurl, 'info');
 				
 				// AJAX-Request
 				$.ajax({
@@ -284,46 +347,80 @@
 					},
 					success: function(response) {
 						console.log('[DEBUG] AJAX Response:', response);
+						debugLog('AJAX-Response empfangen', 'info');
 						
 						if (response.success) {
+							debugLog('✓ SYNCHRONISATION ERFOLGREICH', 'success');
 							console.log('[DEBUG] Erfolgreiche Synchronisation:');
 							console.log('- Statistik:', response.data.stats);
 							console.log('- Debug-Info:', response.data.debug);
 							
-							// Debug-Informationen anzeigen
-							let debugMessage = response.data.message;
+							// Debug-Informationen detailliert anzeigen
 							if (response.data.debug) {
-								debugMessage += '\n\n[DEBUG]\n';
-								debugMessage += 'URL: ' + response.data.debug.url + '\n';
-								debugMessage += 'Tenant: ' + response.data.debug.tenant + '\n';
-								debugMessage += 'Zeitstempel: ' + response.data.debug.timestamp;
+								debugLog('─────────────────────────────────', 'info');
+								debugLog('<strong>API-REQUEST:</strong>', 'info');
+								debugLog('URL: ' + response.data.debug.url, 'info');
+								debugLog('Tenant: ' + response.data.debug.tenant, 'info');
+								debugLog('Zeitstempel: ' + response.data.debug.timestamp, 'info');
 							}
 							
+							if (response.data.stats) {
+								debugLog('─────────────────────────────────', 'info');
+								debugLog('<strong>ERGEBNIS:</strong>', 'success');
+								debugLog('Kalender gesamt: ' + response.data.stats.total, 'success');
+								debugLog('Neu eingefügt: ' + response.data.stats.inserted, 'success');
+								debugLog('Aktualisiert: ' + response.data.stats.updated, 'success');
+								debugLog('Fehler: ' + response.data.stats.errors, (response.data.stats.errors > 0 ? 'warning' : 'success'));
+							}
+							
+							debugLog('─────────────────────────────────', 'info');
+							debugLog('Seite wird in 3 Sekunden neu geladen...', 'info');
+							
+							// Erfolgs-Nachricht
+							let message = response.data.message;
+							
 							ReproCTSuiteAdmin.showNotice(
-								debugMessage.replace(/\n/g, '<br>'),
+								message,
 								'success'
 							);
 							
 							// Seite neu laden um aktualisierte Kalender anzuzeigen
 							setTimeout(function() {
+								debugLog('Seite wird neu geladen...', 'info');
 								location.reload();
 							}, 3000);
 						} else {
+							debugLog('✗ SYNCHRONISATION FEHLGESCHLAGEN', 'error');
 							console.error('[DEBUG] Fehler bei der Synchronisation:');
 							console.error('- Nachricht:', response.data.message);
 							console.error('- Debug-Info:', response.data.debug);
 							console.error('- Vollständige Response:', response);
 							
-							// Detaillierte Fehlermeldung
-							let errorMessage = response.data.message || 'Fehler bei der Synchronisation.';
+							// Detaillierte Fehlermeldung im Debug-Panel
 							if (response.data.debug) {
-								errorMessage += '<br><br><strong>Debug-Informationen:</strong><br>';
+								debugLog('─────────────────────────────────', 'error');
+								debugLog('<strong>FEHLER-DETAILS:</strong>', 'error');
 								if (response.data.debug.url) {
-									errorMessage += 'URL: ' + response.data.debug.url + '<br>';
+									debugLog('URL: ' + response.data.debug.url, 'error');
 								}
 								if (response.data.debug.error) {
-									errorMessage += 'Fehler: ' + response.data.debug.error + '<br>';
+									debugLog('Fehlermeldung: ' + response.data.debug.error, 'error');
 								}
+								if (response.data.debug.trace) {
+									debugLog('Stack Trace:', 'error');
+									const traceLines = response.data.debug.trace.split('\n');
+									traceLines.slice(0, 5).forEach(function(line) {
+										debugLog('  ' + line, 'error');
+									});
+								}
+							}
+							
+							debugLog('Nachricht: ' + (response.data.message || 'Unbekannter Fehler'), 'error');
+							
+							// User-Nachricht
+							let errorMessage = response.data.message || 'Fehler bei der Synchronisation.';
+							if (response.data.debug) {
+								errorMessage += '<br><br><strong>Tipp:</strong> Schauen Sie im Debug-Panel unten für Details.';
 							}
 							
 							ReproCTSuiteAdmin.showNotice(
@@ -333,6 +430,15 @@
 						}
 					},
 					error: function(xhr, status, error) {
+						debugLog('✗ AJAX-FEHLER', 'error');
+						debugLog('─────────────────────────────────', 'error');
+						debugLog('<strong>HTTP-FEHLER:</strong>', 'error');
+						debugLog('Status: ' + status, 'error');
+						debugLog('Fehler: ' + error, 'error');
+						debugLog('HTTP Status-Code: ' + xhr.status, 'error');
+						debugLog('Response Text (erste 500 Zeichen):', 'error');
+						debugLog(xhr.responseText.substring(0, 500), 'error');
+						
 						console.error('[DEBUG] AJAX-Fehler:');
 						console.error('- Status:', status);
 						console.error('- Fehler:', error);
@@ -343,12 +449,13 @@
 						ReproCTSuiteAdmin.showNotice(
 							'Verbindungsfehler: ' + error + '<br>' +
 							'Status: ' + xhr.status + '<br>' +
-							'Bitte prüfen Sie die Browser-Konsole (F12) für weitere Details.',
+							'Bitte prüfen Sie das Debug-Panel unten und die Browser-Konsole (F12) für weitere Details.',
 							'error'
 						);
 					},
 					complete: function() {
 						console.log('[DEBUG] AJAX-Request abgeschlossen');
+						debugLog('=== SYNC-VORGANG BEENDET ===', 'info');
 						ReproCTSuiteAdmin.setButtonLoading($button, false);
 					}
 				});
