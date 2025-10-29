@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.2.5
+Stable tag: 0.3.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,18 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.3.0 =
+* Feature: Neuer Sync-Tab mit zentraler Synchronisations-Steuerung
+* Feature: Kalenderauswahl direkt im Sync-Tab (mit Select-All-Funktion)
+* Feature: Zeitraum-Konfiguration für Sync (Vergangenheit/Zukunft in Tagen)
+* Feature: Events-Sync-Service mit Fallback-Endpunkten
+* Feature: Appointments-Sync-Service mit Kalendermapping und Event-Verknüpfung
+* Refactor: Dashboard zeigt nur noch Status-Informationen (keine Sync-Buttons)
+* Verbessert: Zeitraum-Einstellungen persistent in WP-Optionen gespeichert
+* Verbessert: Klare UX-Trennung zwischen Status-Anzeige und Sync-Aktionen
+* Verbessert: AJAX-Handler nutzt konfigurierte Zeitraum-Einstellungen
+* Neu: Repository-Hilfsmethoden für Kalender- und Event-Zuordnung
 
 = 0.3.2.5 =
 * Fix: CT_Client wird jetzt korrekt mit Credentials (tenant, username, password) instanziiert
