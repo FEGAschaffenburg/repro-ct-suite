@@ -1,0 +1,28 @@
+{
+  "security.workspace.trust.enabled": true,
+  "security.workspace.trust.startupPrompt": "never",
+  "task.allowAutomaticTasks": "on",
+
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.confirmOnKill": "never",
+
+  "powershell.enableProfileLoading": true,
+  "powershell.integratedConsole.showOnStartup": false,
+  "powershell.promptToUpdatePowerShell": false,
+
+  "php.validate.enable": true,
+
+  "editor.formatOnSave": true,
+
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.smartCommitChanges": "all",
+  "git.postCommitCommand": "sync",
+  "git.fetchOnPull": true,
+  "git.pruneOnFetch": true,
+  "git.rebaseWhenSync": true,
+
+  "extensions.autoCheckUpdates": true,
+  "extensions.autoUpdate": true
+}
