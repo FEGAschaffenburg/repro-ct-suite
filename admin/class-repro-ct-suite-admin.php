@@ -255,6 +255,98 @@ class Repro_CT_Suite_Admin {
 	 * Handle calendar selection update.
 	 */
 	public function handle_calendar_selection() {
+		// Kalenderauswahl speichern
+		if ( isset( $_POST['repro_ct_suite_action'] ) && $_POST['repro_ct_suite_action'] === 'save_calendar_selection' ) {
+			if ( ! check_admin_referer( 'repro_ct_suite_calendar_selection', 'repro_ct_suite_calendar_selection_nonce' ) ) {
+				wp_die( __( 'Sicherheitsprüfung fehlgeschlagen.', 'repro-ct-suite' ) );
+			}
+
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( __( 'Keine Berechtigung.', 'repro-ct-suite' ) );
+			}
+
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
+
+			$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
+			$selected_ids = isset( $_POST['selected_calendars'] ) && is_array( $_POST['selected_calendars'] )
+				? array_map( 'intval', $_POST['selected_calendars'] )
+				: array();
+
+			$result = $calendars_repo->update_selected( $selected_ids );
+
+			if ( $result ) {
+				add_settings_error(
+					'repro_ct_suite_sync',
+					'calendars_updated',
+					__( 'Kalender-Auswahl erfolgreich gespeichert.', 'repro-ct-suite' ),
+					'success'
+				);
+			} else {
+				add_settings_error(
+					'repro_ct_suite_sync',
+					'calendars_update_failed',
+					__( 'Fehler beim Speichern der Kalender-Auswahl.', 'repro-ct-suite' ),
+					'error'
+				);
+			}
+
+			set_transient( 'settings_errors', get_settings_errors(), 30 );
+
+			$redirect_url = add_query_arg(
+				array(
+					'page'              => 'repro-ct-suite',
+					'tab'               => 'sync',
+					'settings-updated'  => 'true',
+				),
+				admin_url( 'admin.php' )
+			);
+			wp_safe_redirect( $redirect_url );
+			exit;
+		}
+
+		// Zeitraum-Konfiguration speichern
+		if ( isset( $_POST['repro_ct_suite_action'] ) && $_POST['repro_ct_suite_action'] === 'save_sync_period' ) {
+			if ( ! check_admin_referer( 'repro_ct_suite_sync_period', 'repro_ct_suite_sync_period_nonce' ) ) {
+				wp_die( __( 'Sicherheitsprüfung fehlgeschlagen.', 'repro-ct-suite' ) );
+			}
+
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( __( 'Keine Berechtigung.', 'repro-ct-suite' ) );
+			}
+
+			$sync_from_days = isset( $_POST['sync_from_days'] ) ? intval( $_POST['sync_from_days'] ) : -7;
+			$sync_to_days   = isset( $_POST['sync_to_days'] ) ? intval( $_POST['sync_to_days'] ) : 90;
+
+			// Validierung
+			$sync_from_days = max( -365, min( 0, $sync_from_days ) );
+			$sync_to_days   = max( 0, min( 730, $sync_to_days ) );
+
+			update_option( 'repro_ct_suite_sync_from_days', $sync_from_days, false );
+			update_option( 'repro_ct_suite_sync_to_days', $sync_to_days, false );
+
+			add_settings_error(
+				'repro_ct_suite_sync',
+				'period_updated',
+				__( 'Zeitraum-Konfiguration erfolgreich gespeichert.', 'repro-ct-suite' ),
+				'success'
+			);
+
+			set_transient( 'settings_errors', get_settings_errors(), 30 );
+
+			$redirect_url = add_query_arg(
+				array(
+					'page'              => 'repro-ct-suite',
+					'tab'               => 'sync',
+					'settings-updated'  => 'true',
+				),
+				admin_url( 'admin.php' )
+			);
+			wp_safe_redirect( $redirect_url );
+			exit;
+		}
+
+		// Legacy-Handler (falls noch verwendet)
 		if ( ! isset( $_POST['action'] ) || $_POST['action'] !== 'repro_ct_suite_update_calendars' ) {
 			return;
 		}
@@ -599,9 +691,11 @@ class Repro_CT_Suite_Admin {
 				) );
 			}
 
-			// Zeitraum bestimmen (Standard: heute-7 bis +90 Tage)
-			$from = date( 'Y-m-d', current_time( 'timestamp' ) - 7 * DAY_IN_SECONDS );
-			$to   = date( 'Y-m-d', current_time( 'timestamp' ) + 90 * DAY_IN_SECONDS );
+			// Zeitraum bestimmen (aus den gespeicherten Optionen)
+			$sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
+			$sync_to_days   = get_option( 'repro_ct_suite_sync_to_days', 90 );
+			$from = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_from_days * DAY_IN_SECONDS ) );
+			$to   = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_to_days * DAY_IN_SECONDS ) );
 
 			// Events synchronisieren (zeitbasiert)
 			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo );

@@ -131,12 +131,6 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 	<div class="repro-ct-suite-card-header">
 		<span class="dashicons dashicons-calendar"></span>
 		<h3><?php esc_html_e( 'Nächste Termine', 'repro-ct-suite' ); ?></h3>
-		<?php if ( ! empty( $ct_tenant ) && ! empty( $ct_username ) && ! empty( $ct_password ) ) : ?>
-			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-sm repro-ct-suite-sync-appointments-btn" style="margin-left: auto;">
-				<span class="dashicons dashicons-update"></span>
-				<?php esc_html_e( 'Jetzt synchronisieren', 'repro-ct-suite' ); ?>
-			</button>
-		<?php endif; ?>
 	</div>
 	<div class="repro-ct-suite-card-body">
 		<?php if ( ! empty( $upcoming_appointments ) ) : ?>
@@ -189,12 +183,16 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 				</a>
 			</div>
 		<?php else : ?>
-			<p><?php esc_html_e( 'Keine bevorstehenden Termine gefunden.', 'repro-ct-suite' ); ?></p>
+			<p class="description">
+				<?php esc_html_e( 'Keine bevorstehenden Termine gefunden.', 'repro-ct-suite' ); ?>
+			</p>
 			<?php if ( $connection_status === 'configured' ) : ?>
-				<button class="repro-ct-suite-btn repro-ct-suite-btn-primary repro-ct-suite-sync-btn" data-action="repro_ct_suite_sync_all" disabled>
-					<span class="dashicons dashicons-update"></span>
-					<?php esc_html_e( 'Jetzt synchronisieren', 'repro-ct-suite' ); ?>
-				</button>
+				<p>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite&tab=sync' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-primary">
+						<span class="dashicons dashicons-update"></span>
+						<?php esc_html_e( 'Termine synchronisieren', 'repro-ct-suite' ); ?>
+					</a>
+				</p>
 			<?php endif; ?>
 		<?php endif; ?>
 	</div>
