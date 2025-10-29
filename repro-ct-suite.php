@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Version mit 4 Zahlen: Major.Minor.Patch.Build
  * Build-Nummer erhöhen bei minimalen Änderungen
  */
-define( 'REPRO_CT_SUITE_VERSION', '0.3.3.0' );
+define( 'REPRO_CT_SUITE_VERSION', '0.3.3.1' );
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 define( 'REPRO_CT_SUITE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'REPRO_CT_SUITE_URL', plugin_dir_url( __FILE__ ) );

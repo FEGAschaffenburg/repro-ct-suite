@@ -467,6 +467,9 @@
 				
 				const $button = $(this);
 				
+				debugLog('=== TERMINE-SYNC GESTARTET ===', 'info');
+				debugLog('Button geklickt, starte AJAX-Request...', 'info');
+				
 				// Loading-State aktivieren
 				ReproCTSuiteAdmin.setButtonLoading($button, true);
 				
@@ -479,7 +482,17 @@
 						nonce: reproCTSuiteAdmin.nonce
 					},
 					success: function(response) {
+						debugLog('AJAX Response erhalten', 'success');
+						console.log('[DEBUG] AJAX Response:', response);
+						
 						if (response.success) {
+							debugLog('Sync erfolgreich!', 'success');
+							
+							if (response.data.stats) {
+								debugLog('Events: ' + JSON.stringify(response.data.stats.events), 'info');
+								debugLog('Appointments: ' + JSON.stringify(response.data.stats.appointments), 'info');
+							}
+							
 							ReproCTSuiteAdmin.showNotice(
 								response.data.message,
 								'success'
@@ -490,6 +503,13 @@
 								location.reload();
 							}, 1500);
 						} else {
+							debugLog('Sync fehlgeschlagen: ' + (response.data.message || 'Unbekannter Fehler'), 'error');
+							
+							if (response.data.debug) {
+								console.error('[DEBUG] Error Details:', response.data.debug);
+								debugLog('Error Details: ' + JSON.stringify(response.data.debug), 'error');
+							}
+							
 							ReproCTSuiteAdmin.showNotice(
 								response.data.message || 'Fehler bei der Synchronisation.',
 								'error'
@@ -497,13 +517,29 @@
 						}
 					},
 					error: function(xhr, status, error) {
-						console.error('AJAX Error:', xhr.responseText);
+						debugLog('AJAX-Fehler aufgetreten', 'error');
+						debugLog('Status: ' + status, 'error');
+						debugLog('Error: ' + error, 'error');
+						debugLog('HTTP Status: ' + xhr.status, 'error');
+						debugLog(xhr.responseText.substring(0, 500), 'error');
+						
+						console.error('[DEBUG] AJAX-Fehler:');
+						console.error('- Status:', status);
+						console.error('- Fehler:', error);
+						console.error('- Response Text:', xhr.responseText);
+						console.error('- Status Code:', xhr.status);
+						console.error('- Vollständiges XHR:', xhr);
+						
 						ReproCTSuiteAdmin.showNotice(
-							'Verbindungsfehler: ' + error,
+							'Verbindungsfehler: ' + error + '<br>' +
+							'Status: ' + xhr.status + '<br>' +
+							'Bitte prüfen Sie das Debug-Panel unten und die Browser-Konsole (F12) für weitere Details.',
 							'error'
 						);
 					},
 					complete: function() {
+						debugLog('AJAX-Request abgeschlossen', 'info');
+						debugLog('=== TERMINE-SYNC BEENDET ===', 'info');
 						ReproCTSuiteAdmin.setButtonLoading($button, false);
 					}
 				});
