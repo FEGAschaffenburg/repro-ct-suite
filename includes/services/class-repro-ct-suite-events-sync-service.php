@@ -18,27 +18,38 @@ class Repro_CT_Suite_Events_Sync_Service {
 	private $ct_client;
 	/** @var Repro_CT_Suite_Events_Repository */
 	private $events_repo;
+	/** @var Repro_CT_Suite_Calendars_Repository */
+	private $calendars_repo;
 
-	public function __construct( $ct_client, $events_repo ) {
-		$this->ct_client  = $ct_client;
-		$this->events_repo = $events_repo;
+	public function __construct( $ct_client, $events_repo, $calendars_repo = null ) {
+		$this->ct_client     = $ct_client;
+		$this->events_repo   = $events_repo;
+		$this->calendars_repo = $calendars_repo;
 	}
 
 	/**
 	 * Synchronisiert Events (Veranstaltungen-Einzeltermine) im Zeitraum
 	 *
-	 * @param array $args { from: Y-m-d, to: Y-m-d }
+	 * @param array $args { from: Y-m-d, to: Y-m-d, calendar_ids: array (externe ChurchTools IDs) }
 	 * @return array|WP_Error Stats-Array oder WP_Error
 	 */
 	public function sync_events( $args = array() ) {
 		$defaults = array(
-			'from' => date( 'Y-m-d', current_time( 'timestamp' ) - 7 * DAY_IN_SECONDS ),
-			'to'   => date( 'Y-m-d', current_time( 'timestamp' ) + 90 * DAY_IN_SECONDS ),
+			'from'         => date( 'Y-m-d', current_time( 'timestamp' ) - 7 * DAY_IN_SECONDS ),
+			'to'           => date( 'Y-m-d', current_time( 'timestamp' ) + 90 * DAY_IN_SECONDS ),
+			'calendar_ids' => array(), // Externe ChurchTools Calendar-IDs zum Filtern
 		);
 		$args = wp_parse_args( $args, $defaults );
 
 		Repro_CT_Suite_Logger::header( 'EVENTS-SYNC START (Veranstaltungen-Einzeltermine)' );
 		Repro_CT_Suite_Logger::log( 'Zeitraum: ' . $args['from'] . ' bis ' . $args['to'] );
+		
+		// Ausgewählte Kalender-IDs loggen
+		if ( ! empty( $args['calendar_ids'] ) ) {
+			Repro_CT_Suite_Logger::log( 'Filter auf Kalender-IDs: ' . implode( ', ', $args['calendar_ids'] ) );
+		} else {
+			Repro_CT_Suite_Logger::log( 'WARNUNG: Keine Kalender-Filter - alle Events werden importiert!', 'warning' );
+		}
 
 		$endpoints = array(
 			'/events',
@@ -79,11 +90,50 @@ class Repro_CT_Suite_Events_Sync_Service {
 		}
 
 		$events = $response['data'];
-		Repro_CT_Suite_Logger::log( 'Gefundene Events: ' . count( $events ) );
+		Repro_CT_Suite_Logger::log( 'Gefundene Events (gesamt): ' . count( $events ) );
 
-		$stats = array( 'total' => count( $events ), 'inserted' => 0, 'updated' => 0, 'errors' => 0 );
-
+		// Kalender-Filter anwenden (nachträglich, da Events-API keine calendar_ids unterstützt)
+		$allowed_calendar_ids = array_map( 'strval', $args['calendar_ids'] ); // als Strings
+		$filtered_events = array();
+		$stats_filtered = 0;
+		
 		foreach ( $events as $e ) {
+			// calendar_id extrahieren
+			$event_calendar_id = null;
+			if ( isset( $e['calendar']['id'] ) ) {
+				$event_calendar_id = (string) $e['calendar']['id'];
+			} elseif ( isset( $e['calendarId'] ) ) {
+				$event_calendar_id = (string) $e['calendarId'];
+			} elseif ( isset( $e['calendar_id'] ) ) {
+				$event_calendar_id = (string) $e['calendar_id'];
+			}
+			
+			// Wenn Kalender-Filter aktiv ist UND Event hat calendar_id
+			if ( ! empty( $allowed_calendar_ids ) && $event_calendar_id !== null ) {
+				if ( ! in_array( $event_calendar_id, $allowed_calendar_ids, true ) ) {
+					$stats_filtered++;
+					continue; // Event überspringen
+				}
+			}
+			
+			$filtered_events[] = $e;
+		}
+		
+		if ( $stats_filtered > 0 ) {
+			Repro_CT_Suite_Logger::log( 'Events gefiltert (nicht ausgewählte Kalender): ' . $stats_filtered, 'info' );
+		}
+		Repro_CT_Suite_Logger::log( 'Events nach Filter: ' . count( $filtered_events ) );
+
+		$stats = array( 
+			'total' => count( $events ), 
+			'filtered' => $stats_filtered,
+			'processed' => count( $filtered_events ),
+			'inserted' => 0, 
+			'updated' => 0, 
+			'errors' => 0 
+		);
+
+		foreach ( $filtered_events as $e ) {
 			try {
 				$external_id = (string) ( $e['id'] ?? '' );
 				if ( $external_id === '' ) { throw new Exception( 'Event ohne id' ); }

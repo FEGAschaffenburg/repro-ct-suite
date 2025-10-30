@@ -804,6 +804,16 @@ class Repro_CT_Suite_Admin {
 				) );
 			}
 
+			// Externe Calendar-IDs für Events-Filterung holen
+			$selected_external_calendar_ids = array();
+			foreach ( $selected_calendar_ids as $local_id ) {
+				$calendar = $calendars_repo->get_by_id( $local_id );
+				if ( $calendar && ! empty( $calendar->external_id ) ) {
+					$selected_external_calendar_ids[] = (string) $calendar->external_id;
+				}
+			}
+			Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe IDs): ' . ( $selected_external_calendar_ids ? implode( ',', $selected_external_calendar_ids ) : '[keine]' ) );
+
 			// Zeitraum bestimmen (aus den gespeicherten Optionen)
 			$sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
 			$sync_to_days   = get_option( 'repro_ct_suite_sync_to_days', 90 );
@@ -813,16 +823,18 @@ class Repro_CT_Suite_Admin {
 
 			// STRATEGIE: 
 			// 1. Zuerst Events aus /events synchronisieren (enthält alle ChurchTools-Events)
+			//    WICHTIG: Mit calendar_ids filtern, damit nur Events ausgewählter Kalender importiert werden
 			// 2. Dann Appointments - ABER nur die, deren appointment_id noch NICHT in rcts_events vorkommt
 			//    (d.h. Appointments OHNE zugeordnetes Event)
 			// -> Verhindert Duplikate, da Events aus /events Vorrang haben
 
-			// 1) Events synchronisieren (alle ChurchTools-Events)
-			Repro_CT_Suite_Logger::log( 'SCHRITT 1: Events synchronisieren...' );
-			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo );
+			// 1) Events synchronisieren (nur von ausgewählten Kalendern)
+			Repro_CT_Suite_Logger::log( 'SCHRITT 1: Events synchronisieren (nur ausgewählte Kalender)...' );
+			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo, $calendars_repo );
 			$events_result = $events_service->sync_events( array(
-				'from' => $from,
-				'to'   => $to,
+				'from'         => $from,
+				'to'           => $to,
+				'calendar_ids' => $selected_external_calendar_ids, // Externe ChurchTools Calendar-IDs
 			) );
 
 			if ( is_wp_error( $events_result ) ) {
