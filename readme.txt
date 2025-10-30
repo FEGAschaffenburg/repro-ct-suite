@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.4.0
+Stable tag: 0.3.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,14 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.4.1 =
+* Fix: Events-Duplikate behoben - 2-Stufen-Sync-Strategie
+* Sync: Events werden zuerst synchronisiert (aus /events)
+* Sync: Appointments-Sync überspringt Appointments, die bereits als Event existieren (prüft appointment_id)
+* Sync: Events extrahieren appointment_id aus API-Response
+* Stats: Neue Statistik 'skipped_has_event' für übersprungene Appointments
+* Version: 0.3.4.1
 
 = 0.3.4.0 =
 * Feature: Eigene Debug-Seite mit erweiterten Funktionen
