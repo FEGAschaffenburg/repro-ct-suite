@@ -229,56 +229,6 @@ if ( $release_info && ! is_wp_error( $release_info ) ) {
 		</div>
 	<?php endif; ?>
 
-	<!-- Entwickler-Informationen -->
-	<div class="repro-ct-suite-card repro-ct-suite-mt-20">
-		<div class="repro-ct-suite-card-header">
-			<span class="dashicons dashicons-admin-tools"></span>
-			<h3><?php esc_html_e( 'Für Entwickler: Neues Release erstellen', 'repro-ct-suite' ); ?></h3>
-		</div>
-		<div class="repro-ct-suite-card-body">
-			<p><?php esc_html_e( 'So erstellen Sie ein neues Release auf GitHub:', 'repro-ct-suite' ); ?></p>
-			
-			<ol style="padding-left: 20px; margin-top: 15px;">
-				<li style="margin-bottom: 10px;">
-					<strong><?php esc_html_e( 'Version in repro-ct-suite.php aktualisieren', 'repro-ct-suite' ); ?></strong>
-					<pre style="background: #f5f5f5; padding: 10px; margin-top: 5px; border-radius: 3px; overflow-x: auto;"><code>* Version: 1.1.0</code></pre>
-				</li>
-				<li style="margin-bottom: 10px;">
-					<strong><?php esc_html_e( 'Änderungen committen und pushen', 'repro-ct-suite' ); ?></strong>
-					<pre style="background: #f5f5f5; padding: 10px; margin-top: 5px; border-radius: 3px; overflow-x: auto;"><code>git add repro-ct-suite.php
-git commit -m "Bump version to 1.1.0"
-git push origin main</code></pre>
-				</li>
-				<li style="margin-bottom: 10px;">
-					<strong><?php esc_html_e( 'Release auf GitHub erstellen', 'repro-ct-suite' ); ?></strong>
-					<ul style="margin-top: 5px; padding-left: 20px;">
-						<li><?php esc_html_e( 'Gehen Sie zu:', 'repro-ct-suite' ); ?> <a href="https://github.com/FEGAschaffenburg/repro-ct-suite/releases/new" target="_blank">https://github.com/FEGAschaffenburg/repro-ct-suite/releases/new</a></li>
-						<li><?php esc_html_e( 'Tag-Version: v1.1.0 (mit "v" Präfix)', 'repro-ct-suite' ); ?></li>
-						<li><?php esc_html_e( 'Release-Titel: Version 1.1.0', 'repro-ct-suite' ); ?></li>
-						<li><?php esc_html_e( 'Beschreibung: Changelog mit Features/Fixes', 'repro-ct-suite' ); ?></li>
-						<li><?php esc_html_e( 'Klicken Sie auf "Publish release"', 'repro-ct-suite' ); ?></li>
-					</ul>
-				</li>
-				<li style="margin-bottom: 10px;">
-					<strong><?php esc_html_e( 'WordPress prüft automatisch auf Updates', 'repro-ct-suite' ); ?></strong>
-					<p class="description"><?php esc_html_e( 'Das Plugin überprüft alle 12 Stunden automatisch auf neue Releases. Sie können auch manuell prüfen:', 'repro-ct-suite' ); ?></p>
-					<a href="<?php echo esc_url( admin_url( 'plugins.php' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-primary repro-ct-suite-btn-small repro-ct-suite-mt-10">
-						<span class="dashicons dashicons-update"></span>
-						<?php esc_html_e( 'Jetzt auf Updates prüfen', 'repro-ct-suite' ); ?>
-					</a>
-				</li>
-			</ol>
-
-			<div class="repro-ct-suite-notice repro-ct-suite-notice-warning repro-ct-suite-mt-20">
-				<span class="dashicons dashicons-warning"></span>
-				<div>
-					<strong><?php esc_html_e( 'Wichtig:', 'repro-ct-suite' ); ?></strong>
-					<p><?php esc_html_e( 'Stellen Sie sicher, dass die Version in der Plugin-Datei mit dem GitHub-Release-Tag übereinstimmt (ohne "v" Präfix in der Datei).', 'repro-ct-suite' ); ?></p>
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<!-- GitHub-Repository-Link -->
 	<div class="repro-ct-suite-card repro-ct-suite-mt-20">
 		<div class="repro-ct-suite-card-header">

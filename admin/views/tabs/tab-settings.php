@@ -93,8 +93,44 @@ if ( $test_result !== false ) {
 					<span class="dashicons dashicons-yes"></span>
 					<?php esc_html_e( 'Einstellungen speichern', 'repro-ct-suite' ); ?>
 				</button>
+				<?php if ( ! empty( $tenant ) || ! empty( $username ) || ! empty( $enc_pw ) ) : ?>
+					<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-danger" id="reset-login-credentials" style="margin-left: 10px;">
+						<span class="dashicons dashicons-trash"></span>
+						<?php esc_html_e( 'Zugangsdaten löschen', 'repro-ct-suite' ); ?>
+					</button>
+				<?php endif; ?>
 			</p>
 		</form>
+
+		<script>
+		jQuery(document).ready(function($) {
+			$('#reset-login-credentials').on('click', function() {
+				if (!confirm('<?php esc_html_e( 'Möchten Sie wirklich alle Zugangsdaten (Tenant, Benutzername, Passwort) löschen? Diese Aktion kann nicht rückgängig gemacht werden.', 'repro-ct-suite' ); ?>')) {
+					return;
+				}
+				
+				$.ajax({
+					url: ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'repro_ct_suite_reset_credentials',
+						nonce: reproCTSuite.nonce
+					},
+					success: function(response) {
+						if (response.success) {
+							alert('<?php esc_html_e( 'Zugangsdaten wurden erfolgreich gelöscht.', 'repro-ct-suite' ); ?>');
+							location.reload();
+						} else {
+							alert('<?php esc_html_e( 'Fehler beim Löschen der Zugangsdaten: ', 'repro-ct-suite' ); ?>' + (response.data.message || '<?php esc_html_e( 'Unbekannter Fehler', 'repro-ct-suite' ); ?>'));
+						}
+					},
+					error: function() {
+						alert('<?php esc_html_e( 'Fehler bei der AJAX-Anfrage.', 'repro-ct-suite' ); ?>');
+					}
+				});
+			});
+		});
+		</script>
 	</div>
 </div>
 

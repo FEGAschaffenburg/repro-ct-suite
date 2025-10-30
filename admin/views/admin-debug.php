@@ -312,6 +312,28 @@ if ( $log_exists && $log_size > 0 ) {
 						<td><strong><?php esc_html_e( 'Plugin-Verzeichnis:', 'repro-ct-suite' ); ?></strong></td>
 						<td><code><?php echo esc_html( REPRO_CT_SUITE_PATH ); ?></code></td>
 					</tr>
+					<tr>
+						<td><strong><?php esc_html_e( 'Debug-Logfile:', 'repro-ct-suite' ); ?></strong></td>
+						<td>
+							<code><?php echo esc_html( $log_file ); ?></code>
+							<?php if ( $log_exists ) : ?>
+								<br>
+								<span class="description">
+									<?php 
+									printf( 
+										/* translators: 1: file size in KB, 2: number of lines */
+										esc_html__( 'Größe: %1$s KB • Zeilen: %2$s', 'repro-ct-suite' ),
+										number_format_i18n( round( $log_size / 1024, 2 ) ),
+										number_format_i18n( $log_lines )
+									); 
+									?>
+								</span>
+							<?php else : ?>
+								<br>
+								<span class="description" style="color: #999;"><?php esc_html_e( '(noch nicht erstellt)', 'repro-ct-suite' ); ?></span>
+							<?php endif; ?>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
