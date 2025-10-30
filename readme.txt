@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.3.8
+Stable tag: 0.3.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,17 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.4.0 =
+* Feature: Eigene Debug-Seite mit erweiterten Funktionen
+* Debug: Einzelne oder alle Tabellen zurücksetzen (mit Bestätigung)
+* Debug: Debug-Log-Anzeige mit Syntax-Highlighting (letzte 100 Zeilen)
+* Debug: Log leeren und aktualisieren
+* Debug: Datenbank-Migrationen manuell ausführen
+* Debug: System-Informationen (WordPress, PHP, MySQL, Memory Limit)
+* Debug: Tabellen-Statistik mit Zählung der Einträge
+* UI: Debug-Bereich vom Dashboard in eigene Seite verschoben
+* Version: 0.3.4.0
 
 = 0.3.3.8 =
 * Schema: `rcts_events` hat jetzt `appointment_id` für Verlinkung zu Appointments (DB_VERSION 3)

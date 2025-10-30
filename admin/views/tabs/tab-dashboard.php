@@ -276,34 +276,3 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 		</div>
 	</div>
 </div>
-
-<!-- Debug-Bereich (nur für Admins) -->
-<?php if ( current_user_can( 'manage_options' ) ) : ?>
-<div class="repro-ct-suite-card repro-ct-suite-mt-20" style="border-left: 3px solid #d63638;">
-	<div class="repro-ct-suite-card-header" style="background-color: #fcf0f1;">
-		<span class="dashicons dashicons-warning" style="color: #d63638;"></span>
-		<h3 style="color: #d63638;"><?php esc_html_e( 'Debug-Bereich', 'repro-ct-suite' ); ?></h3>
-	</div>
-	<div class="repro-ct-suite-card-body">
-		<p class="description" style="margin-bottom: 15px;">
-			<?php esc_html_e( 'Vorsicht: Diese Aktionen löschen alle synchronisierten Daten aus der Datenbank. Verwenden Sie dies nur zu Testzwecken oder bei Problemen.', 'repro-ct-suite' ); ?>
-		</p>
-		
-		<div style="background-color: #fff8e5; border: 1px solid #f0b849; padding: 12px; border-radius: 4px; margin-bottom: 15px;">
-			<strong><?php esc_html_e( 'Warnung:', 'repro-ct-suite' ); ?></strong>
-			<?php esc_html_e( 'Folgende Tabellen werden geleert: rcts_events, rcts_appointments, rcts_calendars, rcts_event_services', 'repro-ct-suite' ); ?>
-		</div>
-
-		<button 
-			id="repro-ct-suite-clear-tables-btn" 
-			class="repro-ct-suite-btn repro-ct-suite-btn-danger"
-			data-nonce="<?php echo esc_attr( wp_create_nonce( 'repro_ct_suite_admin' ) ); ?>"
-		>
-			<span class="dashicons dashicons-trash"></span>
-			<?php esc_html_e( 'Alle Tabellen leeren', 'repro-ct-suite' ); ?>
-		</button>
-		
-		<span id="repro-ct-suite-clear-tables-result" style="margin-left: 15px; display: none;"></span>
-	</div>
-</div>
-<?php endif; ?>

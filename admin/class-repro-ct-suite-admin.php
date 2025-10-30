@@ -44,6 +44,9 @@ class Repro_CT_Suite_Admin {
 		
 		// AJAX Handlers
 		add_action( 'wp_ajax_repro_ct_suite_clear_tables', array( $this, 'ajax_clear_tables' ) );
+		add_action( 'wp_ajax_repro_ct_suite_clear_single_table', array( $this, 'ajax_clear_single_table' ) );
+		add_action( 'wp_ajax_repro_ct_suite_run_migrations', array( $this, 'ajax_run_migrations' ) );
+		add_action( 'wp_ajax_repro_ct_suite_clear_log', array( $this, 'ajax_clear_log' ) );
 	}
 
 	/**
@@ -135,6 +138,18 @@ class Repro_CT_Suite_Admin {
 			false
 		);
 
+		// Debug-Seite JavaScript
+		$screen = get_current_screen();
+		if ( $screen && strpos( $screen->id, 'repro-ct-suite-debug' ) !== false ) {
+			wp_enqueue_script(
+				$this->plugin_name . '-debug',
+				plugin_dir_url( __FILE__ ) . 'js/repro-ct-suite-debug.js',
+				array( 'jquery' ),
+				null,
+				false
+			);
+		}
+
 		// Localize script für AJAX
 		wp_localize_script(
 			$this->plugin_name,
@@ -186,6 +201,15 @@ class Repro_CT_Suite_Admin {
 			'repro-ct-suite-update',
 			array( $this, 'display_update_page' )
 		);
+
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Debug', 'repro-ct-suite' ),
+			__( 'Debug', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-debug',
+			array( $this, 'display_debug_page' )
+		);
 	}
 
 	/**
@@ -207,6 +231,13 @@ class Repro_CT_Suite_Admin {
 	 */
 	public function display_events_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
+	}
+
+	/**
+	 * Display the debug page.
+	 */
+	public function display_debug_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-debug.php';
 	}
 
 	/**
@@ -887,6 +918,174 @@ class Repro_CT_Suite_Admin {
 				),
 				'cleared' => $cleared,
 				'errors' => $errors,
+			) );
+		}
+	}
+
+	/**
+	 * AJAX: Leert eine einzelne Tabelle (Debug-Funktion)
+	 */
+	public function ajax_clear_single_table() {
+		// Nonce-Prüfung
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		// Berechtigungsprüfung
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$table_key = isset( $_POST['table'] ) ? sanitize_text_field( $_POST['table'] ) : '';
+
+		if ( empty( $table_key ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Tabelle angegeben.', 'repro-ct-suite' )
+			) );
+		}
+
+		global $wpdb;
+
+		// Mapping von table_key zu echtem Tabellennamen
+		$table_mapping = array(
+			'rcts_calendars'       => $wpdb->prefix . 'rcts_calendars',
+			'rcts_events'          => $wpdb->prefix . 'rcts_events',
+			'rcts_appointments'    => $wpdb->prefix . 'rcts_appointments',
+			'rcts_event_services'  => $wpdb->prefix . 'rcts_event_services',
+		);
+
+		if ( ! isset( $table_mapping[ $table_key ] ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ungültige Tabelle.', 'repro-ct-suite' )
+			) );
+		}
+
+		$table = $table_mapping[ $table_key ];
+
+		// Prüfe, ob Tabelle existiert
+		$table_exists = $wpdb->get_var( $wpdb->prepare( 
+			"SHOW TABLES LIKE %s", 
+			$table 
+		) );
+
+		if ( ! $table_exists ) {
+			wp_send_json_error( array(
+				'message' => sprintf( 
+					__( 'Tabelle %s existiert nicht.', 'repro-ct-suite' ),
+					$table
+				)
+			) );
+		}
+
+		// Tabelle leeren
+		$result = $wpdb->query( "TRUNCATE TABLE `{$table}`" );
+
+		if ( $result !== false ) {
+			wp_send_json_success( array(
+				'message' => sprintf(
+					__( 'Tabelle %s wurde erfolgreich geleert.', 'repro-ct-suite' ),
+					str_replace( $wpdb->prefix, '', $table )
+				),
+				'table' => $table_key,
+			) );
+		} else {
+			wp_send_json_error( array(
+				'message' => sprintf(
+					__( 'Fehler beim Leeren der Tabelle %s: %s', 'repro-ct-suite' ),
+					$table,
+					$wpdb->last_error
+				)
+			) );
+		}
+	}
+
+	/**
+	 * AJAX: Führt DB-Migrationen manuell aus
+	 */
+	public function ajax_run_migrations() {
+		// Nonce-Prüfung
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		// Berechtigungsprüfung
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Migrations-Klasse laden
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-migrations.php';
+
+		$old_version = get_option( 'repro_ct_suite_db_version', '0' );
+
+		try {
+			// Migration ausführen
+			Repro_CT_Suite_Migrations::run();
+
+			$new_version = get_option( 'repro_ct_suite_db_version', '0' );
+
+			if ( $old_version === $new_version ) {
+				wp_send_json_success( array(
+					'message' => sprintf(
+						__( 'Datenbank ist bereits auf dem neuesten Stand (Version %s).', 'repro-ct-suite' ),
+						$new_version
+					),
+					'old_version' => $old_version,
+					'new_version' => $new_version,
+				) );
+			} else {
+				wp_send_json_success( array(
+					'message' => sprintf(
+						__( 'Datenbank erfolgreich aktualisiert von Version %s auf %s.', 'repro-ct-suite' ),
+						$old_version,
+						$new_version
+					),
+					'old_version' => $old_version,
+					'new_version' => $new_version,
+				) );
+			}
+		} catch ( Exception $e ) {
+			wp_send_json_error( array(
+				'message' => sprintf(
+					__( 'Fehler bei der Migration: %s', 'repro-ct-suite' ),
+					$e->getMessage()
+				)
+			) );
+		}
+	}
+
+	/**
+	 * AJAX: Leert die Debug-Log-Datei
+	 */
+	public function ajax_clear_log() {
+		// Nonce-Prüfung
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		// Berechtigungsprüfung
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$log_file = WP_CONTENT_DIR . '/repro-ct-suite-debug.log';
+
+		if ( ! file_exists( $log_file ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Log-Datei existiert nicht.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Log-Datei leeren
+		$result = file_put_contents( $log_file, '' );
+
+		if ( $result !== false ) {
+			wp_send_json_success( array(
+				'message' => __( 'Debug-Log wurde erfolgreich geleert.', 'repro-ct-suite' )
+			) );
+		} else {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Leeren der Log-Datei.', 'repro-ct-suite' )
 			) );
 		}
 	}
