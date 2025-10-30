@@ -64,62 +64,31 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 		Repro_CT_Suite_Logger::log( 'Zeitraum: ' . $args['from'] . ' bis ' . $args['to'] );
 		Repro_CT_Suite_Logger::log( 'Kalender (extern): ' . implode( ',', $external_calendar_ids ) );
 
-		// Endpunkt + Fallbacks (nur GET, da API 405 auf POST liefert)
-		$attempts = array();
-
-		// Helper zum Bauen von Querystrings mit wiederholten Keys (calendarIds[]=1&calendarIds[]=2)
-		$from_to_qs = http_build_query( array( 'from' => $args['from'], 'to' => $args['to'] ) );
-		$ids_bracket = implode( '&', array_map( function( $id ) { return 'calendarIds[]=' . rawurlencode( (string) $id ); }, $external_calendar_ids ) );
-		$cals_bracket = implode( '&', array_map( function( $id ) { return 'calendars[]=' . rawurlencode( (string) $id ); }, $external_calendar_ids ) );
-		$ids_csv = 'calendarIds=' . rawurlencode( implode( ',', $external_calendar_ids ) );
-		$cals_csv = 'calendars=' . rawurlencode( implode( ',', $external_calendar_ids ) );
-
-		// 1) GET mit calendarIds[] wiederholt
-		$attempts[] = array( 'method' => 'GET_RAW', 'endpoint' => '/calendars/appointments?' . $from_to_qs . '&' . $ids_bracket );
-		// 2) GET mit calendars[] wiederholt
-		$attempts[] = array( 'method' => 'GET_RAW', 'endpoint' => '/calendars/appointments?' . $from_to_qs . '&' . $cals_bracket );
-		// 3) GET mit calendarIds als CSV
-		$attempts[] = array( 'method' => 'GET_RAW', 'endpoint' => '/calendars/appointments?' . $from_to_qs . '&' . $ids_csv );
-		// 4) GET mit calendars als CSV
-		$attempts[] = array( 'method' => 'GET_RAW', 'endpoint' => '/calendars/appointments?' . $from_to_qs . '&' . $cals_csv );
-		// 5) GET Standard mit add_query_arg und calendarIds als Array (letzter Versuch)
-		$attempts[] = array( 'method' => 'GET_ARGS', 'endpoint' => '/calendars/appointments', 'params' => array( 'from' => $args['from'], 'to' => $args['to'], 'calendarIds' => $external_calendar_ids ) );
-
-		$response = null;
-		foreach ( $attempts as $i => $try ) {
-			if ( $try['method'] === 'GET_RAW' ) {
-				Repro_CT_Suite_Logger::log( 'Try GET (raw) ' . $try['endpoint'] );
-				$response = $this->ct_client->get( $try['endpoint'], array() );
-			} elseif ( $try['method'] === 'GET_ARGS' ) {
-				Repro_CT_Suite_Logger::log( 'Try GET ' . $try['endpoint'] . ' with params keys [' . implode( ',', array_keys( $try['params'] ) ) . ']' );
-				$response = $this->ct_client->get( $try['endpoint'], $try['params'] );
-			} else {
-				continue;
-			}
-
+		// Neue Strategie: pro Kalender GET /calendars/{id}/appointments
+		$all_appointments = array();
+		$errors = 0;
+		foreach ( $external_calendar_ids as $cid ) {
+			$endpoint = '/calendars/' . rawurlencode( (string) $cid ) . '/appointments';
+			Repro_CT_Suite_Logger::log( 'Abruf: ' . $endpoint . ' ? from=' . $args['from'] . ' & to=' . $args['to'] );
+			$response = $this->ct_client->get( $endpoint, array( 'from' => $args['from'], 'to' => $args['to'] ) );
 			if ( is_wp_error( $response ) ) {
 				$code = $response->get_error_data()['status'] ?? null;
-				Repro_CT_Suite_Logger::log( 'Endpoint failed (status=' . ( $code ?? 'n/a' ) . '): ' . $response->get_error_message(), 'warning' );
-				if ( in_array( (int) $code, array( 400, 404, 405 ), true ) ) { continue; }
-				return $response;
+				Repro_CT_Suite_Logger::log( 'Kalender ' . $cid . ' fehlgeschlagen (status=' . ( $code ?? 'n/a' ) . '): ' . $response->get_error_message(), 'warning' );
+				if ( in_array( (int) $code, array( 400, 404, 405 ), true ) ) { $errors++; continue; }
+				return $response; // harte Fehler abbrechen
 			}
-			break; // Erfolg
+			if ( isset( $response['data'] ) && is_array( $response['data'] ) ) {
+				$all_appointments = array_merge( $all_appointments, $response['data'] );
+			} else {
+				Repro_CT_Suite_Logger::log( 'Unerwartete Struktur bei Kalender ' . $cid, 'warning' );
+				$errors++;
+			}
 		}
 
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
+		Repro_CT_Suite_Logger::log( 'Gefundene Appointments gesamt: ' . count( $all_appointments ) );
 
-		if ( ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
-			Repro_CT_Suite_Logger::log( 'Ungültige Appointments-Response-Struktur', 'error' );
-			Repro_CT_Suite_Logger::dump( $response, 'Full Response', 'error' );
-			return new WP_Error( 'invalid_appointments_response', __( 'Ungültige API-Antwort für Appointments', 'repro-ct-suite' ) );
-		}
-
-		$appointments = $response['data'];
-		Repro_CT_Suite_Logger::log( 'Gefundene Appointments: ' . count( $appointments ) );
-
-		$stats = array( 'total' => count( $appointments ), 'inserted' => 0, 'updated' => 0, 'errors' => 0 );
+		$appointments = $all_appointments;
+		$stats = array( 'total' => count( $appointments ), 'inserted' => 0, 'updated' => 0, 'errors' => (int) $errors );
 
 		foreach ( $appointments as $a ) {
 			try {
