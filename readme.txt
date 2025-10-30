@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.6.2
+Stable tag: 0.3.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,14 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.7.0 =
+* Feature: Neue DB-Tabelle rcts_schedule als konsolidierte Terminübersicht (Events + Appointments)
+* Feature: Neue Admin-Seite "Terminübersicht" mit Filtern (Zeitraum, Kalender, Typ)
+* Änderung: Appointments-Sync setzt calendar_id jetzt strikt aus dem aufrufenden Endpoint (/calendars/{calendarId}/appointments)
+* Änderung: Beide Sync-Services (Events & Appointments) befüllen die neue Terminübersicht automatisch
+* Wartung: Uninstall bereinigt nun auch rcts_schedule-Tabelle
+* Version: 0.3.7.0
 
 = 0.3.6.2 =
 * **CRITICAL FIX**: Events-Sync filtert jetzt nach ausgewählten Kalendern (is_selected)

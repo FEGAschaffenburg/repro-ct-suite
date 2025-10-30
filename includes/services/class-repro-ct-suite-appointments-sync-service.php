@@ -22,12 +22,15 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 	private $events_repo;
 	/** @var Repro_CT_Suite_Calendars_Repository */
 	private $calendars_repo;
+	/** @var Repro_CT_Suite_Schedule_Repository */
+	private $schedule_repo;
 
-	public function __construct( $ct_client, $appointments_repo, $events_repo, $calendars_repo ) {
+	public function __construct( $ct_client, $appointments_repo, $events_repo, $calendars_repo, $schedule_repo = null ) {
 		$this->ct_client        = $ct_client;
 		$this->appointments_repo = $appointments_repo;
 		$this->events_repo      = $events_repo;
 		$this->calendars_repo   = $calendars_repo;
+		$this->schedule_repo    = $schedule_repo;
 	}
 
 	/**
@@ -67,8 +70,17 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 		Repro_CT_Suite_Logger::log( 'Kalender (extern): ' . implode( ',', $external_calendar_ids ) );
 
 		// Pro Kalender: GET /calendars/{id}/appointments (Terminvorlagen mit berechneten Instanzen)
-		$all_appointments = array();
 		$errors = 0;
+		$stats = array(
+			'total' => 0,
+			'events_inserted' => 0,
+			'events_updated' => 0,
+			'appointments_inserted' => 0,
+			'appointments_updated' => 0,
+			'skipped_has_event' => 0,
+			'errors' => 0,
+		);
+
 		foreach ( $external_calendar_ids as $cid ) {
 			$endpoint = '/calendars/' . rawurlencode( (string) $cid ) . '/appointments';
 			Repro_CT_Suite_Logger::log( 'Abruf: ' . $endpoint . ' ? from=' . $args['from'] . ' & to=' . $args['to'] );
@@ -79,135 +91,132 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 				if ( in_array( (int) $code, array( 400, 404, 405 ), true ) ) { $errors++; continue; }
 				return $response; // harte Fehler abbrechen
 			}
-			if ( isset( $response['data'] ) && is_array( $response['data'] ) ) {
-				$all_appointments = array_merge( $all_appointments, $response['data'] );
-			} else {
+			if ( ! ( isset( $response['data'] ) && is_array( $response['data'] ) ) ) {
 				Repro_CT_Suite_Logger::log( 'Unerwartete Struktur bei Kalender ' . $cid, 'warning' );
 				$errors++;
+				continue;
 			}
-		}
 
-		Repro_CT_Suite_Logger::log( 'Gefundene Appointments gesamt: ' . count( $all_appointments ) );
+			$appointments = $response['data'];
+			$stats['total'] += count( $appointments );
 
-		$appointments = $all_appointments;
-		$stats = array( 
-			'total' => count( $appointments ), 
-			'events_inserted' => 0, 
-			'events_updated' => 0,
-			'appointments_inserted' => 0,
-			'appointments_updated' => 0,
-			'skipped_has_event' => 0, // Appointments die übersprungen wurden, weil Event bereits existiert
-			'errors' => (int) $errors 
-		);
+			global $wpdb;
+			$events_table = $wpdb->prefix . 'rcts_events';
 
-		global $wpdb;
-		$events_table = $wpdb->prefix . 'rcts_events';
+			foreach ( $appointments as $a ) {
+				try {
+					// Appointment-Daten extrahieren: base = Basis-Termin, calculated = berechnete Instanz
+					$appointment_base = $a['appointment']['base'] ?? $a['base'] ?? null;
+					$appointment_calc = $a['appointment']['calculated'] ?? $a['calculated'] ?? null;
 
-		foreach ( $appointments as $a ) {
-			try {
-				// Appointment-Daten extrahieren: base = Basis-Termin, calculated = berechnete Instanz
-				$appointment_base = $a['appointment']['base'] ?? $a['base'] ?? null;
-				$appointment_calc = $a['appointment']['calculated'] ?? $a['calculated'] ?? null;
+					if ( ! $appointment_base || ! $appointment_calc ) {
+						Repro_CT_Suite_Logger::log( 'Ungültiges Appointment-Format (base/calculated fehlt)', 'warning' );
+						$stats['errors']++;
+						continue;
+					}
 
-				if ( ! $appointment_base || ! $appointment_calc ) {
-					Repro_CT_Suite_Logger::log( 'Ungültiges Appointment-Format (base/calculated fehlt)', 'warning' );
-					$stats['errors']++;
-					continue;
-				}
+					$appointment_id = (int) ( $appointment_base['id'] ?? 0 );
+					if ( $appointment_id === 0 ) {
+						throw new Exception( 'Appointment ohne id' );
+					}
 
-				$appointment_id = (int) ( $appointment_base['id'] ?? 0 );
-				if ( $appointment_id === 0 ) {
-					throw new Exception( 'Appointment ohne id' );
-				}
+					// WICHTIG: Prüfen, ob bereits ein Event mit dieser appointment_id existiert
+					// Falls ja, überspringen wir dieses Appointment (wurde bereits vom Events-Sync geholt)
+					$existing_event_with_appointment = $wpdb->get_var( $wpdb->prepare(
+						"SELECT id FROM {$events_table} WHERE appointment_id = %d LIMIT 1",
+						$appointment_id
+					) );
 
-				// WICHTIG: Prüfen, ob bereits ein Event mit dieser appointment_id existiert
-				// Falls ja, überspringen wir dieses Appointment (wurde bereits vom Events-Sync geholt)
-				$existing_event_with_appointment = $wpdb->get_var( $wpdb->prepare(
-					"SELECT id FROM {$events_table} WHERE appointment_id = %d LIMIT 1",
-					$appointment_id
-				) );
+					if ( $existing_event_with_appointment ) {
+						Repro_CT_Suite_Logger::log( 'Appointment #' . $appointment_id . ' übersprungen - Event bereits vorhanden (ID: ' . $existing_event_with_appointment . ')', 'info' );
+						$stats['skipped_has_event']++;
+						continue; // Nächstes Appointment
+					}
 
-				if ( $existing_event_with_appointment ) {
-					Repro_CT_Suite_Logger::log( 'Appointment #' . $appointment_id . ' übersprungen - Event bereits vorhanden (ID: ' . $existing_event_with_appointment . ')', 'info' );
-					$stats['skipped_has_event']++;
-					continue; // Nächstes Appointment
-				}
+					// Kalender-Zuordnung: EXTERNE Calendar-ID DIREKT aus dem Endpoint-Kontext verwenden
+					$calendar_id = (string) $cid;
 
-				// Kalender-Zuordnung (externe ChurchTools Calendar-ID)
-				// WICHTIG: Wir speichern die EXTERNE Calendar-ID, nicht die interne WordPress-ID
-				$calendar_ext = $appointment_base['calendar']['id'] ?? null;
-				$calendar_id = $calendar_ext !== null ? (string) $calendar_ext : null;
+					// Gemeinsame Daten
+					$title = sanitize_text_field( $appointment_base['title'] ?? '' );
+					$description = isset( $appointment_base['description'] ) ? (string) $appointment_base['description'] : null;
+					$start_raw = $appointment_calc['startDate'] ?? null;
+					$end_raw   = $appointment_calc['endDate'] ?? null;
+					$is_all_day = ! empty( $appointment_base['allDay'] ) ? 1 : 0;
 
-				// Gemeinsame Daten
-				$title = sanitize_text_field( $appointment_base['title'] ?? '' );
-				$description = isset( $appointment_base['description'] ) ? (string) $appointment_base['description'] : null;
-				$start_raw = $appointment_calc['startDate'] ?? null;
-				$end_raw   = $appointment_calc['endDate'] ?? null;
-				$is_all_day = ! empty( $appointment_base['allDay'] ) ? 1 : 0;
+					$start_dt = $start_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $start_raw ) ) : null;
+					$end_dt   = $end_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $end_raw ) ) : null;
 
-				$start_dt = $start_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $start_raw ) ) : null;
-				$end_dt   = $end_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $end_raw ) ) : null;
-
-				// 1) APPOINTMENT speichern (Basis-Termin in rcts_appointments)
-				$appointment_data = array(
-					'external_id'     => (string) $appointment_id,
-					'event_id'        => null, // wird später gesetzt, falls Event existiert
-					'calendar_id'     => $calendar_id, // Externe ChurchTools Calendar-ID
-					'title'           => $title,
-					'description'     => $description,
-					'start_datetime'  => $start_dt,
-					'end_datetime'    => $end_dt,
-					'is_all_day'      => $is_all_day,
-					'raw_payload'     => wp_json_encode( $a ),
-				);
-
-				// Prüfe, ob Appointment bereits existiert (via upsert_by_external_id gibt es keine direkte "exists"-Methode)
-				$local_appointment_id = $this->appointments_repo->upsert_by_external_id( $appointment_data );
-				// Bestimme, ob insert oder update (upsert gibt immer ID zurück, prüfe vorher ob existiert)
-				global $wpdb;
-				$existed_before = $wpdb->get_var( $wpdb->prepare(
-					"SELECT id FROM " . $wpdb->prefix . "rcts_appointments WHERE external_id = %s AND id != %d",
-					(string) $appointment_id,
-					$local_appointment_id
-				) );
-				$stats[ $existed_before ? 'appointments_updated' : 'appointments_inserted' ]++;
-
-				// 2) EVENT speichern (Einzeltermin-Instanz in rcts_events)
-				// External ID: Kombiniere appointment_id + startDate für eindeutige Event-Instanzen
-				$event_external_id = 'appt_' . $appointment_id . '_' . gmdate( 'Ymd_His', strtotime( $start_raw ) );
-
-				$event_data = array(
-					'external_id'     => $event_external_id,
-					'calendar_id'     => $calendar_id, // Externe ChurchTools Calendar-ID
-					'appointment_id'  => $appointment_id,
-					'title'           => $title,
-					'description'     => $description,
-					'start_datetime'  => $start_dt,
-					'end_datetime'    => $end_dt,
-					'location_name'   => null, // optional aus address extrahieren
-					'status'          => null,
-					'raw_payload'     => wp_json_encode( $a ),
-				);
-
-				$existing_event_id = $this->events_repo->get_id_by_external_id( $event_external_id );
-				$local_event_id = $this->events_repo->upsert_by_external_id( $event_data );
-				$stats[ $existing_event_id ? 'events_updated' : 'events_inserted' ]++;
-
-				// 3) Appointment mit Event verknüpfen (event_id setzen)
-				if ( $local_event_id && $local_appointment_id ) {
-					global $wpdb;
-					$wpdb->update(
-						$wpdb->prefix . 'rcts_appointments',
-						array( 'event_id' => $local_event_id ),
-						array( 'id' => $local_appointment_id ),
-						array( '%d' ),
-						array( '%d' )
+					// 1) APPOINTMENT speichern (Basis-Termin in rcts_appointments)
+					$appointment_data = array(
+						'external_id'     => (string) $appointment_id,
+						'event_id'        => null, // wird später gesetzt, falls Event existiert
+						'calendar_id'     => $calendar_id, // Externe ChurchTools Calendar-ID (aus Endpoint)
+						'title'           => $title,
+						'description'     => $description,
+						'start_datetime'  => $start_dt,
+						'end_datetime'    => $end_dt,
+						'is_all_day'      => $is_all_day,
+						'raw_payload'     => wp_json_encode( $a ),
 					);
-				}
 
-			} catch ( Exception $ex ) {
-				$stats['errors']++;
-				Repro_CT_Suite_Logger::log( 'Appointment-Import-Fehler: ' . $ex->getMessage(), 'error' );
+					// Prüfe, ob Appointment bereits existiert (via upsert_by_external_id gibt es keine direkte "exists"-Methode)
+					$local_appointment_id = $this->appointments_repo->upsert_by_external_id( $appointment_data );
+					// Bestimme, ob insert oder update (upsert gibt immer ID zurück, prüfe vorher ob existiert)
+					global $wpdb;
+					$existed_before = $wpdb->get_var( $wpdb->prepare(
+						"SELECT id FROM " . $wpdb->prefix . "rcts_appointments WHERE external_id = %s AND id != %d",
+						(string) $appointment_id,
+						$local_appointment_id
+					) );
+					$stats[ $existed_before ? 'appointments_updated' : 'appointments_inserted' ]++;
+
+					// Schedule aus Appointment updaten
+					if ( $this->schedule_repo && $local_appointment_id ) {
+						$this->schedule_repo->upsert_from_appointment( array_merge( $appointment_data, array( 'id' => $local_appointment_id ) ) );
+					}
+
+					// 2) EVENT speichern (Einzeltermin-Instanz in rcts_events)
+					// External ID: Kombiniere appointment_id + startDate für eindeutige Event-Instanzen
+					$event_external_id = 'appt_' . $appointment_id . '_' . gmdate( 'Ymd_His', strtotime( $start_raw ) );
+
+					$event_data = array(
+						'external_id'     => $event_external_id,
+						'calendar_id'     => $calendar_id, // Externe ChurchTools Calendar-ID (aus Endpoint)
+						'appointment_id'  => $appointment_id,
+						'title'           => $title,
+						'description'     => $description,
+						'start_datetime'  => $start_dt,
+						'end_datetime'    => $end_dt,
+						'location_name'   => null, // optional aus address extrahieren
+						'status'          => null,
+						'raw_payload'     => wp_json_encode( $a ),
+					);
+
+					$existing_event_id = $this->events_repo->get_id_by_external_id( $event_external_id );
+					$local_event_id = $this->events_repo->upsert_by_external_id( $event_data );
+					$stats[ $existing_event_id ? 'events_updated' : 'events_inserted' ]++;
+
+					// Schedule aus Event updaten
+					if ( $this->schedule_repo && $local_event_id ) {
+						$this->schedule_repo->upsert_from_event( array_merge( $event_data, array( 'id' => $local_event_id ) ) );
+					}
+
+					// 3) Appointment mit Event verknüpfen (event_id setzen)
+					if ( $local_event_id && $local_appointment_id ) {
+						global $wpdb;
+						$wpdb->update(
+							$wpdb->prefix . 'rcts_appointments',
+							array( 'event_id' => $local_event_id ),
+							array( 'id' => $local_appointment_id ),
+							array( '%d' ),
+							array( '%d' )
+						);
+					}
+
+				} catch ( Exception $ex ) {
+					$stats['errors']++;
+					Repro_CT_Suite_Logger::log( 'Appointment-Import-Fehler: ' . $ex->getMessage(), 'error' );
+				}
 			}
 		}
 

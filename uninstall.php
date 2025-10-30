@@ -44,6 +44,7 @@ function repro_ct_suite_cleanup_site() {
         $wpdb->prefix . 'rcts_events',
         $wpdb->prefix . 'rcts_appointments',
         $wpdb->prefix . 'rcts_event_services',
+        $wpdb->prefix . 'rcts_schedule',
     );
 
     foreach ( $tables as $table ) {

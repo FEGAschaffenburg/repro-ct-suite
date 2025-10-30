@@ -20,11 +20,14 @@ class Repro_CT_Suite_Events_Sync_Service {
 	private $events_repo;
 	/** @var Repro_CT_Suite_Calendars_Repository */
 	private $calendars_repo;
+	/** @var Repro_CT_Suite_Schedule_Repository */
+	private $schedule_repo;
 
-	public function __construct( $ct_client, $events_repo, $calendars_repo = null ) {
+	public function __construct( $ct_client, $events_repo, $calendars_repo = null, $schedule_repo = null ) {
 		$this->ct_client     = $ct_client;
 		$this->events_repo   = $events_repo;
 		$this->calendars_repo = $calendars_repo;
+		$this->schedule_repo = $schedule_repo;
 	}
 
 	/**
@@ -187,6 +190,11 @@ class Repro_CT_Suite_Events_Sync_Service {
 				$existing_id = $this->events_repo->get_id_by_external_id( $external_id );
 				$local_id = $this->events_repo->upsert_by_external_id( $data );
 				$stats[ $existing_id ? 'updated' : 'inserted' ]++;
+
+				// Schedule updaten
+				if ( $this->schedule_repo && $local_id ) {
+					$this->schedule_repo->upsert_from_event( array_merge( $data, array( 'id' => $local_id ) ) );
+				}
 			} catch ( Exception $ex ) {
 				$stats['errors']++;
 				Repro_CT_Suite_Logger::log( 'Event-Import-Fehler: ' . $ex->getMessage(), 'error' );

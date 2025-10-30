@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Migrations {
 
-	const DB_VERSION = '4';
+	const DB_VERSION = '5';
 	const OPTION_KEY = 'repro_ct_suite_db_version';
 
 	/**
@@ -31,6 +31,7 @@ class Repro_CT_Suite_Migrations {
 		$events_table       = $wpdb->prefix . 'rcts_events';
 		$appointments_table = $wpdb->prefix . 'rcts_appointments';
 		$services_table     = $wpdb->prefix . 'rcts_event_services';
+		$schedule_table     = $wpdb->prefix . 'rcts_schedule';
 
 		// Calendars (Kalender aus ChurchTools)
 		$sql_calendars = "CREATE TABLE {$calendars_table} (
@@ -109,6 +110,30 @@ class Repro_CT_Suite_Migrations {
 		dbDelta( $sql_appointments );
 		dbDelta( $sql_services );
 
+		// Kombinierte Terminübersicht (Schedule)
+		$sql_schedule = "CREATE TABLE {$schedule_table} (
+			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			source_type VARCHAR(20) NOT NULL,
+			source_local_id BIGINT(20) UNSIGNED NOT NULL,
+			external_id VARCHAR(64) NULL,
+			calendar_id VARCHAR(64) NULL,
+			title VARCHAR(255) NOT NULL,
+			description LONGTEXT NULL,
+			start_datetime DATETIME NOT NULL,
+			end_datetime DATETIME NULL,
+			is_all_day TINYINT(1) NOT NULL DEFAULT 0,
+			location_name VARCHAR(255) NULL,
+			status VARCHAR(32) NULL,
+			updated_at DATETIME NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY unique_source (source_type, source_local_id),
+			KEY calendar_id (calendar_id),
+			KEY start_datetime (start_datetime),
+			KEY end_datetime (end_datetime)
+		) {$charset_collate};";
+
+		dbDelta( $sql_schedule );
+
 		// Versionsabhängige Daten-Migrationen
 		$current = get_option( self::OPTION_KEY, '0' );
 		
@@ -116,6 +141,8 @@ class Repro_CT_Suite_Migrations {
 		if ( version_compare( $current, '4', '<' ) ) {
 			self::migrate_calendar_ids_v4();
 		}
+
+		// Platzhalter für zukünftige Migrationen (z.B. Backfill der Schedule-Tabelle)
 
 		update_option( self::OPTION_KEY, self::DB_VERSION );
 	}

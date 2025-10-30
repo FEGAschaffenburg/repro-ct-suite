@@ -234,6 +234,16 @@ class Repro_CT_Suite_Admin {
 			array( $this, 'display_events_page' )
 		);
 
+		// Submenu: Terminübersicht (kombinierte Liste)
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Terminübersicht', 'repro-ct-suite' ),
+			__( 'Terminübersicht', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-schedule',
+			array( $this, 'display_schedule_page' )
+		);
+
 		// Submenu: Update-Info (immer sichtbar)
 		add_submenu_page(
 			'repro-ct-suite',
@@ -274,6 +284,13 @@ class Repro_CT_Suite_Admin {
 	 */
 	public function display_events_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
+	}
+
+	/**
+	 * Display the schedule (Terminübersicht) page.
+	 */
+	public function display_schedule_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-schedule.php';
 	}
 
 	/**
@@ -751,6 +768,7 @@ class Repro_CT_Suite_Admin {
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-events-repository.php';
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-schedule-repository.php';
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-events-sync-service.php';
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-appointments-sync-service.php';
 
@@ -789,6 +807,7 @@ class Repro_CT_Suite_Admin {
 			$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
 			$events_repo = new Repro_CT_Suite_Events_Repository();
 			$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
+			$schedule_repo = new Repro_CT_Suite_Schedule_Repository();
 
 			// Debug-Kontext
 			Repro_CT_Suite_Logger::log( 'Tenant: ' . $tenant );
@@ -830,7 +849,7 @@ class Repro_CT_Suite_Admin {
 
 			// 1) Events synchronisieren (nur von ausgewählten Kalendern)
 			Repro_CT_Suite_Logger::log( 'SCHRITT 1: Events synchronisieren (nur ausgewählte Kalender)...' );
-			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo, $calendars_repo );
+			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo, $calendars_repo, $schedule_repo );
 			$events_result = $events_service->sync_events( array(
 				'from'         => $from,
 				'to'           => $to,
@@ -856,7 +875,7 @@ class Repro_CT_Suite_Admin {
 
 			// 2) Appointments synchronisieren (nur die OHNE Event)
 			Repro_CT_Suite_Logger::log( 'SCHRITT 2: Appointments synchronisieren (nur ohne Event)...' );
-			$appointments_service = new Repro_CT_Suite_Appointments_Sync_Service( $ct_client, $appointments_repo, $events_repo, $calendars_repo );
+			$appointments_service = new Repro_CT_Suite_Appointments_Sync_Service( $ct_client, $appointments_repo, $events_repo, $calendars_repo, $schedule_repo );
 			$appointments_result = $appointments_service->sync_appointments( array(
 				'calendar_ids' => $selected_calendar_ids,
 				'from' => $from,
@@ -968,6 +987,7 @@ class Repro_CT_Suite_Admin {
 			$wpdb->prefix . 'rcts_event_services',
 			$wpdb->prefix . 'rcts_appointments',
 			$wpdb->prefix . 'rcts_events',
+			$wpdb->prefix . 'rcts_schedule',
 			$wpdb->prefix . 'rcts_calendars',
 		);
 
@@ -1045,6 +1065,7 @@ class Repro_CT_Suite_Admin {
 			'rcts_events'          => $wpdb->prefix . 'rcts_events',
 			'rcts_appointments'    => $wpdb->prefix . 'rcts_appointments',
 			'rcts_event_services'  => $wpdb->prefix . 'rcts_event_services',
+			'rcts_schedule'        => $wpdb->prefix . 'rcts_schedule',
 		);
 
 		if ( ! isset( $table_mapping[ $table_key ] ) ) {
