@@ -49,6 +49,7 @@ if ( ! empty( $calendar_filter ) ) {
 $where_clause = count( $where_conditions ) > 0 ? 'WHERE ' . implode( ' AND ', $where_conditions ) : '';
 
 // UNION: Events + Appointments ohne event_id
+// WICHTIG: calendar_id in beiden Tabellen ist die externe ChurchTools Calendar-ID
 $sql = "
 	SELECT id, external_id, calendar_id, appointment_id, title, description, start_datetime, end_datetime, 'event' AS source
 	FROM {$events_table}
@@ -128,15 +129,17 @@ $total_pages = ceil( $total / $limit );
             <table class="widefat fixed striped">
                 <thead>
                     <tr>
-                        <th style="width:18%;"><?php esc_html_e( 'Datum/Uhrzeit', 'repro-ct-suite' ); ?></th>
-                        <th style="width:10%;"><?php esc_html_e( 'Art', 'repro-ct-suite' ); ?></th>
-                        <th style="width:50%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
-                        <th style="width:22%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
+                        <th style="width:12%;"><?php esc_html_e( 'Anfang', 'repro-ct-suite' ); ?></th>
+                        <th style="width:12%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
+                        <th style="width:25%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
+                        <th style="width:25%;"><?php esc_html_e( 'Beschreibung', 'repro-ct-suite' ); ?></th>
+                        <th style="width:16%;"><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
+                        <th style="width:10%;"><?php esc_html_e( 'Typ', 'repro-ct-suite' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php if ( empty( $items ) ) : ?>
-                    <tr><td colspan="4" style="text-align:center; padding:30px;">
+                    <tr><td colspan="6" style="text-align:center; padding:30px;">
                         <?php esc_html_e( 'Keine Termine gefunden. Führen Sie die Synchronisation aus, um Termine zu importieren.', 'repro-ct-suite' ); ?>
                     </td></tr>
                 <?php else : foreach ( $items as $item ) : 
@@ -144,7 +147,9 @@ $total_pages = ceil( $total / $limit );
                     $type = $item->source === 'event' ? 'Event' : 'Termin';
                     $type_class = $item->source === 'event' ? 'repro-ct-suite-badge-info' : 'repro-ct-suite-badge-success';
                     $tooltip = $item->source === 'event' ? 'Event aus ChurchTools Events-API' : 'Termin aus Appointment (ohne Event-Verknüpfung)';
-                    $calendar = $item->calendar_id ? $calendars_repo->get_by_id( $item->calendar_id ) : null;
+                    
+                    // Kalender holen über external_id (calendar_id in Events/Appointments ist die externe ChurchTools ID)
+                    $calendar = $item->calendar_id ? $calendars_repo->get_by_external_id( $item->calendar_id ) : null;
                     
                     // WordPress-Zeitzone berücksichtigen
                     $wp_timezone = wp_timezone();
@@ -156,6 +161,9 @@ $total_pages = ceil( $total / $limit );
                         $end_dt = new DateTime( $item->end_datetime, new DateTimeZone('UTC') );
                         $end_dt->setTimezone( $wp_timezone );
                     }
+                    
+                    // Beschreibung kürzen
+                    $description_preview = ! empty( $item->description ) ? wp_trim_words( strip_tags( $item->description ), 10, '...' ) : '—';
                     ?>
                     <tr>
                         <td>
@@ -163,25 +171,31 @@ $total_pages = ceil( $total / $limit );
                             <small><?php echo esc_html( $start_dt->format( 'H:i' ) ); ?> Uhr</small>
                         </td>
                         <td>
-                            <span class="repro-ct-suite-badge <?php echo esc_attr( $type_class ); ?>" title="<?php echo esc_attr( $tooltip ); ?>">
-                                <?php echo esc_html( $type ); ?>
-                            </span>
-                        </td>
-                        <td>
-                            <strong><?php echo esc_html( $item->title ); ?></strong>
-                            <?php if ( $calendar ) : ?>
-                                <br><small style="color:#666;">
-                                    <span class="dashicons dashicons-calendar" style="font-size:14px;"></span>
-                                    <?php echo esc_html( $calendar->name ); ?>
-                                </small>
-                            <?php endif; ?>
-                        </td>
-                        <td>
                             <?php if ( $end_dt ) : ?>
-                                <?php echo esc_html( $end_dt->format( get_option('date_format') . ' H:i' ) ); ?>
+                                <strong><?php echo esc_html( $end_dt->format( get_option('date_format') ) ); ?></strong><br>
+                                <small><?php echo esc_html( $end_dt->format( 'H:i' ) ); ?> Uhr</small>
                             <?php else : ?>
                                 —
                             <?php endif; ?>
+                        </td>
+                        <td>
+                            <strong><?php echo esc_html( $item->title ); ?></strong>
+                        </td>
+                        <td>
+                            <small><?php echo esc_html( $description_preview ); ?></small>
+                        </td>
+                        <td>
+                            <?php if ( $calendar ) : ?>
+                                <span class="dashicons dashicons-calendar" style="font-size:14px; color:#666;"></span>
+                                <?php echo esc_html( $calendar->name ); ?>
+                            <?php else : ?>
+                                <span style="color:#999;">—</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <span class="repro-ct-suite-badge <?php echo esc_attr( $type_class ); ?>" title="<?php echo esc_attr( $tooltip ); ?>">
+                                <?php echo esc_html( $type ); ?>
+                            </span>
                         </td>
                     </tr>
                 <?php endforeach; endif; ?>
