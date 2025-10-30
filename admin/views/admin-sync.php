@@ -53,8 +53,8 @@ $last_sync_stats = get_option( 'repro_ct_suite_last_sync_stats', null );
 					<span class="dashicons dashicons-warning"></span>
 					<div>
 						<p><strong><?php esc_html_e( 'Keine Kalender ausgewählt', 'repro-ct-suite' ); ?></strong></p>
-						<p><?php esc_html_e( 'Bitte wählen Sie zunächst mindestens einen Kalender im Tab "Kalender" aus.', 'repro-ct-suite' ); ?></p>
-						<p><a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite-calendars' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-secondary"><?php esc_html_e( 'Zur Kalenderauswahl', 'repro-ct-suite' ); ?></a></p>
+						<p><?php esc_html_e( 'Bitte wählen Sie zunächst mindestens einen Kalender in den Einstellungen aus.', 'repro-ct-suite' ); ?></p>
+						<p><a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite-settings' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-secondary"><?php esc_html_e( 'Zu den Einstellungen', 'repro-ct-suite' ); ?></a></p>
 					</div>
 				</div>
 			<?php else : ?>
@@ -130,7 +130,7 @@ $last_sync_stats = get_option( 'repro_ct_suite_last_sync_stats', null );
 				<div class="repro-ct-suite-notice repro-ct-suite-notice-warning">
 					<span class="dashicons dashicons-info"></span>
 					<div>
-						<p><?php esc_html_e( 'Bitte wählen Sie mindestens einen Kalender aus, um die Synchronisation zu starten.', 'repro-ct-suite' ); ?></p>
+						<p><?php esc_html_e( 'Bitte wählen Sie mindestens einen Kalender in den Einstellungen aus, um die Synchronisation zu starten.', 'repro-ct-suite' ); ?></p>
 					</div>
 				</div>
 			<?php else : ?>

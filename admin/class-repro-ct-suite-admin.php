@@ -227,18 +227,6 @@ class Repro_CT_Suite_Admin {
 			array( $this, 'display_settings_page' )
 		);
 
-		// Submenu: Kalender (nur wenn Verbindung OK)
-		if ( $this->has_connection() ) {
-			add_submenu_page(
-				'repro-ct-suite',
-				__( 'Kalender', 'repro-ct-suite' ),
-				__( 'Kalender', 'repro-ct-suite' ),
-				'manage_options',
-				'repro-ct-suite-calendars',
-				array( $this, 'display_calendars_page' )
-			);
-		}
-
 		// Submenu: Termine-Sync (nur wenn Verbindung OK und Kalender ausgewählt)
 		if ( $this->has_connection() && $this->has_calendars_selected() ) {
 			add_submenu_page(
@@ -294,13 +282,6 @@ class Repro_CT_Suite_Admin {
 	 */
 	public function display_settings_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-settings.php';
-	}
-
-	/**
-	 * Display the calendars page.
-	 */
-	public function display_calendars_page() {
-		include_once plugin_dir_path( __FILE__ ) . 'views/admin-calendars.php';
 	}
 
 	/**
