@@ -87,14 +87,21 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 			}
 		}
 
-		Repro_CT_Suite_Logger::log( 'Gefundene Appointments (Terminvorlagen) gesamt: ' . count( $all_appointments ) );
+		Repro_CT_Suite_Logger::log( 'Gefundene Appointments gesamt: ' . count( $all_appointments ) );
 
 		$appointments = $all_appointments;
-		$stats = array( 'total' => count( $appointments ), 'inserted' => 0, 'updated' => 0, 'errors' => (int) $errors );
+		$stats = array( 
+			'total' => count( $appointments ), 
+			'events_inserted' => 0, 
+			'events_updated' => 0,
+			'appointments_inserted' => 0,
+			'appointments_updated' => 0,
+			'errors' => (int) $errors 
+		);
 
 		foreach ( $appointments as $a ) {
 			try {
-				// Appointment-Daten extrahieren: base = Vorlage, calculated = berechnete Instanz (Event)
+				// Appointment-Daten extrahieren: base = Basis-Termin, calculated = berechnete Instanz
 				$appointment_base = $a['appointment']['base'] ?? $a['base'] ?? null;
 				$appointment_calc = $a['appointment']['calculated'] ?? $a['calculated'] ?? null;
 
@@ -117,7 +124,7 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 					$local_calendar_id = $cal ? (int) $cal->id : null;
 				}
 
-				// Event-Daten aus 'calculated' (berechnete Einzeltermin-Instanz dieser Appointment-Vorlage)
+				// Gemeinsame Daten
 				$title = sanitize_text_field( $appointment_base['title'] ?? '' );
 				$description = isset( $appointment_base['description'] ) ? (string) $appointment_base['description'] : null;
 				$start_raw = $appointment_calc['startDate'] ?? null;
@@ -127,41 +134,63 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 				$start_dt = $start_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $start_raw ) ) : null;
 				$end_dt   = $end_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $end_raw ) ) : null;
 
-				// External ID: Kombiniere appointment_id + startDate für eindeutige Event-Instanzen in Veranstaltungen
-				$event_external_id = 'appt_' . $appointment_id . '_' . gmdate( 'Ymd_His', strtotime( $start_raw ) );
-
-				// Prüfe, ob diese appointment_id (Terminvorlage) bereits in Veranstaltungen (Events) existiert
-				global $wpdb;
-				$events_table = $wpdb->prefix . 'rcts_events';
-				$existing_event_with_appointment = $wpdb->get_var( $wpdb->prepare(
-					"SELECT id FROM {$events_table} WHERE appointment_id = %d LIMIT 1",
-					$appointment_id
-				) );
-				if ( $existing_event_with_appointment ) {
-					Repro_CT_Suite_Logger::log( 'Appointment-Vorlage #' . $appointment_id . ' bereits in Veranstaltungen (Event-ID ' . $existing_event_with_appointment . '); erstelle weitere Termin-Instanz.', 'info' );
-				}
-
-				// Event-Daten zusammenstellen (Einzeltermin für Veranstaltungen-Gesamtliste)
-				$event_data = array(
-					'external_id'     => $event_external_id,
+				// 1) APPOINTMENT speichern (Basis-Termin in rcts_appointments)
+				$appointment_data = array(
+					'external_id'     => (string) $appointment_id,
+					'event_id'        => null, // wird später gesetzt, falls Event existiert
 					'calendar_id'     => $local_calendar_id,
-					'appointment_id'  => $appointment_id, // Referenz zur Terminvorlage
 					'title'           => $title,
 					'description'     => $description,
 					'start_datetime'  => $start_dt,
 					'end_datetime'    => $end_dt,
-					'location_name'   => null, // optional aus address extrahieren, falls vorhanden
+					'is_all_day'      => $is_all_day,
+					'raw_payload'     => wp_json_encode( $a ),
+				);
+
+				$existing_appointment = $this->appointments_repo->db->get_var( 
+					$this->appointments_repo->db->prepare( 
+						"SELECT id FROM {$this->appointments_repo->table} WHERE external_id=%s", 
+						(string) $appointment_id 
+					) 
+				);
+				$local_appointment_id = $this->appointments_repo->upsert_by_external_id( $appointment_data );
+				$stats[ $existing_appointment ? 'appointments_updated' : 'appointments_inserted' ]++;
+
+				// 2) EVENT speichern (Einzeltermin-Instanz in rcts_events)
+				// External ID: Kombiniere appointment_id + startDate für eindeutige Event-Instanzen
+				$event_external_id = 'appt_' . $appointment_id . '_' . gmdate( 'Ymd_His', strtotime( $start_raw ) );
+
+				$event_data = array(
+					'external_id'     => $event_external_id,
+					'calendar_id'     => $local_calendar_id,
+					'appointment_id'  => $appointment_id,
+					'title'           => $title,
+					'description'     => $description,
+					'start_datetime'  => $start_dt,
+					'end_datetime'    => $end_dt,
+					'location_name'   => null, // optional aus address extrahieren
 					'status'          => null,
 					'raw_payload'     => wp_json_encode( $a ),
 				);
 
-				// Insert/Update Event in Veranstaltungen
 				$existing_event_id = $this->events_repo->get_id_by_external_id( $event_external_id );
 				$local_event_id = $this->events_repo->upsert_by_external_id( $event_data );
-				$stats[ $existing_event_id ? 'updated' : 'inserted' ]++;
+				$stats[ $existing_event_id ? 'events_updated' : 'events_inserted' ]++;
+
+				// 3) Appointment mit Event verknüpfen (event_id setzen)
+				if ( $local_event_id && $local_appointment_id ) {
+					$this->appointments_repo->db->update(
+						$this->appointments_repo->table,
+						array( 'event_id' => $local_event_id ),
+						array( 'id' => $local_appointment_id ),
+						array( '%d' ),
+						array( '%d' )
+					);
+				}
+
 			} catch ( Exception $ex ) {
 				$stats['errors']++;
-				Repro_CT_Suite_Logger::log( 'Appointment-Import-Fehler (Terminvorlage -> Event): ' . $ex->getMessage(), 'error' );
+				Repro_CT_Suite_Logger::log( 'Appointment-Import-Fehler: ' . $ex->getMessage(), 'error' );
 			}
 		}
 

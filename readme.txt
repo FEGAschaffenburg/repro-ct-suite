@@ -15,15 +15,15 @@ WordPress-Plugin zur Integration von ChurchTools-Daten. Synchronisiert Termine u
 Repro CT-Suite erstellt eine Brücke zwischen ChurchTools und WordPress. Das Plugin synchronisiert automatisch Termin- und Veranstaltungsdaten aus Ihrer ChurchTools-Instanz und macht sie über Shortcodes in WordPress verfügbar.
 
 **Begriffsdefinition:**
-* **Appointments (Terminvorlagen)**: Wiederkehrende Termine aus ChurchTools mit Serieneinstellungen
-* **Events (Einzeltermine)**: Berechnete Termin-Instanzen für die Veranstaltungen-Gesamtliste
-* **Veranstaltungen**: Gesamtliste aller Events (Einzeltermine) zur Anzeige
+* **Events**: Veranstaltungen aus ChurchTools Events-API
+* **Termine (Appointments)**: Einfache Termine aus ChurchTools Appointments (ohne Event-Verknüpfung)
+* **Terminkalender**: Gesamtübersicht aller Events und Termine
 
 **Hauptfunktionen:**
 
-* Automatische Synchronisation von ChurchTools Appointments (Terminvorlagen)
-* Erzeugung von Events (Einzeltermine) aus Appointments für Veranstaltungen
-* Abruf von Event-Daten aus ChurchTools /events API
+* Automatische Synchronisation von ChurchTools Events
+* Synchronisation von Appointments (Termine ohne Event-Verknüpfung)
+* Gesamtübersicht im Terminkalender (Events + Termine)
 * Einfache Anzeige via Shortcodes
 * Admin-Oberfläche für Konfiguration
 * WordPress Cron für automatische Updates
@@ -31,8 +31,8 @@ Repro CT-Suite erstellt eine Brücke zwischen ChurchTools und WordPress. Das Plu
 
 **Shortcodes:**
 
-* `[ct_appointments]` - Zeigt Terminvorlagen an
-* `[ct_events]` - Zeigt Veranstaltungen-Einzeltermine an
+* `[ct_appointments]` - Zeigt Termine an
+* `[ct_events]` - Zeigt Events an
 
 == Installation ==
 
@@ -65,12 +65,12 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 == Changelog ==
 
 = 0.3.3.8 =
-* Schema: `rcts_events` hat jetzt `appointment_id BIGINT(20) UNSIGNED NULL` für Verlinkung zu Appointment-Vorlagen (DB_VERSION 3)
-* Appointments-Sync: Importiert Terminvorlagen aus `/calendars/{id}/appointments` und erstellt Events (Einzeltermine) in Veranstaltungen-Gesamtliste
-* Wording: Klare Unterscheidung zwischen Appointments (Terminvorlagen), Events (Einzeltermine) und Veranstaltungen (Gesamtliste)
-* UI: Dashboard und Admin-Seiten zeigen nur noch Veranstaltungen (Events-Gesamtliste) an
-* Admin-Menü: "Termine" → "Veranstaltungen" (Events-Liste mit Quelle: Event/Appointment)
-* Validierung: Prüft beim Import, ob appointment_id bereits in Events existiert (Info-Log bei Mehrfachverwendung durch Serien)
+* Schema: `rcts_events` hat jetzt `appointment_id` für Verlinkung zu Appointments (DB_VERSION 3)
+* Appointments-Sync: Speichert sowohl Events als auch Appointments-Einträge (vollständige Datenstruktur)
+* Terminkalender: Zeigt Events (aus Events-API) + Termine (Appointments ohne Event-Verknüpfung)
+* Wording: "Terminkalender" mit Art-Badge: Event (blau) vs Termin (grün)
+* UI: Dashboard zeigt "Termine gesamt", Menü "Terminkalender"
+* Appointments mit event_id werden in Events gespeichert und mit Appointment verknüpft
 
 = 0.3.3.7 =
 * Appointments: Umgestellt auf pro-Kalender-Abruf `GET /calendars/{id}/appointments?from&to` (Aggregation aller ausgewählten Kalender)

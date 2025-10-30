@@ -67,13 +67,13 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 	<div class="repro-ct-suite-card">
 		<div class="repro-ct-suite-card-header">
 			<span class="dashicons dashicons-calendar-alt"></span>
-			<h3><?php esc_html_e( 'Veranstaltungen', 'repro-ct-suite' ); ?></h3>
+			<h3><?php esc_html_e( 'Termine gesamt', 'repro-ct-suite' ); ?></h3>
 		</div>
 		<div class="repro-ct-suite-card-body">
 			<div style="font-size: 32px; font-weight: 600; color: #0073aa; margin-bottom: 10px;">
 				<?php echo esc_html( $events_count ); ?>
 			</div>
-			<p class="description"><?php esc_html_e( 'Synchronisierte Events (Einzeltermine aus Events-API und Appointments-Vorlagen)', 'repro-ct-suite' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Events (aus Events-API) und Termine (aus Appointments ohne Event)', 'repro-ct-suite' ); ?></p>
 		</div>
 		<div class="repro-ct-suite-card-footer">
 			<span class="repro-ct-suite-badge repro-ct-suite-badge-info">
@@ -133,11 +133,11 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 	</div>
 </div>
 
-<!-- Nächste Veranstaltungen -->
+<!-- Nächste Termine -->
 <div class="repro-ct-suite-card repro-ct-suite-mt-20">
 	<div class="repro-ct-suite-card-header">
 		<span class="dashicons dashicons-calendar"></span>
-		<h3><?php esc_html_e( 'Nächste Veranstaltungen', 'repro-ct-suite' ); ?></h3>
+		<h3><?php esc_html_e( 'Nächste Termine', 'repro-ct-suite' ); ?></h3>
 	</div>
 	<div class="repro-ct-suite-card-body">
 		<?php if ( ! empty( $upcoming_events ) ) : ?>
@@ -147,7 +147,7 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 						<th><?php esc_html_e( 'Datum & Zeit', 'repro-ct-suite' ); ?></th>
 						<th><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
 						<th><?php esc_html_e( 'Ort', 'repro-ct-suite' ); ?></th>
-						<th><?php esc_html_e( 'Quelle', 'repro-ct-suite' ); ?></th>
+						<th><?php esc_html_e( 'Art', 'repro-ct-suite' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -158,14 +158,15 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 						$time_format = get_option( 'time_format' );
 						$formatted_date = date_i18n( $date_format, $start );
 						$formatted_time = date_i18n( $time_format, $start );
-						$source = $event->appointment_id ? 'Appointment' : 'Event';
-						$source_class = $event->appointment_id ? 'repro-ct-suite-badge-warning' : 'repro-ct-suite-badge-info';
+						// Art: Event (aus rcts_events) oder Termin (aus rcts_appointments)
+						$type = 'Event'; // aus events-Tabelle, daher immer Event
+						$type_class = 'repro-ct-suite-badge-info';
 						?>
 						<tr>
 							<td>
 								<strong><?php echo esc_html( $formatted_date ); ?></strong><br>
 								<span class="description"><?php echo esc_html( $formatted_time ); ?></span>
-							</td>
+			</td>
 							<td>
 								<strong><?php echo esc_html( $event->title ); ?></strong>
 								<?php if ( ! empty( $event->description ) ) : ?>
@@ -176,8 +177,8 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 								<?php echo ! empty( $event->location_name ) ? esc_html( $event->location_name ) : '—'; ?>
 							</td>
 							<td>
-								<span class="repro-ct-suite-badge <?php echo esc_attr( $source_class ); ?>" title="<?php echo esc_attr( $source === 'Appointment' ? 'Aus Terminvorlage' : 'Direkt aus Events-API' ); ?>">
-									<?php echo esc_html( $source ); ?>
+								<span class="repro-ct-suite-badge <?php echo esc_attr( $type_class ); ?>">
+									<?php echo esc_html( $type ); ?>
 								</span>
 							</td>
 						</tr>
@@ -186,18 +187,18 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 			</table>
 			<div style="margin-top: 15px; text-align: right;">
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite-events' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-secondary repro-ct-suite-btn-small">
-					<?php esc_html_e( 'Alle Veranstaltungen ansehen', 'repro-ct-suite' ); ?>
+					<?php esc_html_e( 'Alle Termine ansehen', 'repro-ct-suite' ); ?>
 				</a>
 			</div>
 		<?php else : ?>
 			<p class="description">
-				<?php esc_html_e( 'Keine bevorstehenden Veranstaltungen gefunden.', 'repro-ct-suite' ); ?>
+				<?php esc_html_e( 'Keine bevorstehenden Termine gefunden.', 'repro-ct-suite' ); ?>
 			</p>
 			<?php if ( $connection_status === 'configured' ) : ?>
 				<p>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite&tab=sync' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-primary">
 						<span class="dashicons dashicons-update"></span>
-						<?php esc_html_e( 'Veranstaltungen synchronisieren', 'repro-ct-suite' ); ?>
+						<?php esc_html_e( 'Termine synchronisieren', 'repro-ct-suite' ); ?>
 					</a>
 				</p>
 			<?php endif; ?>

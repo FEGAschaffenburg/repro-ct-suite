@@ -168,8 +168,8 @@ class Repro_CT_Suite_Admin {
 
 		add_submenu_page(
 			'repro-ct-suite',
-			__( 'Veranstaltungen', 'repro-ct-suite' ),
-			__( 'Veranstaltungen', 'repro-ct-suite' ),
+			__( 'Terminkalender', 'repro-ct-suite' ),
+			__( 'Terminkalender', 'repro-ct-suite' ),
 			'manage_options',
 			'repro-ct-suite-events',
 			array( $this, 'display_events_page' )
@@ -200,7 +200,7 @@ class Repro_CT_Suite_Admin {
 	}
 
 	/**
-	 * Display the events (Veranstaltungen) page.
+	 * Display the events (Terminkalender) page.
 	 */
 	public function display_events_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
@@ -782,9 +782,9 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_success( array(
 				'message' => sprintf(
-					__( 'Synchronisation abgeschlossen: %d Veranstaltungen-Einzeltermine (Events), %d Terminvorlagen-Instanzen (Appointments) importiert.', 'repro-ct-suite' ),
+					__( 'Synchronisation abgeschlossen: %d Events, %d Termine importiert.', 'repro-ct-suite' ),
 					( isset( $events_result['inserted'] ) ? (int) $events_result['inserted'] : 0 ) + ( isset( $events_result['updated'] ) ? (int) $events_result['updated'] : 0 ),
-					( isset( $appointments_result['inserted'] ) ? (int) $appointments_result['inserted'] : 0 ) + ( isset( $appointments_result['updated'] ) ? (int) $appointments_result['updated'] : 0 )
+					( isset( $appointments_result['appointments_inserted'] ) ? (int) $appointments_result['appointments_inserted'] : 0 ) + ( isset( $appointments_result['appointments_updated'] ) ? (int) $appointments_result['appointments_updated'] : 0 )
 				),
 				'stats' => array(
 					'events' => $events_result,
