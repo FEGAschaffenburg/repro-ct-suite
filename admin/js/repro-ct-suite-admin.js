@@ -544,6 +544,139 @@
 					}
 				});
 			});
+
+			// Datenbank-Migrationen ausführen
+			$('#repro-ct-suite-run-migrations').on('click', function(e) {
+				e.preventDefault();
+				
+				const $button = $(this);
+				const $result = $('#repro-ct-suite-migration-result');
+				
+				if (!confirm('Möchten Sie die Datenbank-Migrationen jetzt ausführen?')) {
+					return;
+				}
+				
+				// Loading-State aktivieren
+				ReproCTSuiteAdmin.setButtonLoading($button, true);
+				$result.hide();
+				
+				// AJAX-Request
+				$.ajax({
+					url: ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'repro_ct_suite_run_migrations',
+						nonce: reproCTSuiteAdmin.nonce
+					},
+					success: function(response) {
+						if (response.success) {
+							$result
+								.css('color', '#46b450')
+								.html('<span class="dashicons dashicons-yes-alt"></span> ' + (response.data.message || 'Migrationen erfolgreich ausgeführt!'))
+								.show();
+							
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message || 'Migrationen erfolgreich ausgeführt!',
+								'success'
+							);
+						} else {
+							$result
+								.css('color', '#dc3232')
+								.html('<span class="dashicons dashicons-dismiss"></span> ' + (response.data.message || 'Fehler bei der Migration.'))
+								.show();
+							
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message || 'Fehler bei der Migration.',
+								'error'
+							);
+						}
+					},
+					error: function(xhr, status, error) {
+						$result
+							.css('color', '#dc3232')
+							.html('<span class="dashicons dashicons-dismiss"></span> Verbindungsfehler: ' + error)
+							.show();
+						
+						ReproCTSuiteAdmin.showNotice(
+							'Verbindungsfehler: ' + error,
+							'error'
+						);
+					},
+					complete: function() {
+						ReproCTSuiteAdmin.setButtonLoading($button, false);
+					}
+				});
+			});
+
+			// Calendar-IDs korrigieren
+			$('#repro-ct-suite-fix-calendar-ids').on('click', function(e) {
+				e.preventDefault();
+				
+				const $button = $(this);
+				const $result = $('#repro-ct-suite-fix-calendar-ids-result');
+				
+				if (!confirm('Möchten Sie die Calendar-IDs für alle Events und Termine aus den Rohdaten extrahieren?')) {
+					return;
+				}
+				
+				// Loading-State aktivieren
+				ReproCTSuiteAdmin.setButtonLoading($button, true);
+				$result.hide();
+				
+				// AJAX-Request
+				$.ajax({
+					url: ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'repro_ct_suite_fix_calendar_ids',
+						nonce: reproCTSuiteAdmin.nonce
+					},
+					success: function(response) {
+						if (response.success) {
+							const stats = response.data.stats;
+							const message = '<strong>Erfolgreich korrigiert!</strong><br>' +
+								'Events: ' + stats.events_updated + '/' + stats.events_total + ' aktualisiert<br>' +
+								'Termine: ' + stats.appointments_updated + '/' + stats.appointments_total + ' aktualisiert';
+							
+							$result
+								.css('color', '#46b450')
+								.html('<span class="dashicons dashicons-yes-alt"></span> ' + message)
+								.show();
+							
+							ReproCTSuiteAdmin.showNotice(
+								'Calendar-IDs erfolgreich korrigiert!<br>' + 
+								'Events: ' + stats.events_updated + '/' + stats.events_total + ' • ' +
+								'Termine: ' + stats.appointments_updated + '/' + stats.appointments_total,
+								'success'
+							);
+						} else {
+							$result
+								.css('color', '#dc3232')
+								.html('<span class="dashicons dashicons-dismiss"></span> ' + (response.data.message || 'Fehler bei der Korrektur.'))
+								.show();
+							
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message || 'Fehler bei der Korrektur.',
+								'error'
+							);
+						}
+					},
+					error: function(xhr, status, error) {
+						$result
+							.css('color', '#dc3232')
+							.html('<span class="dashicons dashicons-dismiss"></span> Verbindungsfehler: ' + error)
+							.show();
+						
+						ReproCTSuiteAdmin.showNotice(
+							'Verbindungsfehler: ' + error,
+							'error'
+						);
+					},
+					complete: function() {
+						ReproCTSuiteAdmin.setButtonLoading($button, false);
+					}
+				});
+			});
 		},
 
 		/**
