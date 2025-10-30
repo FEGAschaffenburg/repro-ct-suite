@@ -60,8 +60,49 @@ class Repro_CT_Suite_Logger {
 		$milliseconds = sprintf( '%03d', ( $microtime - floor( $microtime ) ) * 1000 );
 		$timestamp = $datetime->format( 'Y-m-d H:i:s' ) . '.' . $milliseconds;
 		
-		// Log-Eintrag schreiben
-		error_log( '[' . $timestamp . '] ' . $prefix . $message );
+	// Log-Eintrag schreiben: primär über PHP error_log (WP debug.log),
+	// zusätzlich als Fallback in eine plugin-spezifische Datei.
+	$entry = '[' . $timestamp . '] ' . $prefix . $message . PHP_EOL;
+
+	// Versuche, in das globale WP debug.log zu schreiben (über error_log)
+	@error_log( $entry );
+
+	// Optional: auch in den System-Logger (syslog) schreiben, falls aktiviert
+	// Aktivierung über Option 'repro_ct_suite_syslog' (bool) oder Konstante REPRO_CT_SUITE_SYSLOG
+	$use_syslog = false;
+	if ( defined( 'REPRO_CT_SUITE_SYSLOG' ) ) {
+		$use_syslog = (bool) REPRO_CT_SUITE_SYSLOG;
+	} else {
+		$use_syslog = (bool) get_option( 'repro_ct_suite_syslog', false );
+	}
+	if ( $use_syslog ) {
+		// map level to syslog priority
+		switch ( $level ) {
+			case 'error':
+				$prio = LOG_ERR;
+				break;
+			case 'warning':
+				$prio = LOG_WARNING;
+				break;
+			case 'success':
+				$prio = LOG_INFO;
+				break;
+			case 'info':
+			default:
+				$prio = LOG_INFO;
+		}
+
+		// openlog/syslog are safe to call multiple times; include plugin name
+		if ( function_exists( 'openlog' ) && function_exists( 'syslog' ) ) {
+			@openlog( 'repro-ct-suite', LOG_PID, LOG_USER );
+			@syslog( $prio, trim( strip_tags( $prefix . $message ) ) );
+			@closelog();
+		}
+	}
+
+	// Fallback / zusätzliches Log in plugin-eigene Datei
+	$plugin_log = WP_CONTENT_DIR . '/repro-ct-suite-debug.log';
+	@file_put_contents( $plugin_log, $entry, FILE_APPEND | LOCK_EX );
 	}
 
 	/**

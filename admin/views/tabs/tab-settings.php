@@ -102,6 +102,25 @@ if ( $test_result !== false ) {
 			</p>
 		</form>
 
+		<form method="post" action="options.php" style="margin-top: 20px;">
+			<?php settings_fields( 'repro_ct_suite' ); ?>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Logging: Syslog aktivieren', 'repro-ct-suite' ); ?></th>
+					<td>
+						<input type="checkbox" id="repro_ct_suite_syslog" name="repro_ct_suite_syslog" value="1" <?php checked( get_option( 'repro_ct_suite_syslog', 0 ), 1 ); ?> />
+						<p class="description"><?php esc_html_e( 'Bei Aktivierung werden Log-Einträge zusätzlich an das System-Log (syslog) gesendet. Dies setzt entsprechende Serverrechte/Logging voraus.', 'repro-ct-suite' ); ?></p>
+					</td>
+				</tr>
+			</table>
+			<p>
+				<button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-secondary">
+					<span class="dashicons dashicons-yes"></span>
+					<?php esc_html_e( 'Logging-Einstellungen speichern', 'repro-ct-suite' ); ?>
+				</button>
+			</p>
+		</form>
+
 		<script>
 		jQuery(document).ready(function($) {
 			$('#reset-login-credentials').on('click', function() {

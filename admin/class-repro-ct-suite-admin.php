@@ -178,7 +178,17 @@ class Repro_CT_Suite_Admin {
 
 		// Debug-Seite JavaScript
 		$screen = get_current_screen();
+		// Enqueue debug JS either on the dedicated debug page OR on the main plugin page when the Logs tab is active
+		$enqueue_debug = false;
 		if ( $screen && strpos( $screen->id, 'repro-ct-suite-debug' ) !== false ) {
+			$enqueue_debug = true;
+		} elseif ( $screen && strpos( $screen->id, 'toplevel_page_repro-ct-suite' ) !== false ) {
+			// If we're on the main plugin page and the Logs tab is requested, enqueue the debug script so the buttons work
+			if ( isset( $_GET['tab'] ) && $_GET['tab'] === 'logs' ) {
+				$enqueue_debug = true;
+			}
+		}
+		if ( $enqueue_debug ) {
 			wp_enqueue_script(
 				$this->plugin_name . '-debug',
 				plugin_dir_url( __FILE__ ) . 'js/repro-ct-suite-debug.js',
@@ -503,6 +513,18 @@ class Repro_CT_Suite_Admin {
 			array(
 				'type'              => 'boolean',
 				'description'       => __( 'Automatische Updates für Repro CT-Suite aktivieren', 'repro-ct-suite' ),
+				'sanitize_callback' => function ( $value ) { return (int) ( ! empty( $value ) ); },
+				'default'           => 0,
+			)
+		);
+
+		// Optional: Syslog output for debug messages
+		register_setting(
+			'repro_ct_suite',
+			'repro_ct_suite_syslog',
+			array(
+				'type'              => 'boolean',
+				'description'       => __( 'Enable syslog output for plugin logging', 'repro-ct-suite' ),
 				'sanitize_callback' => function ( $value ) { return (int) ( ! empty( $value ) ); },
 				'default'           => 0,
 			)
