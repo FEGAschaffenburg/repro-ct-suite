@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.5.4
+Stable tag: 0.3.5.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,14 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.5.5 =
+* Fix: Kalenderfilter in Terminkalender-Übersicht funktioniert jetzt korrekt
+* Fix: Termine zeigen jetzt korrekten Typ (Event/Termin) statt nur "event"
+* UI: Ort und Status aus Übersicht entfernt (cleaner)
+* Feature: Datum/Uhrzeit werden gemäß WordPress-Zeitzone angezeigt
+* UX: Spaltenbreiten in Übersicht optimiert
+* Version: 0.3.5.5
 
 = 0.3.5.4 =
 * UI: Separate "Termine-Sync" Subpage entfernt
