@@ -7,6 +7,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+
+class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base {
+	public function __construct() {
+		global $wpdb;
+		parent::__construct( $wpdb->prefix . 'rcts_schedule' );
+	}
+
 	/**
 	 * Rebuild schedule table from existing events and appointments.
 	 * Skips appointments that are already linked to events (event_id is set)
@@ -48,7 +55,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$count_events++;
 		}
 
-		// Appointments: nur jene, die NICHT mit einem Event verknüpft sind
+		// Appointments: only those not linked to an event
 		$where_a = 'WHERE 1=1 AND (event_id IS NULL)';
 		$params = array();
 		if ( ! empty( $args['from'] ) ) { $where_a .= ' AND start_datetime >= %s'; $params[] = $args['from']; }
@@ -76,12 +83,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 			'events' => $count_events,
 			'appointments' => $count_appointments,
 		);
-	}
-
-class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base {
-	public function __construct() {
-		global $wpdb;
-		parent::__construct( $wpdb->prefix . 'rcts_schedule' );
 	}
 
 	/**
