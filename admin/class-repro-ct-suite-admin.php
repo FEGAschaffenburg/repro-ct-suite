@@ -41,6 +41,9 @@ class Repro_CT_Suite_Admin {
 		
 		// Update-Check Handler
 		add_action( 'admin_init', array( $this, 'check_manual_update_request' ) );
+		
+		// AJAX Handlers
+		add_action( 'wp_ajax_repro_ct_suite_clear_tables', array( $this, 'ajax_clear_tables' ) );
 	}
 
 	/**
@@ -819,4 +822,73 @@ class Repro_CT_Suite_Admin {
 			) );
 		}
 	}
+
+	/**
+	 * AJAX: Leert alle Plugin-Tabellen (nur für Admins, Debug-Funktion)
+	 */
+	public function ajax_clear_tables() {
+		// Nonce-Prüfung
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		// Berechtigungsprüfung
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		global $wpdb;
+		
+		// Tabellen leeren (TRUNCATE löscht alle Daten und resettet AUTO_INCREMENT)
+		$tables = array(
+			$wpdb->prefix . 'rcts_event_services',
+			$wpdb->prefix . 'rcts_appointments',
+			$wpdb->prefix . 'rcts_events',
+			$wpdb->prefix . 'rcts_calendars',
+		);
+
+		$cleared = array();
+		$errors = array();
+
+		foreach ( $tables as $table ) {
+			// Prüfe, ob Tabelle existiert
+			$table_exists = $wpdb->get_var( $wpdb->prepare( 
+				"SHOW TABLES LIKE %s", 
+				$table 
+			) );
+
+			if ( $table_exists ) {
+				$result = $wpdb->query( "TRUNCATE TABLE `{$table}`" );
+				if ( $result !== false ) {
+					$cleared[] = $table;
+				} else {
+					$errors[] = $table . ' (Fehler: ' . $wpdb->last_error . ')';
+				}
+			} else {
+				$errors[] = $table . ' (existiert nicht)';
+			}
+		}
+
+		if ( empty( $errors ) ) {
+			wp_send_json_success( array(
+				'message' => sprintf(
+					__( 'Alle Tabellen wurden geleert: %s', 'repro-ct-suite' ),
+					implode( ', ', array_map( function( $t ) use ( $wpdb ) { 
+						return str_replace( $wpdb->prefix, '', $t ); 
+					}, $cleared ) )
+				),
+				'cleared' => $cleared,
+			) );
+		} else {
+			wp_send_json_error( array(
+				'message' => sprintf(
+					__( 'Tabellen teilweise geleert. Fehler bei: %s', 'repro-ct-suite' ),
+					implode( ', ', $errors )
+				),
+				'cleared' => $cleared,
+				'errors' => $errors,
+			) );
+		}
+	}
 }
+
