@@ -109,7 +109,99 @@ class Repro_CT_Suite_Migrations {
 		dbDelta( $sql_appointments );
 		dbDelta( $sql_services );
 
+		// Versionsabhängige Daten-Migrationen
+		$current = get_option( self::OPTION_KEY, '0' );
+		
+		// Migration von Version 3 auf 4: calendar_id Werte korrigieren
+		if ( version_compare( $current, '4', '<' ) ) {
+			self::migrate_calendar_ids_v4();
+		}
+
 		update_option( self::OPTION_KEY, self::DB_VERSION );
+	}
+
+	/**
+	 * Migration V3 -> V4: calendar_id aus raw_payload extrahieren und korrigieren
+	 * 
+	 * Diese Funktion versucht, die calendar_id aus dem raw_payload JSON zu extrahieren
+	 * und in die calendar_id Spalte zu schreiben (für Events und Appointments).
+	 */
+	private static function migrate_calendar_ids_v4() {
+		global $wpdb;
+		
+		$events_table = $wpdb->prefix . 'rcts_events';
+		$appointments_table = $wpdb->prefix . 'rcts_appointments';
+		
+		// Events: calendar_id aus raw_payload extrahieren
+		$events = $wpdb->get_results( "SELECT id, raw_payload FROM {$events_table} WHERE raw_payload IS NOT NULL" );
+		$events_updated = 0;
+		
+		foreach ( $events as $event ) {
+			$payload = json_decode( $event->raw_payload, true );
+			if ( ! $payload ) continue;
+			
+			// calendar_id extrahieren
+			$calendar_id = null;
+			if ( isset( $payload['calendar']['id'] ) ) {
+				$calendar_id = (string) $payload['calendar']['id'];
+			} elseif ( isset( $payload['calendarId'] ) ) {
+				$calendar_id = (string) $payload['calendarId'];
+			} elseif ( isset( $payload['calendar_id'] ) ) {
+				$calendar_id = (string) $payload['calendar_id'];
+			}
+			
+			if ( $calendar_id !== null ) {
+				$wpdb->update(
+					$events_table,
+					array( 'calendar_id' => $calendar_id ),
+					array( 'id' => $event->id ),
+					array( '%s' ),
+					array( '%d' )
+				);
+				$events_updated++;
+			}
+		}
+		
+		// Appointments: calendar_id aus raw_payload extrahieren
+		$appointments = $wpdb->get_results( "SELECT id, raw_payload FROM {$appointments_table} WHERE raw_payload IS NOT NULL" );
+		$appointments_updated = 0;
+		
+		foreach ( $appointments as $appointment ) {
+			$payload = json_decode( $appointment->raw_payload, true );
+			if ( ! $payload ) continue;
+			
+			// Bei Appointments kann die Struktur verschachtelt sein
+			$base = $payload['base'] ?? $payload;
+			$calendar_id = null;
+			
+			if ( isset( $base['calendar']['id'] ) ) {
+				$calendar_id = (string) $base['calendar']['id'];
+			} elseif ( isset( $base['calendarId'] ) ) {
+				$calendar_id = (string) $base['calendarId'];
+			} elseif ( isset( $payload['calendar']['id'] ) ) {
+				$calendar_id = (string) $payload['calendar']['id'];
+			}
+			
+			if ( $calendar_id !== null ) {
+				$wpdb->update(
+					$appointments_table,
+					array( 'calendar_id' => $calendar_id ),
+					array( 'id' => $appointment->id ),
+					array( '%s' ),
+					array( '%d' )
+				);
+				$appointments_updated++;
+			}
+		}
+		
+		// Log für Debug-Zwecke
+		if ( $events_updated > 0 || $appointments_updated > 0 ) {
+			error_log( sprintf(
+				'Repro CT-Suite Migration V4: %d Events und %d Appointments calendar_id aktualisiert',
+				$events_updated,
+				$appointments_updated
+			) );
+		}
 	}
 
 	/**

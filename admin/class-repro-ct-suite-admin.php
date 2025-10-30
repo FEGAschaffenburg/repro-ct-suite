@@ -49,6 +49,11 @@ class Repro_CT_Suite_Admin {
 		add_action( 'wp_ajax_repro_ct_suite_clear_log', array( $this, 'ajax_clear_log' ) );
 		add_action( 'wp_ajax_repro_ct_suite_reset_credentials', array( $this, 'ajax_reset_credentials' ) );
 		add_action( 'wp_ajax_repro_ct_suite_full_reset', array( $this, 'ajax_full_reset' ) );
+		add_action( 'wp_ajax_repro_ct_suite_fix_calendar_ids', array( $this, 'ajax_fix_calendar_ids' ) );
+		add_action( 'wp_ajax_repro_ct_suite_delete_event', array( $this, 'ajax_delete_event' ) );
+		add_action( 'wp_ajax_repro_ct_suite_delete_appointment', array( $this, 'ajax_delete_appointment' ) );
+		add_action( 'wp_ajax_repro_ct_suite_update_event', array( $this, 'ajax_update_event' ) );
+		add_action( 'wp_ajax_repro_ct_suite_update_appointment', array( $this, 'ajax_update_appointment' ) );
 	}
 
 	/**
@@ -1240,6 +1245,352 @@ class Repro_CT_Suite_Admin {
 
 		wp_send_json_success( array(
 			'message' => __( 'Vollständiger Reset durchgeführt. Alle Zugangsdaten, Einstellungen und Daten wurden gelöscht.', 'repro-ct-suite' )
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Calendar-IDs aus raw_payload extrahieren und korrigieren
+	 *
+	 * @since 0.3.6.0
+	 */
+	public function ajax_fix_calendar_ids() {
+		// Nonce-Prüfung
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		// Berechtigungsprüfung
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		global $wpdb;
+		
+		$events_table = $wpdb->prefix . 'rcts_events';
+		$appointments_table = $wpdb->prefix . 'rcts_appointments';
+		
+		$stats = array(
+			'events_total' => 0,
+			'events_updated' => 0,
+			'events_skipped' => 0,
+			'appointments_total' => 0,
+			'appointments_updated' => 0,
+			'appointments_skipped' => 0
+		);
+		
+		// Events: calendar_id aus raw_payload extrahieren
+		$events = $wpdb->get_results( "SELECT id, calendar_id, raw_payload FROM {$events_table} WHERE raw_payload IS NOT NULL" );
+		$stats['events_total'] = count( $events );
+		
+		foreach ( $events as $event ) {
+			$payload = json_decode( $event->raw_payload, true );
+			if ( ! $payload ) {
+				$stats['events_skipped']++;
+				continue;
+			}
+			
+			// calendar_id extrahieren
+			$new_calendar_id = null;
+			if ( isset( $payload['calendar']['id'] ) ) {
+				$new_calendar_id = (string) $payload['calendar']['id'];
+			} elseif ( isset( $payload['calendarId'] ) ) {
+				$new_calendar_id = (string) $payload['calendarId'];
+			} elseif ( isset( $payload['calendar_id'] ) ) {
+				$new_calendar_id = (string) $payload['calendar_id'];
+			}
+			
+			// Nur updaten wenn neuer Wert gefunden wurde und sich vom alten unterscheidet
+			if ( $new_calendar_id !== null && $new_calendar_id !== $event->calendar_id ) {
+				$wpdb->update(
+					$events_table,
+					array( 'calendar_id' => $new_calendar_id ),
+					array( 'id' => $event->id ),
+					array( '%s' ),
+					array( '%d' )
+				);
+				$stats['events_updated']++;
+			} else {
+				$stats['events_skipped']++;
+			}
+		}
+		
+		// Appointments: calendar_id aus raw_payload extrahieren
+		$appointments = $wpdb->get_results( "SELECT id, calendar_id, raw_payload FROM {$appointments_table} WHERE raw_payload IS NOT NULL" );
+		$stats['appointments_total'] = count( $appointments );
+		
+		foreach ( $appointments as $appointment ) {
+			$payload = json_decode( $appointment->raw_payload, true );
+			if ( ! $payload ) {
+				$stats['appointments_skipped']++;
+				continue;
+			}
+			
+			// Bei Appointments kann die Struktur verschachtelt sein
+			$base = $payload['base'] ?? $payload;
+			$new_calendar_id = null;
+			
+			if ( isset( $base['calendar']['id'] ) ) {
+				$new_calendar_id = (string) $base['calendar']['id'];
+			} elseif ( isset( $base['calendarId'] ) ) {
+				$new_calendar_id = (string) $base['calendarId'];
+			} elseif ( isset( $payload['calendar']['id'] ) ) {
+				$new_calendar_id = (string) $payload['calendar']['id'];
+			}
+			
+			// Nur updaten wenn neuer Wert gefunden wurde und sich vom alten unterscheidet
+			if ( $new_calendar_id !== null && $new_calendar_id !== $appointment->calendar_id ) {
+				$wpdb->update(
+					$appointments_table,
+					array( 'calendar_id' => $new_calendar_id ),
+					array( 'id' => $appointment->id ),
+					array( '%s' ),
+					array( '%d' )
+				);
+				$stats['appointments_updated']++;
+			} else {
+				$stats['appointments_skipped']++;
+			}
+		}
+		
+		wp_send_json_success( array(
+			'message' => sprintf(
+				__( 'Calendar-IDs korrigiert: %d von %d Events und %d von %d Appointments aktualisiert.', 'repro-ct-suite' ),
+				$stats['events_updated'],
+				$stats['events_total'],
+				$stats['appointments_updated'],
+				$stats['appointments_total']
+			),
+			'stats' => $stats
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Einzelnes Event löschen
+	 *
+	 * @since 0.3.6.1
+	 */
+	public function ajax_delete_event() {
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$event_id = isset( $_POST['event_id'] ) ? (int) $_POST['event_id'] : 0;
+
+		if ( $event_id <= 0 ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ungültige Event-ID.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-events-repository.php';
+
+		$events_repo = new Repro_CT_Suite_Events_Repository();
+
+		// Prüfen ob Event existiert
+		if ( ! $events_repo->exists( $event_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Event nicht gefunden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Event löschen
+		$result = $events_repo->delete_by_id( $event_id );
+
+		if ( $result === false ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Löschen des Events.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'message' => __( 'Event erfolgreich gelöscht.', 'repro-ct-suite' )
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Einzelnen Appointment löschen
+	 *
+	 * @since 0.3.6.1
+	 */
+	public function ajax_delete_appointment() {
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$appointment_id = isset( $_POST['appointment_id'] ) ? (int) $_POST['appointment_id'] : 0;
+
+		if ( $appointment_id <= 0 ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ungültige Appointment-ID.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
+
+		$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
+
+		// Prüfen ob Appointment existiert
+		if ( ! $appointments_repo->exists( $appointment_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Appointment nicht gefunden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Appointment löschen
+		$result = $appointments_repo->delete_by_id( $appointment_id );
+
+		if ( $result === false ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Löschen des Appointments.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'message' => __( 'Appointment erfolgreich gelöscht.', 'repro-ct-suite' )
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Einzelnes Event aktualisieren
+	 *
+	 * @since 0.3.6.1
+	 */
+	public function ajax_update_event() {
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$event_id = isset( $_POST['event_id'] ) ? (int) $_POST['event_id'] : 0;
+
+		if ( $event_id <= 0 ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ungültige Event-ID.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-events-repository.php';
+
+		$events_repo = new Repro_CT_Suite_Events_Repository();
+
+		// Prüfen ob Event existiert
+		if ( ! $events_repo->exists( $event_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Event nicht gefunden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Erlaubte Felder zum Aktualisieren
+		$allowed_fields = array( 'title', 'description', 'start_datetime', 'end_datetime', 'location_name', 'status' );
+		$update_data = array();
+
+		foreach ( $allowed_fields as $field ) {
+			if ( isset( $_POST[ $field ] ) ) {
+				$update_data[ $field ] = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+			}
+		}
+
+		if ( empty( $update_data ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Daten zum Aktualisieren vorhanden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Event aktualisieren
+		$result = $events_repo->update_by_id( $event_id, $update_data );
+
+		if ( $result === false ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Aktualisieren des Events.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'message' => __( 'Event erfolgreich aktualisiert.', 'repro-ct-suite' ),
+			'updated_fields' => array_keys( $update_data )
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Einzelnen Appointment aktualisieren
+	 *
+	 * @since 0.3.6.1
+	 */
+	public function ajax_update_appointment() {
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$appointment_id = isset( $_POST['appointment_id'] ) ? (int) $_POST['appointment_id'] : 0;
+
+		if ( $appointment_id <= 0 ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ungültige Appointment-ID.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
+
+		$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
+
+		// Prüfen ob Appointment existiert
+		if ( ! $appointments_repo->exists( $appointment_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Appointment nicht gefunden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Erlaubte Felder zum Aktualisieren
+		$allowed_fields = array( 'title', 'description', 'start_datetime', 'end_datetime', 'is_all_day' );
+		$update_data = array();
+
+		foreach ( $allowed_fields as $field ) {
+			if ( isset( $_POST[ $field ] ) ) {
+				if ( $field === 'is_all_day' ) {
+					$update_data[ $field ] = (int) $_POST[ $field ];
+				} else {
+					$update_data[ $field ] = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+				}
+			}
+		}
+
+		if ( empty( $update_data ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Daten zum Aktualisieren vorhanden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Appointment aktualisieren
+		$result = $appointments_repo->update_by_id( $appointment_id, $update_data );
+
+		if ( $result === false ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Aktualisieren des Appointments.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'message' => __( 'Appointment erfolgreich aktualisiert.', 'repro-ct-suite' ),
+			'updated_fields' => array_keys( $update_data )
 		) );
 	}
 }

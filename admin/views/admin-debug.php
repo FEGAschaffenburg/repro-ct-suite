@@ -175,6 +175,7 @@ if ( $log_exists && $log_size > 0 ) {
 			</table>
 
 			<div style="margin-top: 20px;">
+				<h3><?php esc_html_e( 'Datenbank-Migrationen', 'repro-ct-suite' ); ?></h3>
 				<p class="description">
 					<?php esc_html_e( 'Führt die Datenbank-Migrationen manuell aus. Normalerweise geschieht dies automatisch bei Plugin-Updates.', 'repro-ct-suite' ); ?>
 				</p>
@@ -188,6 +189,23 @@ if ( $log_exists && $log_size > 0 ) {
 				</button>
 				
 				<span id="repro-ct-suite-migration-result" style="margin-left: 15px; display: none;"></span>
+			</div>
+
+			<div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #ddd;">
+				<h3><?php esc_html_e( 'Calendar-IDs korrigieren', 'repro-ct-suite' ); ?></h3>
+				<p class="description">
+					<?php esc_html_e( 'Extrahiert Calendar-IDs aus dem raw_payload und aktualisiert die calendar_id Spalte in Events und Appointments. Nützlich nach dem Update auf Version 0.3.6.0.', 'repro-ct-suite' ); ?>
+				</p>
+				<button 
+					id="repro-ct-suite-fix-calendar-ids" 
+					class="repro-ct-suite-btn repro-ct-suite-btn-secondary"
+					data-nonce="<?php echo esc_attr( wp_create_nonce( 'repro_ct_suite_admin' ) ); ?>"
+				>
+					<span class="dashicons dashicons-admin-tools"></span>
+					<?php esc_html_e( 'Calendar-IDs korrigieren', 'repro-ct-suite' ); ?>
+				</button>
+				
+				<span id="repro-ct-suite-fix-calendar-ids-result" style="margin-left: 15px; display: none;"></span>
 			</div>
 		</div>
 	</div>

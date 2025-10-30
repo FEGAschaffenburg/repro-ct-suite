@@ -87,16 +87,17 @@ $items = array_slice( $items, 0, $limit );
             <table class="widefat fixed striped">
                 <thead>
                     <tr>
-                        <th><?php esc_html_e( 'Datum', 'repro-ct-suite' ); ?></th>
-                        <th><?php esc_html_e( 'Typ', 'repro-ct-suite' ); ?></th>
-                        <th><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
-                        <th><?php esc_html_e( 'Ort', 'repro-ct-suite' ); ?></th>
-                        <th><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
+                        <th style="width:15%;"><?php esc_html_e( 'Datum', 'repro-ct-suite' ); ?></th>
+                        <th style="width:12%;"><?php esc_html_e( 'Typ', 'repro-ct-suite' ); ?></th>
+                        <th style="width:30%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
+                        <th style="width:20%;"><?php esc_html_e( 'Ort', 'repro-ct-suite' ); ?></th>
+                        <th style="width:15%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'Aktionen', 'repro-ct-suite' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php if ( empty( $items ) ) : ?>
-                    <tr><td colspan="5"><?php esc_html_e( 'Keine Einträge gefunden.', 'repro-ct-suite' ); ?></td></tr>
+                    <tr><td colspan="6"><?php esc_html_e( 'Keine Einträge gefunden.', 'repro-ct-suite' ); ?></td></tr>
                 <?php else : foreach ( $items as $row ) : ?>
                     <tr>
                         <td><?php echo esc_html( date_i18n( get_option('date_format') . ' H:i', strtotime( $row->start_datetime ) ) ); ?></td>
@@ -110,6 +111,18 @@ $items = array_slice( $items, 0, $limit );
                         <td><?php echo esc_html( $row->title ); ?></td>
                         <td><?php echo isset( $row->location_name ) ? esc_html( $row->location_name ) : ''; ?></td>
                         <td><?php echo ! empty( $row->end_datetime ) ? esc_html( date_i18n( get_option('date_format') . ' H:i', strtotime( $row->end_datetime ) ) ) : '—'; ?></td>
+                        <td>
+                            <button 
+                                class="repro-ct-suite-delete-item-btn" 
+                                data-id="<?php echo esc_attr( $row->id ); ?>" 
+                                data-type="<?php echo esc_attr( $row->kind ); ?>"
+                                data-title="<?php echo esc_attr( $row->title ); ?>"
+                                title="<?php esc_attr_e( 'Löschen', 'repro-ct-suite' ); ?>"
+                                style="cursor:pointer; background:#dc3232; color:#fff; border:none; padding:4px 8px; border-radius:3px; font-size:12px;"
+                            >
+                                <span class="dashicons dashicons-trash" style="font-size:14px; vertical-align:middle;"></span>
+                            </button>
+                        </td>
                     </tr>
                 <?php endforeach; endif; ?>
                 </tbody>

@@ -33,6 +33,7 @@
 			this.initTooltips();
 			this.initFormValidation();
 			this.initAjaxActions();
+			this.initDeleteButtons();
 		},
 
 		/**
@@ -674,6 +675,86 @@
 					},
 					complete: function() {
 						ReproCTSuiteAdmin.setButtonLoading($button, false);
+					}
+				});
+			});
+		},
+
+		/**
+		 * Initialisiert die Lösch-Buttons für Events und Appointments
+		 * 
+		 * @since 0.3.6.1
+		 */
+		initDeleteButtons: function() {
+			// Event-Delegation für dynamisch geladene Buttons
+			$(document).on('click', '.repro-ct-suite-delete-item-btn', function(e) {
+				e.preventDefault();
+				
+				const $button = $(this);
+				const itemId = $button.data('id');
+				const itemType = $button.data('type'); // 'event' oder 'appointment'
+				const itemTitle = $button.data('title');
+				
+				// Bestätigung
+				if (!confirm('Möchten Sie "' + itemTitle + '" wirklich löschen?\n\nDieser Vorgang kann nicht rückgängig gemacht werden.')) {
+					return;
+				}
+				
+				// AJAX-Action je nach Typ
+				const action = itemType === 'event' ? 'repro_ct_suite_delete_event' : 'repro_ct_suite_delete_appointment';
+				const dataKey = itemType === 'event' ? 'event_id' : 'appointment_id';
+				
+				// Zeile merken für späteres Entfernen
+				const $row = $button.closest('tr');
+				
+				// Loading-State
+				$button.prop('disabled', true).css('opacity', '0.5');
+				
+				// AJAX-Request
+				$.ajax({
+					url: ajaxurl,
+					type: 'POST',
+					data: {
+						action: action,
+						[dataKey]: itemId,
+						nonce: reproCTSuiteAdmin.nonce
+					},
+					success: function(response) {
+						if (response.success) {
+							// Zeile ausblenden und entfernen
+							$row.fadeOut(300, function() {
+								$(this).remove();
+								
+								// Wenn keine Zeilen mehr da sind, Hinweis anzeigen
+								const $tbody = $row.parent();
+								if ($tbody.find('tr').length === 0) {
+									const colspan = $tbody.closest('table').find('thead th').length;
+									$tbody.html(
+										'<tr><td colspan="' + colspan + '" style="text-align:center; padding:30px;">' +
+										'Keine Einträge gefunden.' +
+										'</td></tr>'
+									);
+								}
+							});
+							
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message || 'Erfolgreich gelöscht!',
+								'success'
+							);
+						} else {
+							$button.prop('disabled', false).css('opacity', '1');
+							ReproCTSuiteAdmin.showNotice(
+								response.data.message || 'Fehler beim Löschen.',
+								'error'
+							);
+						}
+					},
+					error: function(xhr, status, error) {
+						$button.prop('disabled', false).css('opacity', '1');
+						ReproCTSuiteAdmin.showNotice(
+							'Verbindungsfehler: ' + error,
+							'error'
+						);
 					}
 				});
 			});

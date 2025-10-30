@@ -131,15 +131,16 @@ $total_pages = ceil( $total / $limit );
                     <tr>
                         <th style="width:12%;"><?php esc_html_e( 'Anfang', 'repro-ct-suite' ); ?></th>
                         <th style="width:12%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
-                        <th style="width:25%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
-                        <th style="width:25%;"><?php esc_html_e( 'Beschreibung', 'repro-ct-suite' ); ?></th>
-                        <th style="width:16%;"><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
-                        <th style="width:10%;"><?php esc_html_e( 'Typ', 'repro-ct-suite' ); ?></th>
+                        <th style="width:23%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
+                        <th style="width:23%;"><?php esc_html_e( 'Beschreibung', 'repro-ct-suite' ); ?></th>
+                        <th style="width:14%;"><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'Typ', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'Aktionen', 'repro-ct-suite' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php if ( empty( $items ) ) : ?>
-                    <tr><td colspan="6" style="text-align:center; padding:30px;">
+                    <tr><td colspan="7" style="text-align:center; padding:30px;">
                         <?php esc_html_e( 'Keine Termine gefunden. Führen Sie die Synchronisation aus, um Termine zu importieren.', 'repro-ct-suite' ); ?>
                     </td></tr>
                 <?php else : foreach ( $items as $item ) : 
@@ -196,6 +197,18 @@ $total_pages = ceil( $total / $limit );
                             <span class="repro-ct-suite-badge <?php echo esc_attr( $type_class ); ?>" title="<?php echo esc_attr( $tooltip ); ?>">
                                 <?php echo esc_html( $type ); ?>
                             </span>
+                        </td>
+                        <td>
+                            <button 
+                                class="repro-ct-suite-delete-item-btn" 
+                                data-id="<?php echo esc_attr( $item->id ); ?>" 
+                                data-type="<?php echo esc_attr( $item->source ); ?>"
+                                data-title="<?php echo esc_attr( $item->title ); ?>"
+                                title="<?php esc_attr_e( 'Löschen', 'repro-ct-suite' ); ?>"
+                                style="cursor:pointer; background:#dc3232; color:#fff; border:none; padding:4px 8px; border-radius:3px; font-size:12px;"
+                            >
+                                <span class="dashicons dashicons-trash" style="font-size:14px; vertical-align:middle;"></span>
+                            </button>
                         </td>
                     </tr>
                 <?php endforeach; endif; ?>

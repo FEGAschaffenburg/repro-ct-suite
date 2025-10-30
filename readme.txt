@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.6.0
+Stable tag: 0.3.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,18 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.6.1 =
+* Feature: CRUD-Funktionen für einzelne Events und Appointments
+* Feature: Lösch-Buttons in Terminkalender-Übersicht und Events-Übersicht
+* Feature: AJAX-Handler für Delete und Update (ajax_delete_event, ajax_delete_appointment, ajax_update_event, ajax_update_appointment)
+* Repository: Neue Basisfunktionen in Repository-Base (get_by_id, delete_by_id, update_by_id, exists)
+* UI: Neue "Aktionen"-Spalte mit Lösch-Button in Events/Appointments-Tabellen
+* UX: Bestätigungsdialog vor dem Löschen mit Titel-Anzeige
+* JavaScript: initDeleteButtons() für Event-Delegation der Lösch-Buttons
+* JavaScript: AJAX-Handler für Migrations- und Calendar-ID-Fix-Buttons hinzugefügt
+* Sicherheit: Nonce-Prüfung und Berechtigungsprüfung für alle AJAX-Handler
+* Version: 0.3.6.1
 
 = 0.3.6.0 =
 * **BREAKING**: DB-Schema-Update auf Version 4
