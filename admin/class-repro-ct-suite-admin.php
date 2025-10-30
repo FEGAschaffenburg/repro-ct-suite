@@ -50,6 +50,37 @@ class Repro_CT_Suite_Admin {
 	}
 
 	/**
+	 * Prüft ob ChurchTools-Verbindung konfiguriert ist
+	 *
+	 * @return bool
+	 */
+	private function has_connection() {
+		$tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
+		$username = get_option( 'repro_ct_suite_ct_username', '' );
+		$password = get_option( 'repro_ct_suite_ct_password', '' );
+		return ! empty( $tenant ) && ! empty( $username ) && ! empty( $password );
+	}
+
+	/**
+	 * Prüft ob mindestens ein Kalender ausgewählt ist
+	 *
+	 * @return bool
+	 */
+	private function has_calendars_selected() {
+		global $wpdb;
+		$table = $wpdb->prefix . 'rcts_calendars';
+		
+		// Prüfe ob Tabelle existiert
+		$table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) );
+		if ( ! $table_exists ) {
+			return false;
+		}
+		
+		$count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE is_selected = 1" );
+		return $count > 0;
+	}
+
+	/**
 	 * Debug-Logging Helper
 	 * 
 	 * Schreibt Debug-Informationen ins WordPress Debug-Log.
@@ -165,6 +196,7 @@ class Repro_CT_Suite_Admin {
 	 * Add admin menu pages.
 	 */
 	public function add_admin_menu() {
+		// Hauptmenü (Dashboard)
 		add_menu_page(
 			__( 'Repro CT-Suite', 'repro-ct-suite' ),
 			__( 'Repro CT-Suite', 'repro-ct-suite' ),
@@ -175,15 +207,51 @@ class Repro_CT_Suite_Admin {
 			30
 		);
 
+		// Submenu: Dashboard (Umbenennung des ersten Eintrags)
 		add_submenu_page(
 			'repro-ct-suite',
-			__( 'Einstellungen', 'repro-ct-suite' ),
-			__( 'Einstellungen', 'repro-ct-suite' ),
+			__( 'Dashboard', 'repro-ct-suite' ),
+			__( 'Dashboard', 'repro-ct-suite' ),
 			'manage_options',
 			'repro-ct-suite',
 			array( $this, 'display_admin_page' )
 		);
 
+		// Submenu: Einstellungen (immer sichtbar)
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Einstellungen', 'repro-ct-suite' ),
+			__( 'Einstellungen', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-settings',
+			array( $this, 'display_settings_page' )
+		);
+
+		// Submenu: Kalender (nur wenn Verbindung OK)
+		if ( $this->has_connection() ) {
+			add_submenu_page(
+				'repro-ct-suite',
+				__( 'Kalender', 'repro-ct-suite' ),
+				__( 'Kalender', 'repro-ct-suite' ),
+				'manage_options',
+				'repro-ct-suite-calendars',
+				array( $this, 'display_calendars_page' )
+			);
+		}
+
+		// Submenu: Termine-Sync (nur wenn Verbindung OK und Kalender ausgewählt)
+		if ( $this->has_connection() && $this->has_calendars_selected() ) {
+			add_submenu_page(
+				'repro-ct-suite',
+				__( 'Termine-Sync', 'repro-ct-suite' ),
+				__( 'Termine-Sync', 'repro-ct-suite' ),
+				'manage_options',
+				'repro-ct-suite-sync',
+				array( $this, 'display_sync_page' )
+			);
+		}
+
+		// Submenu: Terminkalender (immer sichtbar)
 		add_submenu_page(
 			'repro-ct-suite',
 			__( 'Terminkalender', 'repro-ct-suite' ),
@@ -193,6 +261,7 @@ class Repro_CT_Suite_Admin {
 			array( $this, 'display_events_page' )
 		);
 
+		// Submenu: Update-Info (immer sichtbar)
 		add_submenu_page(
 			'repro-ct-suite',
 			__( 'Update-Info', 'repro-ct-suite' ),
@@ -202,6 +271,7 @@ class Repro_CT_Suite_Admin {
 			array( $this, 'display_update_page' )
 		);
 
+		// Submenu: Debug (immer sichtbar für Admins)
 		add_submenu_page(
 			'repro-ct-suite',
 			__( 'Debug', 'repro-ct-suite' ),
@@ -217,6 +287,27 @@ class Repro_CT_Suite_Admin {
 	 */
 	public function display_admin_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-display.php';
+	}
+
+	/**
+	 * Display the settings page.
+	 */
+	public function display_settings_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-settings.php';
+	}
+
+	/**
+	 * Display the calendars page.
+	 */
+	public function display_calendars_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-calendars.php';
+	}
+
+	/**
+	 * Display the sync page.
+	 */
+	public function display_sync_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-sync.php';
 	}
 
 	/**
@@ -840,6 +931,17 @@ class Repro_CT_Suite_Admin {
 			}
 
 			// Erfolgsmeldung
+			// Zeitstempel und Statistik speichern
+			update_option( 'repro_ct_suite_last_sync_time', current_time( 'mysql' ) );
+			$combined_stats = array(
+				'events_created' => ( isset( $events_result['inserted'] ) ? (int) $events_result['inserted'] : 0 ),
+				'events_updated' => ( isset( $events_result['updated'] ) ? (int) $events_result['updated'] : 0 ),
+				'appointments_created' => ( isset( $appointments_result['appointments_inserted'] ) ? (int) $appointments_result['appointments_inserted'] : 0 ),
+				'appointments_updated' => ( isset( $appointments_result['appointments_updated'] ) ? (int) $appointments_result['appointments_updated'] : 0 ),
+				'skipped_has_event' => ( isset( $appointments_result['skipped_has_event'] ) ? (int) $appointments_result['skipped_has_event'] : 0 ),
+			);
+			update_option( 'repro_ct_suite_last_sync_stats', $combined_stats );
+
 			wp_send_json_success( array(
 				'message' => sprintf(
 					__( 'Synchronisation abgeschlossen: %d Events (aus /events), %d Events aus Appointments, %d Termine ohne Event.', 'repro-ct-suite' ),
