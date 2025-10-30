@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.5.5
+Stable tag: 0.3.5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,14 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.5.6 =
+* Feature: Zweistufiger Reset-Prozess
+* UX: Nach Löschen der Zugangsdaten Abfrage für vollständigen Reset
+* Feature: Vollständiger Reset löscht alle Daten (Kalender, Events, Appointments, Services)
+* AJAX: Neuer Handler ajax_full_reset() für kompletten Datenbankreset
+* Sicherheit: Deutliche Warnhinweise bei vollständigem Reset
+* Version: 0.3.5.6
 
 = 0.3.5.5 =
 * Fix: Kalenderfilter in Terminkalender-Übersicht funktioniert jetzt korrekt

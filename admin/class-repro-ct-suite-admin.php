@@ -48,6 +48,7 @@ class Repro_CT_Suite_Admin {
 		add_action( 'wp_ajax_repro_ct_suite_run_migrations', array( $this, 'ajax_run_migrations' ) );
 		add_action( 'wp_ajax_repro_ct_suite_clear_log', array( $this, 'ajax_clear_log' ) );
 		add_action( 'wp_ajax_repro_ct_suite_reset_credentials', array( $this, 'ajax_reset_credentials' ) );
+		add_action( 'wp_ajax_repro_ct_suite_full_reset', array( $this, 'ajax_full_reset' ) );
 	}
 
 	/**
@@ -1168,6 +1169,11 @@ class Repro_CT_Suite_Admin {
 	/**
 	 * AJAX: Löscht alle ChurchTools-Zugangsdaten
 	 */
+	/**
+	 * AJAX Handler: Zugangsdaten zurücksetzen
+	 *
+	 * @since 0.3.5.3
+	 */
 	public function ajax_reset_credentials() {
 		// Nonce-Prüfung
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
@@ -1187,7 +1193,53 @@ class Repro_CT_Suite_Admin {
 		delete_option( 'repro_ct_suite_connection_verified' );
 
 		wp_send_json_success( array(
-			'message' => __( 'Alle Zugangsdaten wurden erfolgreich gelöscht.', 'repro-ct-suite' )
+			'message' => __( 'Zugangsdaten wurden erfolgreich gelöscht.', 'repro-ct-suite' ),
+			'ask_full_reset' => true
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Vollständiger Reset (Zugangsdaten + alle Daten + Einstellungen)
+	 *
+	 * @since 0.3.5.6
+	 */
+	public function ajax_full_reset() {
+		// Nonce-Prüfung
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		// Berechtigungsprüfung
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		global $wpdb;
+
+		// Alle Tabellen leeren
+		$tables = array(
+			$wpdb->prefix . 'rcts_calendars',
+			$wpdb->prefix . 'rcts_events',
+			$wpdb->prefix . 'rcts_appointments',
+			$wpdb->prefix . 'rcts_event_services'
+		);
+
+		foreach ( $tables as $table ) {
+			$wpdb->query( "TRUNCATE TABLE {$table}" );
+		}
+
+		// Alle Plugin-Optionen löschen
+		delete_option( 'repro_ct_suite_ct_tenant' );
+		delete_option( 'repro_ct_suite_ct_username' );
+		delete_option( 'repro_ct_suite_ct_password' );
+		delete_option( 'repro_ct_suite_ct_session' );
+		delete_option( 'repro_ct_suite_connection_verified' );
+		delete_option( 'repro_ct_suite_last_calendar_sync' );
+		delete_option( 'repro_ct_suite_last_event_sync' );
+		delete_option( 'repro_ct_suite_last_appointment_sync' );
+
+		wp_send_json_success( array(
+			'message' => __( 'Vollständiger Reset durchgeführt. Alle Zugangsdaten, Einstellungen und Daten wurden gelöscht.', 'repro-ct-suite' )
 		) );
 	}
 }

@@ -105,7 +105,7 @@ if ( $test_result !== false ) {
 		<script>
 		jQuery(document).ready(function($) {
 			$('#reset-login-credentials').on('click', function() {
-				if (!confirm('<?php esc_html_e( 'Möchten Sie wirklich alle Zugangsdaten (Tenant, Benutzername, Passwort) löschen? Diese Aktion kann nicht rückgängig gemacht werden.', 'repro-ct-suite' ); ?>')) {
+				if (!confirm('<?php esc_html_e( 'Möchten Sie wirklich alle Zugangsdaten (Tenant, Benutzername, Passwort) löschen?\n\nDiese Aktion kann nicht rückgängig gemacht werden.', 'repro-ct-suite' ); ?>')) {
 					return;
 				}
 				
@@ -118,8 +118,37 @@ if ( $test_result !== false ) {
 					},
 					success: function(response) {
 						if (response.success) {
-							alert('<?php esc_html_e( 'Zugangsdaten wurden erfolgreich gelöscht.', 'repro-ct-suite' ); ?>');
-							location.reload();
+							// Erste Stufe erfolgreich - Frage nach vollständigem Reset
+							if (response.data.ask_full_reset) {
+								if (confirm('<?php esc_html_e( 'Zugangsdaten wurden gelöscht.\n\nMöchten Sie auch ALLE anderen Daten löschen?\n\n⚠️ WARNUNG: Dies löscht:\n• Alle Kalender-Einstellungen\n• Alle synchronisierten Events\n• Alle Termine (Appointments)\n• Alle Service-Zuordnungen\n• Alle Synchronisations-Zeitstempel\n\nDiese Aktion kann NICHT rückgängig gemacht werden!', 'repro-ct-suite' ); ?>')) {
+									// Vollständiger Reset
+									$.ajax({
+										url: ajaxurl,
+										type: 'POST',
+										data: {
+											action: 'repro_ct_suite_full_reset',
+											nonce: reproCTSuite.nonce
+										},
+										success: function(response) {
+											if (response.success) {
+												alert('<?php esc_html_e( 'Vollständiger Reset durchgeführt. Alle Daten wurden gelöscht.', 'repro-ct-suite' ); ?>');
+												location.reload();
+											} else {
+												alert('<?php esc_html_e( 'Fehler beim vollständigen Reset: ', 'repro-ct-suite' ); ?>' + (response.data.message || '<?php esc_html_e( 'Unbekannter Fehler', 'repro-ct-suite' ); ?>'));
+											}
+										},
+										error: function() {
+											alert('<?php esc_html_e( 'Fehler bei der AJAX-Anfrage.', 'repro-ct-suite' ); ?>');
+										}
+									});
+								} else {
+									// Nur Zugangsdaten gelöscht, kein vollständiger Reset
+									alert('<?php esc_html_e( 'Nur Zugangsdaten wurden gelöscht. Alle anderen Daten bleiben erhalten.', 'repro-ct-suite' ); ?>');
+									location.reload();
+								}
+							} else {
+								location.reload();
+							}
 						} else {
 							alert('<?php esc_html_e( 'Fehler beim Löschen der Zugangsdaten: ', 'repro-ct-suite' ); ?>' + (response.data.message || '<?php esc_html_e( 'Unbekannter Fehler', 'repro-ct-suite' ); ?>'));
 						}
