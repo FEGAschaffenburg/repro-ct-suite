@@ -98,9 +98,21 @@ class Repro_CT_Suite_Events_Sync_Service {
 				$start_dt = $start_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $start_raw ) ) : null;
 				$end_dt   = $end_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $end_raw ) ) : null;
 
+				// Appointment-ID extrahieren (falls Event aus Appointment stammt)
+				// ChurchTools liefert bei Events aus Appointments: appointment.id oder appointmentId
+				$appointment_id = null;
+				if ( isset( $e['appointment']['id'] ) ) {
+					$appointment_id = (int) $e['appointment']['id'];
+				} elseif ( isset( $e['appointmentId'] ) ) {
+					$appointment_id = (int) $e['appointmentId'];
+				} elseif ( isset( $e['appointment_id'] ) ) {
+					$appointment_id = (int) $e['appointment_id'];
+				}
+
 				// Upsert
 				$data = array(
 					'external_id'    => $external_id,
+					'appointment_id' => $appointment_id, // NULL wenn nicht aus Appointment
 					'title'          => $title,
 					'description'    => $description,
 					'start_datetime' => $start_dt,

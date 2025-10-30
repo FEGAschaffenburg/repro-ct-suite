@@ -96,8 +96,12 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 			'events_updated' => 0,
 			'appointments_inserted' => 0,
 			'appointments_updated' => 0,
+			'skipped_has_event' => 0, // Appointments die übersprungen wurden, weil Event bereits existiert
 			'errors' => (int) $errors 
 		);
+
+		global $wpdb;
+		$events_table = $wpdb->prefix . 'rcts_events';
 
 		foreach ( $appointments as $a ) {
 			try {
@@ -114,6 +118,19 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 				$appointment_id = (int) ( $appointment_base['id'] ?? 0 );
 				if ( $appointment_id === 0 ) {
 					throw new Exception( 'Appointment ohne id' );
+				}
+
+				// WICHTIG: Prüfen, ob bereits ein Event mit dieser appointment_id existiert
+				// Falls ja, überspringen wir dieses Appointment (wurde bereits vom Events-Sync geholt)
+				$existing_event_with_appointment = $wpdb->get_var( $wpdb->prepare(
+					"SELECT id FROM {$events_table} WHERE appointment_id = %d LIMIT 1",
+					$appointment_id
+				) );
+
+				if ( $existing_event_with_appointment ) {
+					Repro_CT_Suite_Logger::log( 'Appointment #' . $appointment_id . ' übersprungen - Event bereits vorhanden (ID: ' . $existing_event_with_appointment . ')', 'info' );
+					$stats['skipped_has_event']++;
+					continue; // Nächstes Appointment
 				}
 
 				// Kalender-Zuordnung (extern -> lokal)

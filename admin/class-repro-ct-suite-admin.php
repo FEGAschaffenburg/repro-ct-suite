@@ -768,14 +768,39 @@ class Repro_CT_Suite_Admin {
 			$to   = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_to_days * DAY_IN_SECONDS ) );
 			Repro_CT_Suite_Logger::log( 'Zeitraum: von ' . $from . ' bis ' . $to );
 
-			// Events synchronisieren (Veranstaltungen-Einzeltermine, zeitbasiert)
+			// STRATEGIE: 
+			// 1. Zuerst Events aus /events synchronisieren (enthält alle ChurchTools-Events)
+			// 2. Dann Appointments - ABER nur die, deren appointment_id noch NICHT in rcts_events vorkommt
+			//    (d.h. Appointments OHNE zugeordnetes Event)
+			// -> Verhindert Duplikate, da Events aus /events Vorrang haben
+
+			// 1) Events synchronisieren (alle ChurchTools-Events)
+			Repro_CT_Suite_Logger::log( 'SCHRITT 1: Events synchronisieren...' );
 			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo );
 			$events_result = $events_service->sync_events( array(
 				'from' => $from,
 				'to'   => $to,
 			) );
 
-			// Appointments synchronisieren (Terminvorlagen -> Events, nur ausgewählte Kalender)
+			if ( is_wp_error( $events_result ) ) {
+				Repro_CT_Suite_Logger::header( 'EVENTS-SYNC FEHLGESCHLAGEN', 'error' );
+				Repro_CT_Suite_Logger::log( 'Error: ' . $events_result->get_error_message(), 'error' );
+				wp_send_json_error( array(
+					'message' => sprintf(
+						__( 'Fehler beim Synchronisieren der Events: %s', 'repro-ct-suite' ),
+						$events_result->get_error_message()
+					),
+					'debug' => array(
+						'stage' => 'events',
+						'error_code' => $events_result->get_error_code(),
+						'error_message' => $events_result->get_error_message(),
+					),
+				) );
+				return;
+			}
+
+			// 2) Appointments synchronisieren (nur die OHNE Event)
+			Repro_CT_Suite_Logger::log( 'SCHRITT 2: Appointments synchronisieren (nur ohne Event)...' );
 			$appointments_service = new Repro_CT_Suite_Appointments_Sync_Service( $ct_client, $appointments_repo, $events_repo, $calendars_repo );
 			$appointments_result = $appointments_service->sync_appointments( array(
 				'calendar_ids' => $selected_calendar_ids,
@@ -783,10 +808,10 @@ class Repro_CT_Suite_Admin {
 				'to'   => $to,
 			) );
 
-			// Fehler aus den Services robust behandeln
-			if ( is_wp_error( $events_result ) || is_wp_error( $appointments_result ) ) {
-				$which = is_wp_error( $events_result ) ? 'events' : 'appointments';
-				$err   = is_wp_error( $events_result ) ? $events_result : $appointments_result;
+			// Fehler aus dem Service robust behandeln
+			if ( is_wp_error( $appointments_result ) ) {
+				$which = 'appointments';
+				$err   = $appointments_result;
 
 				Repro_CT_Suite_Logger::header( 'SYNC FEHLGESCHLAGEN: ' . strtoupper( $which ), 'error' );
 				Repro_CT_Suite_Logger::log( 'Error Code: ' . $err->get_error_code(), 'error' );
@@ -814,10 +839,12 @@ class Repro_CT_Suite_Admin {
 				return;
 			}
 
+			// Erfolgsmeldung
 			wp_send_json_success( array(
 				'message' => sprintf(
-					__( 'Synchronisation abgeschlossen: %d Events, %d Termine importiert.', 'repro-ct-suite' ),
+					__( 'Synchronisation abgeschlossen: %d Events (aus /events), %d Events aus Appointments, %d Termine ohne Event.', 'repro-ct-suite' ),
 					( isset( $events_result['inserted'] ) ? (int) $events_result['inserted'] : 0 ) + ( isset( $events_result['updated'] ) ? (int) $events_result['updated'] : 0 ),
+					( isset( $appointments_result['events_inserted'] ) ? (int) $appointments_result['events_inserted'] : 0 ) + ( isset( $appointments_result['events_updated'] ) ? (int) $appointments_result['events_updated'] : 0 ),
 					( isset( $appointments_result['appointments_inserted'] ) ? (int) $appointments_result['appointments_inserted'] : 0 ) + ( isset( $appointments_result['appointments_updated'] ) ? (int) $appointments_result['appointments_updated'] : 0 )
 				),
 				'stats' => array(
