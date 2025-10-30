@@ -665,7 +665,7 @@ class Repro_CT_Suite_Admin {
 		try {
 			// Logger zuerst laden, damit wir früh loggen können
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-logger.php';
-			Repro_CT_Suite_Logger::header( 'AJAX: TERMINE-SYNC HANDLER START' );
+			Repro_CT_Suite_Logger::header( 'AJAX: APPOINTMENTS-SYNC HANDLER START (Terminvorlagen -> Events)' );
 			Repro_CT_Suite_Logger::log( 'Lade Dependencies...' );
 
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
@@ -734,14 +734,14 @@ class Repro_CT_Suite_Admin {
 			$to   = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_to_days * DAY_IN_SECONDS ) );
 			Repro_CT_Suite_Logger::log( 'Zeitraum: von ' . $from . ' bis ' . $to );
 
-			// Events synchronisieren (zeitbasiert)
+			// Events synchronisieren (Veranstaltungen-Einzeltermine, zeitbasiert)
 			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo );
 			$events_result = $events_service->sync_events( array(
 				'from' => $from,
 				'to'   => $to,
 			) );
 
-			// Appointments synchronisieren (nur ausgewählte Kalender)
+			// Appointments synchronisieren (Terminvorlagen -> Events, nur ausgewählte Kalender)
 			$appointments_service = new Repro_CT_Suite_Appointments_Sync_Service( $ct_client, $appointments_repo, $events_repo, $calendars_repo );
 			$appointments_result = $appointments_service->sync_appointments( array(
 				'calendar_ids' => $selected_calendar_ids,
@@ -782,7 +782,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_success( array(
 				'message' => sprintf(
-					__( 'Synchronisation abgeschlossen: %d Events, %d Termine importiert.', 'repro-ct-suite' ),
+					__( 'Synchronisation abgeschlossen: %d Veranstaltungen-Einzeltermine (Events), %d Terminvorlagen-Instanzen (Appointments) importiert.', 'repro-ct-suite' ),
 					( isset( $events_result['inserted'] ) ? (int) $events_result['inserted'] : 0 ) + ( isset( $events_result['updated'] ) ? (int) $events_result['updated'] : 0 ),
 					( isset( $appointments_result['inserted'] ) ? (int) $appointments_result['inserted'] : 0 ) + ( isset( $appointments_result['updated'] ) ? (int) $appointments_result['updated'] : 0 )
 				),
@@ -793,7 +793,7 @@ class Repro_CT_Suite_Admin {
 			) );
 
 		} catch ( Exception $e ) {
-			Repro_CT_Suite_Logger::header( 'EXCEPTION IM TERMINE-SYNC', 'error' );
+			Repro_CT_Suite_Logger::header( 'EXCEPTION IM APPOINTMENTS-SYNC (Terminvorlagen)', 'error' );
 			Repro_CT_Suite_Logger::log( 'Message: ' . $e->getMessage(), 'error' );
 			Repro_CT_Suite_Logger::log( 'File: ' . $e->getFile() . ' Line: ' . $e->getLine(), 'error' );
 			wp_send_json_error( array(

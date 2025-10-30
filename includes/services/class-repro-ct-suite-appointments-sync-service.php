@@ -2,8 +2,9 @@
 /**
  * Appointments Sync Service
  *
- * Holt Termine (Appointments) für ausgewählte Kalender und verknüpft sie
- * optional mit bereits importierten Events.
+ * Holt Appointments (Terminvorlagen) aus ChurchTools und erstellt daraus
+ * Events (berechnete Einzeltermine) in der Veranstaltungen-Gesamtliste.
+ * Appointments sind die Vorlagen, Events die tatsächlichen Termine-Instanzen.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,7 +31,8 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 	}
 
 	/**
-	 * Synchronisiert Appointments für ausgewählte Kalender
+	 * Synchronisiert Appointments (Terminvorlagen) für ausgewählte Kalender
+	 * und erstellt daraus Events (Einzeltermine) in der Veranstaltungen-Gesamtliste.
 	 *
 	 * @param array $args { calendar_ids: int[] (lokale IDs), from: Y-m-d, to: Y-m-d }
 	 * @return array|WP_Error Stats-Array oder WP_Error
@@ -60,11 +62,11 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 			return new WP_Error( 'no_external_ids', __( 'Keine externen Kalender-IDs gefunden.', 'repro-ct-suite' ) );
 		}
 
-		Repro_CT_Suite_Logger::header( 'APPOINTMENTS-SYNC START' );
+		Repro_CT_Suite_Logger::header( 'APPOINTMENTS-SYNC START (Terminvorlagen -> Events erstellen)' );
 		Repro_CT_Suite_Logger::log( 'Zeitraum: ' . $args['from'] . ' bis ' . $args['to'] );
 		Repro_CT_Suite_Logger::log( 'Kalender (extern): ' . implode( ',', $external_calendar_ids ) );
 
-		// Neue Strategie: pro Kalender GET /calendars/{id}/appointments
+		// Pro Kalender: GET /calendars/{id}/appointments (Terminvorlagen mit berechneten Instanzen)
 		$all_appointments = array();
 		$errors = 0;
 		foreach ( $external_calendar_ids as $cid ) {
@@ -85,61 +87,81 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 			}
 		}
 
-		Repro_CT_Suite_Logger::log( 'Gefundene Appointments gesamt: ' . count( $all_appointments ) );
+		Repro_CT_Suite_Logger::log( 'Gefundene Appointments (Terminvorlagen) gesamt: ' . count( $all_appointments ) );
 
 		$appointments = $all_appointments;
 		$stats = array( 'total' => count( $appointments ), 'inserted' => 0, 'updated' => 0, 'errors' => (int) $errors );
 
 		foreach ( $appointments as $a ) {
 			try {
-				$external_id = (string) ( $a['id'] ?? '' );
-				if ( $external_id === '' ) { throw new Exception( 'Appointment ohne id' ); }
+				// Appointment-Daten extrahieren: base = Vorlage, calculated = berechnete Instanz (Event)
+				$appointment_base = $a['appointment']['base'] ?? $a['base'] ?? null;
+				$appointment_calc = $a['appointment']['calculated'] ?? $a['calculated'] ?? null;
+
+				if ( ! $appointment_base || ! $appointment_calc ) {
+					Repro_CT_Suite_Logger::log( 'Ungültiges Appointment-Format (base/calculated fehlt)', 'warning' );
+					$stats['errors']++;
+					continue;
+				}
+
+				$appointment_id = (int) ( $appointment_base['id'] ?? 0 );
+				if ( $appointment_id === 0 ) {
+					throw new Exception( 'Appointment ohne id' );
+				}
 
 				// Kalender-Zuordnung (extern -> lokal)
-				$calendar_ext = $a['calendarId'] ?? ( $a['calendar']['id'] ?? null );
+				$calendar_ext = $appointment_base['calendar']['id'] ?? null;
 				$local_calendar_id = null;
 				if ( $calendar_ext !== null ) {
 					$cal = $this->calendars_repo->get_by_external_id( (string) $calendar_ext );
 					$local_calendar_id = $cal ? (int) $cal->id : null;
 				}
 
-				// Event-Zuordnung (extern -> lokal), falls vorhanden
-				$event_ext = $a['eventId'] ?? ( $a['event']['id'] ?? null );
-				$local_event_id = null;
-				if ( $event_ext !== null ) {
-					$local_event_id = $this->events_repo->get_id_by_external_id( (string) $event_ext );
-				}
-
-				$title = sanitize_text_field( $a['title'] ?? $a['name'] ?? '' );
-				$description = isset( $a['description'] ) ? (string) $a['description'] : null;
-				$start_raw = $a['start'] ?? $a['startDate'] ?? null;
-				$end_raw   = $a['end'] ?? $a['endDate'] ?? null;
-				$is_all_day = ! empty( $a['isAllDay'] ) ? 1 : 0;
+				// Event-Daten aus 'calculated' (berechnete Einzeltermin-Instanz dieser Appointment-Vorlage)
+				$title = sanitize_text_field( $appointment_base['title'] ?? '' );
+				$description = isset( $appointment_base['description'] ) ? (string) $appointment_base['description'] : null;
+				$start_raw = $appointment_calc['startDate'] ?? null;
+				$end_raw   = $appointment_calc['endDate'] ?? null;
+				$is_all_day = ! empty( $appointment_base['allDay'] ) ? 1 : 0;
 
 				$start_dt = $start_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $start_raw ) ) : null;
 				$end_dt   = $end_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $end_raw ) ) : null;
 
-				$data = array(
-					'external_id'     => $external_id,
-					'event_id'        => $local_event_id,
+				// External ID: Kombiniere appointment_id + startDate für eindeutige Event-Instanzen in Veranstaltungen
+				$event_external_id = 'appt_' . $appointment_id . '_' . gmdate( 'Ymd_His', strtotime( $start_raw ) );
+
+				// Prüfe, ob diese appointment_id (Terminvorlage) bereits in Veranstaltungen (Events) existiert
+				global $wpdb;
+				$events_table = $wpdb->prefix . 'rcts_events';
+				$existing_event_with_appointment = $wpdb->get_var( $wpdb->prepare(
+					"SELECT id FROM {$events_table} WHERE appointment_id = %d LIMIT 1",
+					$appointment_id
+				) );
+				if ( $existing_event_with_appointment ) {
+					Repro_CT_Suite_Logger::log( 'Appointment-Vorlage #' . $appointment_id . ' bereits in Veranstaltungen (Event-ID ' . $existing_event_with_appointment . '); erstelle weitere Termin-Instanz.', 'info' );
+				}
+
+				// Event-Daten zusammenstellen (Einzeltermin für Veranstaltungen-Gesamtliste)
+				$event_data = array(
+					'external_id'     => $event_external_id,
 					'calendar_id'     => $local_calendar_id,
+					'appointment_id'  => $appointment_id, // Referenz zur Terminvorlage
 					'title'           => $title,
 					'description'     => $description,
 					'start_datetime'  => $start_dt,
 					'end_datetime'    => $end_dt,
-					'is_all_day'      => $is_all_day,
+					'location_name'   => null, // optional aus address extrahieren, falls vorhanden
+					'status'          => null,
 					'raw_payload'     => wp_json_encode( $a ),
 				);
 
-				// Insert/Update
-				$existing_row = null;
-				// effizient: direkt upsert_by_external_id und anhand Rückgabewert beurteilen
-				$existing_id = $this->appointments_repo->db->get_var( $this->appointments_repo->db->prepare( "SELECT id FROM {$this->appointments_repo->table} WHERE external_id=%s", $external_id ) );
-				$local_id = $this->appointments_repo->upsert_by_external_id( $data );
-				$stats[ $existing_id ? 'updated' : 'inserted' ]++;
+				// Insert/Update Event in Veranstaltungen
+				$existing_event_id = $this->events_repo->get_id_by_external_id( $event_external_id );
+				$local_event_id = $this->events_repo->upsert_by_external_id( $event_data );
+				$stats[ $existing_event_id ? 'updated' : 'inserted' ]++;
 			} catch ( Exception $ex ) {
 				$stats['errors']++;
-				Repro_CT_Suite_Logger::log( 'Appointment-Import-Fehler: ' . $ex->getMessage(), 'error' );
+				Repro_CT_Suite_Logger::log( 'Appointment-Import-Fehler (Terminvorlage -> Event): ' . $ex->getMessage(), 'error' );
 			}
 		}
 

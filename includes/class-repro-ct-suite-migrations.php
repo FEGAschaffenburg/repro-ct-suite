@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Migrations {
 
-	const DB_VERSION = '2';
+	const DB_VERSION = '3';
 	const OPTION_KEY = 'repro_ct_suite_db_version';
 
 	/**
@@ -53,6 +53,7 @@ class Repro_CT_Suite_Migrations {
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			external_id VARCHAR(64) NOT NULL,
 			calendar_id BIGINT(20) UNSIGNED NULL,
+			appointment_id BIGINT(20) UNSIGNED NULL,
 			title VARCHAR(255) NOT NULL,
 			description LONGTEXT NULL,
 			start_datetime DATETIME NOT NULL,
@@ -64,6 +65,7 @@ class Repro_CT_Suite_Migrations {
 			PRIMARY KEY  (id),
 			UNIQUE KEY external_id (external_id),
 			KEY calendar_id (calendar_id),
+			KEY appointment_id (appointment_id),
 			KEY start_datetime (start_datetime),
 			KEY end_datetime (end_datetime)
 		) {$charset_collate};";

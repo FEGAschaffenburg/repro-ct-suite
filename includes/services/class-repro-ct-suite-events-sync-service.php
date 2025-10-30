@@ -2,8 +2,9 @@
 /**
  * Events Sync Service
  *
- * Holt Events aus ChurchTools im angegebenen Zeitraum und speichert/aktualisiert
- * sie in der lokalen Datenbank.
+ * Holt Events (Veranstaltungen-Einzeltermine) aus ChurchTools im angegebenen
+ * Zeitraum und speichert/aktualisiert sie in der Veranstaltungen-Gesamtliste.
+ * Events sind hier die direkt aus /events kommenden Einzeltermine.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,7 +25,7 @@ class Repro_CT_Suite_Events_Sync_Service {
 	}
 
 	/**
-	 * Synchronisiert Events im Zeitraum
+	 * Synchronisiert Events (Veranstaltungen-Einzeltermine) im Zeitraum
 	 *
 	 * @param array $args { from: Y-m-d, to: Y-m-d }
 	 * @return array|WP_Error Stats-Array oder WP_Error
@@ -36,7 +37,7 @@ class Repro_CT_Suite_Events_Sync_Service {
 		);
 		$args = wp_parse_args( $args, $defaults );
 
-		Repro_CT_Suite_Logger::header( 'EVENTS-SYNC START' );
+		Repro_CT_Suite_Logger::header( 'EVENTS-SYNC START (Veranstaltungen-Einzeltermine)' );
 		Repro_CT_Suite_Logger::log( 'Zeitraum: ' . $args['from'] . ' bis ' . $args['to'] );
 
 		$endpoints = array(

@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.3.7
+Stable tag: 0.3.3.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,10 +14,16 @@ WordPress-Plugin zur Integration von ChurchTools-Daten. Synchronisiert Termine u
 
 Repro CT-Suite erstellt eine Brücke zwischen ChurchTools und WordPress. Das Plugin synchronisiert automatisch Termin- und Veranstaltungsdaten aus Ihrer ChurchTools-Instanz und macht sie über Shortcodes in WordPress verfügbar.
 
+**Begriffsdefinition:**
+* **Appointments (Terminvorlagen)**: Wiederkehrende Termine aus ChurchTools mit Serieneinstellungen
+* **Events (Einzeltermine)**: Berechnete Termin-Instanzen für die Veranstaltungen-Gesamtliste
+* **Veranstaltungen**: Gesamtliste aller Events (Einzeltermine) zur Anzeige
+
 **Hauptfunktionen:**
 
-* Automatische Synchronisation von ChurchTools-Terminen
-* Abruf von Event-Daten
+* Automatische Synchronisation von ChurchTools Appointments (Terminvorlagen)
+* Erzeugung von Events (Einzeltermine) aus Appointments für Veranstaltungen
+* Abruf von Event-Daten aus ChurchTools /events API
 * Einfache Anzeige via Shortcodes
 * Admin-Oberfläche für Konfiguration
 * WordPress Cron für automatische Updates
@@ -25,8 +31,8 @@ Repro CT-Suite erstellt eine Brücke zwischen ChurchTools und WordPress. Das Plu
 
 **Shortcodes:**
 
-* `[ct_appointments]` - Zeigt Termine an
-* `[ct_events]` - Zeigt Events an
+* `[ct_appointments]` - Zeigt Terminvorlagen an
+* `[ct_events]` - Zeigt Veranstaltungen-Einzeltermine an
 
 == Installation ==
 
@@ -57,6 +63,12 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.3.8 =
+* Schema: `rcts_events` hat jetzt `appointment_id BIGINT(20) UNSIGNED NULL` für Verlinkung zu Appointment-Vorlagen (DB_VERSION 3)
+* Appointments-Sync: Importiert Terminvorlagen aus `/calendars/{id}/appointments` und erstellt Events (Einzeltermine) in Veranstaltungen-Gesamtliste
+* Wording: Klare Unterscheidung zwischen Appointments (Terminvorlagen), Events (Einzeltermine) und Veranstaltungen (Gesamtliste)
+* Validierung: Prüft beim Import, ob appointment_id bereits in Events existiert (Info-Log bei Mehrfachverwendung durch Serien)
 
 = 0.3.3.7 =
 * Appointments: Umgestellt auf pro-Kalender-Abruf `GET /calendars/{id}/appointments?from&to` (Aggregation aller ausgewählten Kalender)
