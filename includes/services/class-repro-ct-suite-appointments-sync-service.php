@@ -64,32 +64,43 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 		Repro_CT_Suite_Logger::log( 'Zeitraum: ' . $args['from'] . ' bis ' . $args['to'] );
 		Repro_CT_Suite_Logger::log( 'Kalender (extern): ' . implode( ',', $external_calendar_ids ) );
 
-		// Endpunkt + Fallbacks
-		$attempts = array(
-			// Versuch 1: GET mit camelCase 'calendarIds'
-			array( 'method' => 'GET', 'endpoint' => '/calendars/appointments', 'params' => array( 'calendarIds' => $external_calendar_ids ) ),
-			// Versuch 2: GET mit 'calendars'
-			array( 'method' => 'GET', 'endpoint' => '/calendars/appointments', 'params' => array( 'calendars'   => $external_calendar_ids ) ),
-			// Versuch 3: POST mit snake_case 'calendar_ids' als JSON-Body (wie vom Fehler gemeldet)
-			array( 'method' => 'POST', 'endpoint' => '/calendars/appointments', 'body'   => array( 'calendar_ids' => array_map( 'intval', $external_calendar_ids ) ) ),
-		);
+		// Endpunkt + Fallbacks (nur GET, da API 405 auf POST liefert)
+		$attempts = array();
+
+		// Helper zum Bauen von Querystrings mit wiederholten Keys (calendarIds[]=1&calendarIds[]=2)
+		$from_to_qs = http_build_query( array( 'from' => $args['from'], 'to' => $args['to'] ) );
+		$ids_bracket = implode( '&', array_map( function( $id ) { return 'calendarIds[]=' . rawurlencode( (string) $id ); }, $external_calendar_ids ) );
+		$cals_bracket = implode( '&', array_map( function( $id ) { return 'calendars[]=' . rawurlencode( (string) $id ); }, $external_calendar_ids ) );
+		$ids_csv = 'calendarIds=' . rawurlencode( implode( ',', $external_calendar_ids ) );
+		$cals_csv = 'calendars=' . rawurlencode( implode( ',', $external_calendar_ids ) );
+
+		// 1) GET mit calendarIds[] wiederholt
+		$attempts[] = array( 'method' => 'GET_RAW', 'endpoint' => '/calendars/appointments?' . $from_to_qs . '&' . $ids_bracket );
+		// 2) GET mit calendars[] wiederholt
+		$attempts[] = array( 'method' => 'GET_RAW', 'endpoint' => '/calendars/appointments?' . $from_to_qs . '&' . $cals_bracket );
+		// 3) GET mit calendarIds als CSV
+		$attempts[] = array( 'method' => 'GET_RAW', 'endpoint' => '/calendars/appointments?' . $from_to_qs . '&' . $ids_csv );
+		// 4) GET mit calendars als CSV
+		$attempts[] = array( 'method' => 'GET_RAW', 'endpoint' => '/calendars/appointments?' . $from_to_qs . '&' . $cals_csv );
+		// 5) GET Standard mit add_query_arg und calendarIds als Array (letzter Versuch)
+		$attempts[] = array( 'method' => 'GET_ARGS', 'endpoint' => '/calendars/appointments', 'params' => array( 'from' => $args['from'], 'to' => $args['to'], 'calendarIds' => $external_calendar_ids ) );
 
 		$response = null;
 		foreach ( $attempts as $i => $try ) {
-			if ( strtoupper( $try['method'] ) === 'GET' ) {
-				$params = array_merge( array( 'from' => $args['from'], 'to' => $args['to'] ), $try['params'] );
+			if ( $try['method'] === 'GET_RAW' ) {
+				Repro_CT_Suite_Logger::log( 'Try GET (raw) ' . $try['endpoint'] );
+				$response = $this->ct_client->get( $try['endpoint'], array() );
+			} elseif ( $try['method'] === 'GET_ARGS' ) {
 				Repro_CT_Suite_Logger::log( 'Try GET ' . $try['endpoint'] . ' with params keys [' . implode( ',', array_keys( $try['params'] ) ) . ']' );
-				$response = $this->ct_client->get( $try['endpoint'], $params );
+				$response = $this->ct_client->get( $try['endpoint'], $try['params'] );
 			} else {
-				$body = array_merge( array( 'from' => $args['from'], 'to' => $args['to'] ), $try['body'] );
-				Repro_CT_Suite_Logger::log( 'Try POST ' . $try['endpoint'] . ' with body keys [' . implode( ',', array_keys( $try['body'] ) ) . ']' );
-				$response = $this->ct_client->post( $try['endpoint'], $body );
+				continue;
 			}
 
 			if ( is_wp_error( $response ) ) {
 				$code = $response->get_error_data()['status'] ?? null;
 				Repro_CT_Suite_Logger::log( 'Endpoint failed (status=' . ( $code ?? 'n/a' ) . '): ' . $response->get_error_message(), 'warning' );
-				if ( (int) $code === 404 || (int) $code === 400 ) { continue; }
+				if ( in_array( (int) $code, array( 400, 404, 405 ), true ) ) { continue; }
 				return $response;
 			}
 			break; // Erfolg
