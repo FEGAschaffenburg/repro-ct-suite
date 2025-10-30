@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Migrations {
 
-	const DB_VERSION = '3';
+	const DB_VERSION = '4';
 	const OPTION_KEY = 'repro_ct_suite_db_version';
 
 	/**
@@ -52,7 +52,7 @@ class Repro_CT_Suite_Migrations {
 		$sql_events = "CREATE TABLE {$events_table} (
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			external_id VARCHAR(64) NOT NULL,
-			calendar_id BIGINT(20) UNSIGNED NULL,
+			calendar_id VARCHAR(64) NULL,
 			appointment_id BIGINT(20) UNSIGNED NULL,
 			title VARCHAR(255) NOT NULL,
 			description LONGTEXT NULL,
@@ -74,7 +74,7 @@ class Repro_CT_Suite_Migrations {
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			external_id VARCHAR(64) NOT NULL,
 			event_id BIGINT(20) UNSIGNED NULL,
-			calendar_id BIGINT(20) UNSIGNED NULL,
+			calendar_id VARCHAR(64) NULL,
 			title VARCHAR(255) NOT NULL,
 			description LONGTEXT NULL,
 			start_datetime DATETIME NOT NULL,

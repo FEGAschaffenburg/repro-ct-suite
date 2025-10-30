@@ -109,9 +109,21 @@ class Repro_CT_Suite_Events_Sync_Service {
 					$appointment_id = (int) $e['appointment_id'];
 				}
 
+				// Kalender-ID extrahieren (externe ChurchTools Calendar-ID)
+				// WICHTIG: Wir speichern die EXTERNE Calendar-ID, nicht die interne WordPress-ID
+				$calendar_id = null;
+				if ( isset( $e['calendar']['id'] ) ) {
+					$calendar_id = (string) $e['calendar']['id'];
+				} elseif ( isset( $e['calendarId'] ) ) {
+					$calendar_id = (string) $e['calendarId'];
+				} elseif ( isset( $e['calendar_id'] ) ) {
+					$calendar_id = (string) $e['calendar_id'];
+				}
+
 				// Upsert
 				$data = array(
 					'external_id'    => $external_id,
+					'calendar_id'    => $calendar_id, // Externe ChurchTools Calendar-ID
 					'appointment_id' => $appointment_id, // NULL wenn nicht aus Appointment
 					'title'          => $title,
 					'description'    => $description,

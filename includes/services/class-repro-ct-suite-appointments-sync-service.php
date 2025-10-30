@@ -133,13 +133,10 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 					continue; // Nächstes Appointment
 				}
 
-				// Kalender-Zuordnung (extern -> lokal)
+				// Kalender-Zuordnung (externe ChurchTools Calendar-ID)
+				// WICHTIG: Wir speichern die EXTERNE Calendar-ID, nicht die interne WordPress-ID
 				$calendar_ext = $appointment_base['calendar']['id'] ?? null;
-				$local_calendar_id = null;
-				if ( $calendar_ext !== null ) {
-					$cal = $this->calendars_repo->get_by_external_id( (string) $calendar_ext );
-					$local_calendar_id = $cal ? (int) $cal->id : null;
-				}
+				$calendar_id = $calendar_ext !== null ? (string) $calendar_ext : null;
 
 				// Gemeinsame Daten
 				$title = sanitize_text_field( $appointment_base['title'] ?? '' );
@@ -155,7 +152,7 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 				$appointment_data = array(
 					'external_id'     => (string) $appointment_id,
 					'event_id'        => null, // wird später gesetzt, falls Event existiert
-					'calendar_id'     => $local_calendar_id,
+					'calendar_id'     => $calendar_id, // Externe ChurchTools Calendar-ID
 					'title'           => $title,
 					'description'     => $description,
 					'start_datetime'  => $start_dt,
@@ -181,7 +178,7 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 
 				$event_data = array(
 					'external_id'     => $event_external_id,
-					'calendar_id'     => $local_calendar_id,
+					'calendar_id'     => $calendar_id, // Externe ChurchTools Calendar-ID
 					'appointment_id'  => $appointment_id,
 					'title'           => $title,
 					'description'     => $description,

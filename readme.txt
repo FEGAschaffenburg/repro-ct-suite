@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.5.8
+Stable tag: 0.3.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,16 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.6.0 =
+* **BREAKING**: DB-Schema-Update auf Version 4
+* Fix: calendar_id Spalte von BIGINT auf VARCHAR(64) geändert
+* Fix: Events-Sync setzt jetzt calendar_id (externe ChurchTools Calendar-ID)
+* Fix: Appointments-Sync speichert externe Calendar-ID statt interner WordPress-ID
+* Fix: Kalenderfilter funktioniert jetzt korrekt (verwendet externe IDs)
+* Datenbank: Automatische Migration bei Plugin-Update
+* WICHTIG: Nach Update einmal Synchronisation ausführen, um calendar_id zu füllen
+* Version: 0.3.6.0
 
 = 0.3.5.8 =
 * Fix: Kalenderfilter funktioniert jetzt korrekt (verwendet get_by_external_id statt get_by_id)
