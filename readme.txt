@@ -56,6 +56,15 @@ Das Plugin nutzt WordPress Cron und synchronisiert standardmäßig alle 6 Stunde
 
 Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 
+= Was passiert beim Deinstallieren des Plugins? =
+
+Beim Entfernen (Löschen) des Plugins über die WordPress-Pluginverwaltung werden automatisch alle zugehörigen Daten bereinigt:
+
+- Plugin-Optionen (Tenant, Benutzername, Passwort, Session/Cookies, Sync-Einstellungen, DB-Versionsoption)
+- Eigene Datenbanktabellen: rcts_calendars, rcts_events, rcts_appointments, rcts_event_services
+
+In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
+
 == Screenshots ==
 
 1. Admin-Einstellungsseite
