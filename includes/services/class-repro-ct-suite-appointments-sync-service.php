@@ -147,14 +147,16 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 					'raw_payload'     => wp_json_encode( $a ),
 				);
 
-				$existing_appointment = $this->appointments_repo->db->get_var( 
-					$this->appointments_repo->db->prepare( 
-						"SELECT id FROM {$this->appointments_repo->table} WHERE external_id=%s", 
-						(string) $appointment_id 
-					) 
-				);
+				// Prüfe, ob Appointment bereits existiert (via upsert_by_external_id gibt es keine direkte "exists"-Methode)
 				$local_appointment_id = $this->appointments_repo->upsert_by_external_id( $appointment_data );
-				$stats[ $existing_appointment ? 'appointments_updated' : 'appointments_inserted' ]++;
+				// Bestimme, ob insert oder update (upsert gibt immer ID zurück, prüfe vorher ob existiert)
+				global $wpdb;
+				$existed_before = $wpdb->get_var( $wpdb->prepare(
+					"SELECT id FROM " . $wpdb->prefix . "rcts_appointments WHERE external_id = %s AND id != %d",
+					(string) $appointment_id,
+					$local_appointment_id
+				) );
+				$stats[ $existed_before ? 'appointments_updated' : 'appointments_inserted' ]++;
 
 				// 2) EVENT speichern (Einzeltermin-Instanz in rcts_events)
 				// External ID: Kombiniere appointment_id + startDate für eindeutige Event-Instanzen
@@ -179,8 +181,9 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 
 				// 3) Appointment mit Event verknüpfen (event_id setzen)
 				if ( $local_event_id && $local_appointment_id ) {
-					$this->appointments_repo->db->update(
-						$this->appointments_repo->table,
+					global $wpdb;
+					$wpdb->update(
+						$wpdb->prefix . 'rcts_appointments',
 						array( 'event_id' => $local_event_id ),
 						array( 'id' => $local_appointment_id ),
 						array( '%d' ),
