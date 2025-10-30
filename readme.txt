@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.5.0
+Stable tag: 0.3.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,10 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.3.5.1 =
+* Fix: GitHub Release ZIP-Struktur korrigiert für WordPress-Installation
+* Version: 0.3.5.1
 
 = 0.3.5.0 =
 * UI: Komplette Umstrukturierung der Admin-Oberfläche
