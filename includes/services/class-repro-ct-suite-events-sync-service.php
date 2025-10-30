@@ -50,8 +50,10 @@ class Repro_CT_Suite_Events_Sync_Service {
 		foreach ( $endpoints as $ep ) {
 			Repro_CT_Suite_Logger::log( 'Try endpoint: ' . $ep );
 			$response = $this->ct_client->get( $ep, array(
-				'from' => $args['from'],
-				'to'   => $args['to'],
+				'from'      => $args['from'],
+				'to'        => $args['to'],
+				'direction' => 'forward',
+				'include'   => 'eventServices',
 			) );
 			if ( is_wp_error( $response ) ) {
 				$code = $response->get_error_data()['status'] ?? null;

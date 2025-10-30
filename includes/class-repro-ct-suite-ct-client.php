@@ -319,6 +319,7 @@ class Repro_CT_Suite_CT_Client {
 	private function get_headers() {
 		$headers = array(
 			'Content-Type' => 'application/json',
+			'Accept'       => 'application/json',
 		);
 
 		if ( ! empty( $this->cookies ) ) {
