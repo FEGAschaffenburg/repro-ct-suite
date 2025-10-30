@@ -7,6 +7,77 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+	/**
+	 * Rebuild schedule table from existing events and appointments.
+	 * Skips appointments that are already linked to events (event_id is set)
+	 *
+	 * @param array $args Optional filters: from, to (Y-m-d)
+	 * @return array Counts: events, appointments
+	 */
+	public function rebuild_from_existing( $args = array() ) {
+		$defaults = array(
+			'from' => null,
+			'to'   => null,
+		);
+		$args = wp_parse_args( $args, $defaults );
+
+		$events_table = $this->db->prefix . 'rcts_events';
+		$appointments_table = $this->db->prefix . 'rcts_appointments';
+
+		$where_e = 'WHERE 1=1';
+		$params = array();
+		if ( ! empty( $args['from'] ) ) { $where_e .= ' AND start_datetime >= %s'; $params[] = $args['from']; }
+		if ( ! empty( $args['to'] ) ) { $where_e .= ' AND start_datetime <= %s'; $params[] = $args['to']; }
+
+		$sql_e = $this->db->prepare( "SELECT * FROM {$events_table} {$where_e}", ...$params );
+		$events = $this->db->get_results( $sql_e );
+
+		$count_events = 0;
+		foreach ( $events as $e ) {
+			$this->upsert_from_event( array(
+				'id' => (int) $e->id,
+				'external_id' => $e->external_id,
+				'calendar_id' => $e->calendar_id,
+				'title' => $e->title,
+				'description' => $e->description,
+				'start_datetime' => $e->start_datetime,
+				'end_datetime' => $e->end_datetime,
+				'location_name' => $e->location_name,
+				'status' => $e->status,
+			) );
+			$count_events++;
+		}
+
+		// Appointments: nur jene, die NICHT mit einem Event verknüpft sind
+		$where_a = 'WHERE 1=1 AND (event_id IS NULL)';
+		$params = array();
+		if ( ! empty( $args['from'] ) ) { $where_a .= ' AND start_datetime >= %s'; $params[] = $args['from']; }
+		if ( ! empty( $args['to'] ) ) { $where_a .= ' AND start_datetime <= %s'; $params[] = $args['to']; }
+
+		$sql_a = $this->db->prepare( "SELECT * FROM {$appointments_table} {$where_a}", ...$params );
+		$appointments = $this->db->get_results( $sql_a );
+
+		$count_appointments = 0;
+		foreach ( $appointments as $a ) {
+			$this->upsert_from_appointment( array(
+				'id' => (int) $a->id,
+				'external_id' => $a->external_id,
+				'calendar_id' => $a->calendar_id,
+				'title' => $a->title,
+				'description' => $a->description,
+				'start_datetime' => $a->start_datetime,
+				'end_datetime' => $a->end_datetime,
+				'is_all_day' => $a->is_all_day,
+			) );
+			$count_appointments++;
+		}
+
+		return array(
+			'events' => $count_events,
+			'appointments' => $count_appointments,
+		);
+	}
+
 class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base {
 	public function __construct() {
 		global $wpdb;

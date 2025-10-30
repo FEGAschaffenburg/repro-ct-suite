@@ -159,16 +159,21 @@ class Repro_CT_Suite_Appointments_Sync_Service {
 						'raw_payload'     => wp_json_encode( $a ),
 					);
 
-					// Prüfe, ob Appointment bereits existiert (via upsert_by_external_id gibt es keine direkte "exists"-Methode)
-					$local_appointment_id = $this->appointments_repo->upsert_by_external_id( $appointment_data );
-					// Bestimme, ob insert oder update (upsert gibt immer ID zurück, prüfe vorher ob existiert)
+					// Prüfe, ob Appointment bereits existierte, bevor wir upserten
 					global $wpdb;
-					$existed_before = $wpdb->get_var( $wpdb->prepare(
-						"SELECT id FROM " . $wpdb->prefix . "rcts_appointments WHERE external_id = %s AND id != %d",
-						(string) $appointment_id,
-						$local_appointment_id
+					$existing_appointment_id = $wpdb->get_var( $wpdb->prepare(
+						"SELECT id FROM " . $wpdb->prefix . "rcts_appointments WHERE external_id = %s LIMIT 1",
+						(string) $appointment_id
 					) );
-					$stats[ $existed_before ? 'appointments_updated' : 'appointments_inserted' ]++;
+
+					$local_appointment_id = $this->appointments_repo->upsert_by_external_id( $appointment_data );
+
+					// Bestimme, ob insert oder update anhand der Existenz vor dem Upsert
+					if ( $existing_appointment_id ) {
+						$stats['appointments_updated']++;
+					} else {
+						$stats['appointments_inserted']++;
+					}
 
 					// Schedule aus Appointment updaten
 					if ( $this->schedule_repo && $local_appointment_id ) {

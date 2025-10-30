@@ -111,8 +111,18 @@ class Repro_CT_Suite_Events_Sync_Service {
 				$event_calendar_id = (string) $e['calendar_id'];
 			}
 			
-			// Wenn Kalender-Filter aktiv ist UND Event hat calendar_id
-			if ( ! empty( $allowed_calendar_ids ) && $event_calendar_id !== null ) {
+			// Wenn Kalender-Filter aktiv ist, dann nur Events mit bekannter calendar_id
+			// und die in der Allowlist sind zulassen. Events ohne calendar_id werden
+			// verworfen, da wir sonst ungewollt Termine aus nicht-ausgewählten
+			// Kalendern importieren können.
+			if ( ! empty( $allowed_calendar_ids ) ) {
+				if ( $event_calendar_id === null ) {
+					// Kein calendar_id im Payload -> überspringen
+					$stats_filtered++;
+					Repro_CT_Suite_Logger::log( 'Event ohne calendar_id übersprungen (Payload enthält keine calendar-Infos).', 'info' );
+					continue;
+				}
+
 				if ( ! in_array( $event_calendar_id, $allowed_calendar_ids, true ) ) {
 					$stats_filtered++;
 					continue; // Event überspringen
