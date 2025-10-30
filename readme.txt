@@ -68,6 +68,8 @@ Das Plugin ist für aktuelle ChurchTools-Versionen mit REST API entwickelt.
 * Schema: `rcts_events` hat jetzt `appointment_id BIGINT(20) UNSIGNED NULL` für Verlinkung zu Appointment-Vorlagen (DB_VERSION 3)
 * Appointments-Sync: Importiert Terminvorlagen aus `/calendars/{id}/appointments` und erstellt Events (Einzeltermine) in Veranstaltungen-Gesamtliste
 * Wording: Klare Unterscheidung zwischen Appointments (Terminvorlagen), Events (Einzeltermine) und Veranstaltungen (Gesamtliste)
+* UI: Dashboard und Admin-Seiten zeigen nur noch Veranstaltungen (Events-Gesamtliste) an
+* Admin-Menü: "Termine" → "Veranstaltungen" (Events-Liste mit Quelle: Event/Appointment)
 * Validierung: Prüft beim Import, ob appointment_id bereits in Events existiert (Info-Log bei Mehrfachverwendung durch Serien)
 
 = 0.3.3.7 =

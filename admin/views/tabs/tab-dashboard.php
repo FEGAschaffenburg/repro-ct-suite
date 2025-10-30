@@ -16,16 +16,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Repository laden
 require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-repository-base.php';
-require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
+require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-events-repository.php';
+require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
 
-$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
+$events_repo = new Repro_CT_Suite_Events_Repository();
+$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
 
-// Kombinierte Termine abrufen
-$appointments_count = $appointments_repo->count_combined_appointments();
-$upcoming_appointments = $appointments_repo->get_combined_appointments( array(
-	'from'  => current_time( 'mysql' ),
-	'limit' => 5,
-) );
+// Veranstaltungen-Statistik (nur Events, keine Appointments)
+global $wpdb;
+$events_table = $wpdb->prefix . 'rcts_events';
+$events_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$events_table}" );
+
+// Nächste Veranstaltungen (Events)
+$upcoming_sql = $wpdb->prepare(
+	"SELECT * FROM {$events_table} WHERE start_datetime >= %s ORDER BY start_datetime ASC LIMIT 5",
+	current_time( 'mysql' )
+);
+$upcoming_events = $wpdb->get_results( $upcoming_sql );
 
 // Letzten Sync-Zeitpunkt holen (TODO: später aus Option/Transient)
 $last_sync_time = get_option( 'repro_ct_suite_last_sync_time', __( 'Nie', 'repro-ct-suite' ) );
@@ -56,17 +63,17 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 <!-- Statistik-Grid -->
 <div class="repro-ct-suite-grid repro-ct-suite-grid-2">
 	
-	<!-- Kombinierte Termine Card -->
+	<!-- Veranstaltungen Card -->
 	<div class="repro-ct-suite-card">
 		<div class="repro-ct-suite-card-header">
 			<span class="dashicons dashicons-calendar-alt"></span>
-			<h3><?php esc_html_e( 'Termine', 'repro-ct-suite' ); ?></h3>
+			<h3><?php esc_html_e( 'Veranstaltungen', 'repro-ct-suite' ); ?></h3>
 		</div>
 		<div class="repro-ct-suite-card-body">
 			<div style="font-size: 32px; font-weight: 600; color: #0073aa; margin-bottom: 10px;">
-				<?php echo esc_html( $appointments_count ); ?>
+				<?php echo esc_html( $events_count ); ?>
 			</div>
-			<p class="description"><?php esc_html_e( 'Synchronisierte Termine (kombiniert aus Appointments & Events)', 'repro-ct-suite' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Synchronisierte Events (Einzeltermine aus Events-API und Appointments-Vorlagen)', 'repro-ct-suite' ); ?></p>
 		</div>
 		<div class="repro-ct-suite-card-footer">
 			<span class="repro-ct-suite-badge repro-ct-suite-badge-info">
@@ -126,14 +133,14 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 	</div>
 </div>
 
-<!-- Nächste Termine -->
+<!-- Nächste Veranstaltungen -->
 <div class="repro-ct-suite-card repro-ct-suite-mt-20">
 	<div class="repro-ct-suite-card-header">
 		<span class="dashicons dashicons-calendar"></span>
-		<h3><?php esc_html_e( 'Nächste Termine', 'repro-ct-suite' ); ?></h3>
+		<h3><?php esc_html_e( 'Nächste Veranstaltungen', 'repro-ct-suite' ); ?></h3>
 	</div>
 	<div class="repro-ct-suite-card-body">
-		<?php if ( ! empty( $upcoming_appointments ) ) : ?>
+		<?php if ( ! empty( $upcoming_events ) ) : ?>
 			<table class="widefat" style="margin-top: 0;">
 				<thead>
 					<tr>
@@ -144,13 +151,15 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ( $upcoming_appointments as $appointment ) : ?>
+					<?php foreach ( $upcoming_events as $event ) : ?>
 						<?php
-						$start = strtotime( $appointment->start_datetime );
+						$start = strtotime( $event->start_datetime );
 						$date_format = get_option( 'date_format' );
 						$time_format = get_option( 'time_format' );
 						$formatted_date = date_i18n( $date_format, $start );
-						$formatted_time = $appointment->is_all_day ? __( 'Ganztägig', 'repro-ct-suite' ) : date_i18n( $time_format, $start );
+						$formatted_time = date_i18n( $time_format, $start );
+						$source = $event->appointment_id ? 'Appointment' : 'Event';
+						$source_class = $event->appointment_id ? 'repro-ct-suite-badge-warning' : 'repro-ct-suite-badge-info';
 						?>
 						<tr>
 							<td>
@@ -158,39 +167,37 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 								<span class="description"><?php echo esc_html( $formatted_time ); ?></span>
 							</td>
 							<td>
-								<strong><?php echo esc_html( $appointment->title ); ?></strong>
-								<?php if ( ! empty( $appointment->description ) ) : ?>
-									<br><span class="description"><?php echo esc_html( wp_trim_words( $appointment->description, 10 ) ); ?></span>
+								<strong><?php echo esc_html( $event->title ); ?></strong>
+								<?php if ( ! empty( $event->description ) ) : ?>
+									<br><span class="description"><?php echo esc_html( wp_trim_words( $event->description, 10 ) ); ?></span>
 								<?php endif; ?>
 							</td>
 							<td>
-								<?php echo ! empty( $appointment->location_name ) ? esc_html( $appointment->location_name ) : '—'; ?>
+								<?php echo ! empty( $event->location_name ) ? esc_html( $event->location_name ) : '—'; ?>
 							</td>
 							<td>
-								<?php if ( $appointment->source === 'event' ) : ?>
-									<span class="repro-ct-suite-badge repro-ct-suite-badge-success"><?php esc_html_e( 'Event', 'repro-ct-suite' ); ?></span>
-								<?php else : ?>
-									<span class="repro-ct-suite-badge repro-ct-suite-badge-info"><?php esc_html_e( 'Termin', 'repro-ct-suite' ); ?></span>
-								<?php endif; ?>
+								<span class="repro-ct-suite-badge <?php echo esc_attr( $source_class ); ?>" title="<?php echo esc_attr( $source === 'Appointment' ? 'Aus Terminvorlage' : 'Direkt aus Events-API' ); ?>">
+									<?php echo esc_html( $source ); ?>
+								</span>
 							</td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
 			</table>
 			<div style="margin-top: 15px; text-align: right;">
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite-appointments' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-secondary repro-ct-suite-btn-small">
-					<?php esc_html_e( 'Alle Termine ansehen', 'repro-ct-suite' ); ?>
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite-events' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-secondary repro-ct-suite-btn-small">
+					<?php esc_html_e( 'Alle Veranstaltungen ansehen', 'repro-ct-suite' ); ?>
 				</a>
 			</div>
 		<?php else : ?>
 			<p class="description">
-				<?php esc_html_e( 'Keine bevorstehenden Termine gefunden.', 'repro-ct-suite' ); ?>
+				<?php esc_html_e( 'Keine bevorstehenden Veranstaltungen gefunden.', 'repro-ct-suite' ); ?>
 			</p>
 			<?php if ( $connection_status === 'configured' ) : ?>
 				<p>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite&tab=sync' ) ); ?>" class="repro-ct-suite-btn repro-ct-suite-btn-primary">
 						<span class="dashicons dashicons-update"></span>
-						<?php esc_html_e( 'Termine synchronisieren', 'repro-ct-suite' ); ?>
+						<?php esc_html_e( 'Veranstaltungen synchronisieren', 'repro-ct-suite' ); ?>
 					</a>
 				</p>
 			<?php endif; ?>

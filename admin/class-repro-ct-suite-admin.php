@@ -168,11 +168,11 @@ class Repro_CT_Suite_Admin {
 
 		add_submenu_page(
 			'repro-ct-suite',
-			__( 'Termine', 'repro-ct-suite' ),
-			__( 'Termine', 'repro-ct-suite' ),
+			__( 'Veranstaltungen', 'repro-ct-suite' ),
+			__( 'Veranstaltungen', 'repro-ct-suite' ),
 			'manage_options',
-			'repro-ct-suite-appointments',
-			array( $this, 'display_appointments_page' )
+			'repro-ct-suite-events',
+			array( $this, 'display_events_page' )
 		);
 
 		add_submenu_page(
@@ -200,10 +200,10 @@ class Repro_CT_Suite_Admin {
 	}
 
 	/**
-	 * Display the appointments consolidated page.
+	 * Display the events (Veranstaltungen) page.
 	 */
-	public function display_appointments_page() {
-		include_once plugin_dir_path( __FILE__ ) . 'views/admin-appointments.php';
+	public function display_events_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
 	}
 
 	/**

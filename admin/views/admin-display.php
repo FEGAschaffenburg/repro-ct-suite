@@ -30,7 +30,7 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 			<span class="dashicons dashicons-admin-generic"></span>
 			<?php echo esc_html( get_admin_page_title() ); ?>
 		</h1>
-		<p><?php esc_html_e( 'ChurchTools-Integration für WordPress. Synchronisieren Sie Termine und Events aus ChurchTools.', 'repro-ct-suite' ); ?></p>
+		<p><?php esc_html_e( 'ChurchTools-Integration für WordPress. Synchronisieren Sie Veranstaltungen (Events) aus ChurchTools Events-API und Appointments-Terminvorlagen.', 'repro-ct-suite' ); ?></p>
 	</div>
 
 	<!-- Tab-Navigation -->
