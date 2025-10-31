@@ -50,3 +50,7 @@ Thumbs.db
 *.tmp
 *.bak
 *~
+
+# Release archives (should only exist as GitHub release assets)
+*.zip
+repro-ct-suite-*.zip
