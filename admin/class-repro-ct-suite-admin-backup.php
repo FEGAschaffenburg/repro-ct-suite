@@ -51,8 +51,9 @@ class Repro_CT_Suite_Admin {
 		add_action( 'wp_ajax_repro_ct_suite_full_reset', array( $this, 'ajax_full_reset' ) );
 		add_action( 'wp_ajax_repro_ct_suite_fix_calendar_ids', array( $this, 'ajax_fix_calendar_ids' ) );
 		add_action( 'wp_ajax_repro_ct_suite_delete_event', array( $this, 'ajax_delete_event' ) );
+		add_action( 'wp_ajax_repro_ct_suite_delete_appointment', array( $this, 'ajax_delete_appointment' ) );
 		add_action( 'wp_ajax_repro_ct_suite_update_event', array( $this, 'ajax_update_event' ) );
-		add_action( 'wp_ajax_repro_ct_suite_dismiss_v6_notice', array( $this, 'ajax_dismiss_v6_notice' ) );
+		add_action( 'wp_ajax_repro_ct_suite_update_appointment', array( $this, 'ajax_update_appointment' ) );
 	}
 
 	/**
@@ -233,14 +234,24 @@ class Repro_CT_Suite_Admin {
 			array( $this, 'display_admin_page' )
 		);
 
-		// Submenu: Termine (vereinheitlichte Terminverwaltung)
+		// Submenu: Terminkalender (immer sichtbar)
 		add_submenu_page(
 			'repro-ct-suite',
-			__( 'Termine', 'repro-ct-suite' ),
-			__( 'Termine', 'repro-ct-suite' ),
+			__( 'Terminkalender', 'repro-ct-suite' ),
+			__( 'Terminkalender', 'repro-ct-suite' ),
 			'manage_options',
 			'repro-ct-suite-events',
 			array( $this, 'display_events_page' )
+		);
+
+		// Submenu: Terminübersicht (kombinierte Liste)
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Terminübersicht', 'repro-ct-suite' ),
+			__( 'Terminübersicht', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-schedule',
+			array( $this, 'display_schedule_page' )
 		);
 
 		// Submenu: Update-Info (immer sichtbar)
@@ -283,6 +294,13 @@ class Repro_CT_Suite_Admin {
 	 */
 	public function display_events_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
+	}
+
+	/**
+	 * Display the schedule (Terminübersicht) page.
+	 */
+	public function display_schedule_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-schedule.php';
 	}
 
 	/**
@@ -850,9 +868,12 @@ class Repro_CT_Suite_Admin {
 			'stats' => $result,
 		) );
 	}
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-schedule-repository.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-events-sync-service.php';
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-appointments-sync-service.php';
 
-	/**
-	 * AJAX Handler: Einzelne Tabelle leeren
+			Repro_CT_Suite_Logger::log( 'Dependencies geladen.' );
 		} catch ( Exception $e ) {
 			error_log( '[REPRO CT-SUITE] FEHLER beim Laden der Dependencies (appointments): ' . $e->getMessage() );
 			wp_send_json_error( array(
@@ -1526,6 +1547,54 @@ class Repro_CT_Suite_Admin {
 	}
 
 	/**
+	 * AJAX Handler: Einzelnen Appointment löschen
+	 *
+	 * @since 0.3.6.1
+	 */
+	public function ajax_delete_appointment() {
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$appointment_id = isset( $_POST['appointment_id'] ) ? (int) $_POST['appointment_id'] : 0;
+
+		if ( $appointment_id <= 0 ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ungültige Appointment-ID.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
+
+		$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
+
+		// Prüfen ob Appointment existiert
+		if ( ! $appointments_repo->exists( $appointment_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Appointment nicht gefunden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Appointment löschen
+		$result = $appointments_repo->delete_by_id( $appointment_id );
+
+		if ( $result === false ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Löschen des Appointments.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'message' => __( 'Appointment erfolgreich gelöscht.', 'repro-ct-suite' )
+		) );
+	}
+
+	/**
 	 * AJAX Handler: Einzelnes Event aktualisieren
 	 *
 	 * @since 0.3.6.1
@@ -1591,9 +1660,11 @@ class Repro_CT_Suite_Admin {
 	}
 
 	/**
-	 * AJAX Handler: V6 Notice ausblenden
+	 * AJAX Handler: Einzelnen Appointment aktualisieren
+	 *
+	 * @since 0.3.6.1
 	 */
-	public function ajax_dismiss_v6_notice() {
+	public function ajax_update_appointment() {
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -1602,10 +1673,58 @@ class Repro_CT_Suite_Admin {
 			) );
 		}
 
-		update_option( 'repro_ct_suite_v6_notice_dismissed', true );
+		$appointment_id = isset( $_POST['appointment_id'] ) ? (int) $_POST['appointment_id'] : 0;
+
+		if ( $appointment_id <= 0 ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ungültige Appointment-ID.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+		require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
+
+		$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
+
+		// Prüfen ob Appointment existiert
+		if ( ! $appointments_repo->exists( $appointment_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Appointment nicht gefunden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Erlaubte Felder zum Aktualisieren
+		$allowed_fields = array( 'title', 'description', 'start_datetime', 'end_datetime', 'is_all_day' );
+		$update_data = array();
+
+		foreach ( $allowed_fields as $field ) {
+			if ( isset( $_POST[ $field ] ) ) {
+				if ( $field === 'is_all_day' ) {
+					$update_data[ $field ] = (int) $_POST[ $field ];
+				} else {
+					$update_data[ $field ] = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+				}
+			}
+		}
+
+		if ( empty( $update_data ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Daten zum Aktualisieren vorhanden.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Appointment aktualisieren
+		$result = $appointments_repo->update_by_id( $appointment_id, $update_data );
+
+		if ( $result === false ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Aktualisieren des Appointments.', 'repro-ct-suite' )
+			) );
+		}
 
 		wp_send_json_success( array(
-			'message' => __( 'Notice ausgeblendet.', 'repro-ct-suite' )
+			'message' => __( 'Appointment erfolgreich aktualisiert.', 'repro-ct-suite' ),
+			'updated_fields' => array_keys( $update_data )
 		) );
 	}
 }

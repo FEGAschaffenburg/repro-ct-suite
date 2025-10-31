@@ -22,6 +22,10 @@ require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-c
 $events_repo = new Repro_CT_Suite_Events_Repository();
 $calendars_repo = new Repro_CT_Suite_Calendars_Repository();
 
+// Prüfe auf frische Migration V6 (Unified Sync)
+$db_version = get_option( 'repro_ct_suite_db_version', '0' );
+$show_v6_notice = ( version_compare( $db_version, '6', '>=' ) && ! get_option( 'repro_ct_suite_v6_notice_dismissed', false ) );
+
 // Veranstaltungen-Statistik (nur Events, keine Appointments)
 global $wpdb;
 $events_table = $wpdb->prefix . 'rcts_events';
@@ -59,6 +63,44 @@ if ( empty( $ct_tenant ) || empty( $ct_username ) || empty( $ct_password ) ) {
 	);
 }
 ?>
+
+<?php if ( $show_v6_notice ) : ?>
+<!-- Unified Sync System Notice -->
+<div class="notice notice-success is-dismissible" style="margin-bottom: 20px;">
+	<h3>🎉 Neues Unified Sync System aktiviert!</h3>
+	<p><strong>Verbesserungen in Version 0.4.0:</strong></p>
+	<ul style="list-style: disc; margin-left: 20px;">
+		<li><strong>Intelligenter 2-Phase Sync:</strong> Events + Appointments ohne Duplikate</li>
+		<li><strong>50% weniger Code:</strong> Vereinfachte, wartbare Architektur</li>
+		<li><strong>Bereinigte Admin-UI:</strong> Einheitliche Terminverwaltung</li>
+		<li><strong>Bessere Performance:</strong> Optimierte API-Nutzung</li>
+	</ul>
+	<p>
+		<strong>Was ist neu:</strong> Das Plugin nutzt jetzt ein einheitliches System für alle Termine. 
+		Alte separate "Events" und "Appointments" Listen wurden zu einer "Termine" Übersicht zusammengeführt.
+	</p>
+	<p>
+		<button type="button" class="button button-secondary" onclick="dismissV6Notice()">
+			✓ Verstanden, Notice ausblenden
+		</button>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite&tab=sync' ) ); ?>" class="button button-primary">
+			🚀 Jetzt synchronisieren
+		</a>
+	</p>
+</div>
+
+<script>
+function dismissV6Notice() {
+	fetch('<?php echo admin_url( 'admin-ajax.php' ); ?>', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: 'action=repro_ct_suite_dismiss_v6_notice&nonce=<?php echo wp_create_nonce( 'repro_ct_suite_admin' ); ?>'
+	}).then(() => {
+		document.querySelector('.notice').style.display = 'none';
+	});
+}
+</script>
+<?php endif; ?>
 
 <!-- Statistik-Grid -->
 <div class="repro-ct-suite-grid repro-ct-suite-grid-2">

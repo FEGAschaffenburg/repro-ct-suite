@@ -2,13 +2,14 @@
 /**
  * Tab: Synchronisation
  *
- * Zentrale Synchronisations-Steuerung:
+ * Vereinfachte Synchronisation mit dem neuen einheitlichen Sync-Service:
  * - Kalenderauswahl
- * - Zeitraum-Konfiguration
- * - Manuelle Sync-Buttons
+ * - Zeitraum-Konfiguration  
+ * - Einheitlicher Sync-Button für alle Termine
  *
  * @package    Repro_CT_Suite
  * @subpackage Repro_CT_Suite/admin/views/tabs
+ * @since      0.4.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -278,12 +279,12 @@ $selected_count = $calendars_repo->count_selected();
 						?>
 					</p>
 					<p class="description">
-						<?php esc_html_e( 'Der Vorgang läuft in zwei Schritten: zuerst werden Events importiert, dann die Termine (Appointments) mit Event-Verknüpfung.', 'repro-ct-suite' ); ?>
+						<?php esc_html_e( 'Der neue einheitliche Sync-Service importiert alle Termine aus den ausgewählten Kalendern in einem Schritt.', 'repro-ct-suite' ); ?>
 					</p>
 					<p class="repro-ct-suite-mt-15">
 						<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-primary repro-ct-suite-sync-appointments-btn">
 							<span class="dashicons dashicons-update"></span>
-							<?php esc_html_e( 'Jetzt synchronisieren', 'repro-ct-suite' ); ?>
+							<?php esc_html_e( 'Alle Termine synchronisieren', 'repro-ct-suite' ); ?>
 						</button>
 					</p>
 				<?php endif; ?>

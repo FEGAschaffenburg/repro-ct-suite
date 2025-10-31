@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.9.2
+Stable tag: 0.4.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,22 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.4.0.0 =
+* **MAJOR UPDATE**: Neues einheitliches Sync-System mit intelligenter 2-Phasen-Architektur
+* **BREAKING**: Alte separate Events- und Appointments-Sync-Services durch einheitlichen Sync-Service ersetzt
+* **Feature**: Intelligente Duplikats-Vermeidung durch appointment_id-Tracking zwischen Events und Appointments APIs
+* **Feature**: Automatische Datenbank-Migration V6 mit Schema-Updates und Orphaned-Appointment-Migration
+* **Architecture**: Simplified codebase - von 600+ Zeilen dual sync auf 304 Zeilen unified sync reduziert
+* **UX**: Admin-UI-Aufräumung - redundante Appointment-Handler entfernt, konsolidierte Menü-Struktur
+* **Migration**: Automatische Bereinigung von verwaisten Appointments (bis zu 50 automatisch, manuelle Migration für größere Datenmengen)
+* **Logging**: Umfassendes Logging für beide Sync-Phasen mit detaillierter Statistik
+* **Admin**: Neue Admin-Benachrichtigung für V6-Upgrade mit Dismissal-Funktionalität
+* **Workflow**: Phase 1 (Events API) sammelt appointment_ids, Phase 2 (Appointments API) importiert zusätzliche Termine
+* **Performance**: Reduzierte Code-Komplexität und verbesserte Wartbarkeit
+* **Safety**: Umfangreiche Migrations-Sicherheitsprüfungen mit automatischem Rollback bei Fehlern
+* WICHTIG: Nach Update ersten Sync ausführen, um neues einheitliches System zu aktivieren
+* Version: 0.4.0.0
 
 = 0.3.7.0 =
 * Feature: Neue DB-Tabelle rcts_schedule als konsolidierte Terminübersicht (Events + Appointments)

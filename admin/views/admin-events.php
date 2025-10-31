@@ -1,20 +1,18 @@
 <?php
 /**
- * Veranstaltungen-Übersicht
+ * Termine-Übersicht
  *
- * Zeigt alle Events (Einzeltermine) aus der Veranstaltungen-Gesamtliste.
- * Events können aus /events API oder aus Appointments-Vorlagen stammen.
+ * Zeigt alle Termine aus dem neuen unified sync system.
+ * Nach dem Rebuild werden alle Termine als Events verwaltet.
  */
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 require_once plugin_dir_path( dirname( __DIR__ ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
 require_once plugin_dir_path( dirname( __DIR__ ) ) . 'includes/repositories/class-repro-ct-suite-events-repository.php';
-require_once plugin_dir_path( dirname( __DIR__ ) ) . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
 require_once plugin_dir_path( dirname( __DIR__ ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
 
 $events_repo = new Repro_CT_Suite_Events_Repository();
-$appointments_repo = new Repro_CT_Suite_Appointments_Repository();
 $calendars_repo = new Repro_CT_Suite_Calendars_Repository();
 
 // Filter
@@ -90,8 +88,8 @@ $total_pages = ceil( $total / $limit );
 ?>
 <div class="wrap repro-ct-suite-admin-wrapper">
     <div class="repro-ct-suite-header">
-        <h1><span class="dashicons dashicons-calendar-alt"></span> <?php esc_html_e( 'Terminkalender', 'repro-ct-suite' ); ?></h1>
-        <p><?php esc_html_e( 'Gesamtübersicht aller Termine: Events (aus ChurchTools Events-API) und Termine (aus Appointments ohne Event-Verknüpfung).', 'repro-ct-suite' ); ?></p>
+        <h1><span class="dashicons dashicons-calendar-alt"></span> <?php esc_html_e( 'Termine', 'repro-ct-suite' ); ?></h1>
+        <p><?php esc_html_e( 'Übersicht aller Termine aus ChurchTools über das neue unified sync system.', 'repro-ct-suite' ); ?></p>
     </div>
 
     <form method="get" class="repro-ct-suite-mt-10">
