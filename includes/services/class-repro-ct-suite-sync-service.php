@@ -348,20 +348,56 @@ class Repro_CT_Suite_Sync_Service {
 	 * @return bool
 	 */
 	private function is_event_relevant_for_calendar( $event, $external_calendar_id ) {
-		// Events können mehrere Kalender haben - prüfe ob unser Zielkalender dabei ist
-		if ( isset( $event['calendar'] ) && isset( $event['calendar']['id'] ) ) {
-			return (string) $event['calendar']['id'] === (string) $external_calendar_id;
+		// Debug: Event-Struktur loggen
+		if ( isset( $event['id'] ) ) {
+			Repro_CT_Suite_Logger::log( "Event {$event['id']} Struktur-Check für Kalender {$external_calendar_id}" );
 		}
 		
-		// Fallback: Kalender-Array prüfen
+		// Prüfung 1: Direkte calendar property
+		if ( isset( $event['calendar'] ) && isset( $event['calendar']['id'] ) ) {
+			$event_calendar_id = (string) $event['calendar']['id'];
+			$matches = $event_calendar_id === (string) $external_calendar_id;
+			Repro_CT_Suite_Logger::log( "Event calendar.id: {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
+			return $matches;
+		}
+		
+		// Prüfung 2: calendars Array
 		if ( isset( $event['calendars'] ) && is_array( $event['calendars'] ) ) {
 			foreach ( $event['calendars'] as $calendar ) {
-				if ( isset( $calendar['id'] ) && (string) $calendar['id'] === (string) $external_calendar_id ) {
-					return true;
+				if ( isset( $calendar['id'] ) ) {
+					$event_calendar_id = (string) $calendar['id'];
+					if ( $event_calendar_id === (string) $external_calendar_id ) {
+						Repro_CT_Suite_Logger::log( "Event calendars[].id: {$event_calendar_id}, Match: YES" );
+						return true;
+					}
 				}
 			}
+			Repro_CT_Suite_Logger::log( "Event calendars[] geprüft, kein Match gefunden" );
 		}
 		
+		// Prüfung 3: Direkte calendarId property
+		if ( isset( $event['calendarId'] ) ) {
+			$event_calendar_id = (string) $event['calendarId'];
+			$matches = $event_calendar_id === (string) $external_calendar_id;
+			Repro_CT_Suite_Logger::log( "Event calendarId: {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
+			return $matches;
+		}
+		
+		// Prüfung 4: appointment mit calendar
+		if ( isset( $event['appointment'] ) && isset( $event['appointment']['calendar'] ) && isset( $event['appointment']['calendar']['id'] ) ) {
+			$event_calendar_id = (string) $event['appointment']['calendar']['id'];
+			$matches = $event_calendar_id === (string) $external_calendar_id;
+			Repro_CT_Suite_Logger::log( "Event appointment.calendar.id: {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
+			return $matches;
+		}
+		
+		// Debug: Verfügbare Keys loggen
+		if ( isset( $event['id'] ) ) {
+			$available_keys = implode( ', ', array_keys( $event ) );
+			Repro_CT_Suite_Logger::log( "Event {$event['id']} verfügbare Keys: {$available_keys}" );
+		}
+		
+		Repro_CT_Suite_Logger::log( "Event hat keine erkannten Kalender-Informationen - ÜBERSPRUNGEN" );
 		return false;
 	}
 	

@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.4.0.2
+Stable tag: 0.4.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,15 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.4.0.3 =
+* **CRITICAL FIX**: Events-Filterlogik korrigiert - alle Events wurden übersprungen
+* **Fix**: Erweiterte Kalender-Zuordnung prüft multiple Event-Strukturen (`calendar.id`, `calendarId`, `appointment.calendar.id`)
+* **Debug**: Umfassendes Debug-Logging für Event-Kalender-Zuordnung zur Diagnose von Sync-Problemen
+* **Improvement**: 4-stufige Prüfung der Event-Kalender-Verknüpfung für maximale API-Kompatibilität
+* **Logging**: Detaillierte Struktur-Analyse mit verfügbaren Keys bei unbekannten Event-Formaten
+* **Critical**: Behebt Problem wo "Event 2008 nicht relevant für Kalender 1" alle Events ausfilterte
+* Version: 0.4.0.3
 
 = 0.4.0.2 =
 * **Debug**: Debug-Seite zeigt Warnung bei ungewöhnlichen/doppelten Tabellen
