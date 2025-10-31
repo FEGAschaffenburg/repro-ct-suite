@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.3.9.1
+Stable tag: 0.3.9.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 * Fix: Sicherstellung, dass Debug-JavaScript auch auf dem Logs-Tab geladen wird.
 * Wartung: Kleine Verbesserungen am Logger (syslog-Fallback, weiterhin plugin-spezifische Datei als zuverlässiges Log).
 * Version: 0.3.8.0
+
+ = 0.3.9.2 =
+* Fix: Corrected release asset for v0.3.9.1 (was corrupted/oversized). This is a re-release with the same functionality.
+* Maintenance: Patch release to validate online update; contains the schedule-repository syntax fix and logging updates from prior commits.
+* Note: Please run a Sync after updating to ensure DB state and OPcache are refreshed.
+* Version: 0.3.9.2
 
  = 0.3.9.1 =
 * Maintenance: Patch release to validate online update; contains the schedule-repository syntax fix and logging updates from prior commits.
