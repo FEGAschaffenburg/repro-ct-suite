@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.4.0.3
+Stable tag: 0.4.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,16 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.4.0.4 =
+* **SIMPLIFICATION**: Sync-Prozess auf Phase 1 (Events API) beschränkt für bessere Diagnose
+* **Change**: Phase 2 (Appointments API) temporär deaktiviert - fokussiert auf Events-Import
+* **Debug**: Vereinfachter Sync-Workflow für einfachere Fehlerdiagnose und Debugging
+* **Logging**: Klarere Log-Ausgaben "EVENTS-ONLY SYNC" mit Hinweis auf deaktivierte Phase 2
+* **Performance**: Reduzierter API-Traffic durch Fokus auf Events-Synchronisation
+* **Diagnosis**: Ermöglicht isolierte Analyse der Events-Filterlogik ohne Appointments-Komplexität
+* **Temporary**: Appointments-Sync wird in zukünftiger Version wieder aktiviert
+* Version: 0.4.0.4
 
 = 0.4.0.3 =
 * **CRITICAL FIX**: Events-Filterlogik korrigiert - alle Events wurden übersprungen

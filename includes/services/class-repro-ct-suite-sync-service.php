@@ -121,11 +121,13 @@ class Repro_CT_Suite_Sync_Service {
 		}
 
 		Repro_CT_Suite_Logger::separator();
-		Repro_CT_Suite_Logger::log( 'SYNC ABGESCHLOSSEN' );
+		Repro_CT_Suite_Logger::log( 'EVENTS-ONLY SYNC ABGESCHLOSSEN' );
+		Repro_CT_Suite_Logger::log( 'Hinweis: Phase 2 (Appointments) temporär deaktiviert' );
 		Repro_CT_Suite_Logger::log( "Kalender verarbeitet: {$stats['calendars_processed']}" );
 		Repro_CT_Suite_Logger::log( "Events gefunden: {$stats['events_found']}" );
 		Repro_CT_Suite_Logger::log( "Events eingefügt: {$stats['events_inserted']}" );
 		Repro_CT_Suite_Logger::log( "Events aktualisiert: {$stats['events_updated']}" );
+		Repro_CT_Suite_Logger::log( "Events übersprungen: {$stats['events_skipped']}" );
 		if ( $stats['errors'] > 0 ) {
 			Repro_CT_Suite_Logger::log( "Fehler: {$stats['errors']}", 'warning' );
 		}
@@ -134,29 +136,29 @@ class Repro_CT_Suite_Sync_Service {
 	}
 
 	/**
-	 * Synchronisiert Events eines einzelnen Kalenders - 2-Phase Ansatz
+	 * Synchronisiert Events eines einzelnen Kalenders - NUR PHASE 1 (Events API)
 	 *
-	 * Phase 1: Events API - sammelt appointment_ids von Events
-	 * Phase 2: Appointments API - holt zusätzliche Appointments (nicht in Events enthalten)
+	 * Temporär vereinfacht: Nur Events API ohne Appointments für bessere Diagnose
 	 *
 	 * @param string $external_calendar_id ChurchTools Kalender-ID
 	 * @param array  $args Sync-Parameter (from, to)
 	 * @return array|WP_Error Einzelkalender-Statistiken
 	 */
 	private function sync_calendar_events( $external_calendar_id, $args ) {
-		Repro_CT_Suite_Logger::log( "=== 2-PHASE SYNC für Kalender {$external_calendar_id} ===" );
+		Repro_CT_Suite_Logger::log( "=== EVENTS-ONLY SYNC für Kalender {$external_calendar_id} ===" );
 		
 		$stats = array(
 			'events_found'    => 0,
-			'appointments_found' => 0,
+			'appointments_found' => 0, // Bleibt 0 da deaktiviert
 			'events_inserted' => 0,
 			'events_updated'  => 0,
 			'events_skipped'  => 0,
 		);
 		
-		$imported_appointment_ids = array(); // Tracking für Phase 2
+		$imported_appointment_ids = array(); // Für spätere Nutzung
 		
-		// PHASE 1: Events API - Sammle Events mit appointment_ids
+		// NUR PHASE 1: Events API
+		Repro_CT_Suite_Logger::log( "Phase 2 (Appointments) temporär deaktiviert - nur Events werden synchronisiert" );
 		$events_result = $this->sync_phase1_events( $external_calendar_id, $args, $imported_appointment_ids );
 		if ( is_wp_error( $events_result ) ) {
 			return $events_result;
@@ -168,23 +170,13 @@ class Repro_CT_Suite_Sync_Service {
 		$stats['events_updated'] += $events_result['events_updated'];
 		$stats['events_skipped'] += $events_result['events_skipped'];
 		
-		// PHASE 2: Appointments API - Hole zusätzliche Appointments
-		$appointments_result = $this->sync_phase2_appointments( $external_calendar_id, $args, $imported_appointment_ids );
-		if ( is_wp_error( $appointments_result ) ) {
-			// Phase 2 Fehler ist nicht kritisch, loggen aber weitermachen
-			Repro_CT_Suite_Logger::log( 'Phase 2 Fehler (nicht kritisch): ' . $appointments_result->get_error_message(), 'warning' );
-		} else {
-			// Statistiken von Phase 2 hinzufügen
-			$stats['appointments_found'] = $appointments_result['appointments_found'];
-			$stats['events_inserted'] += $appointments_result['events_inserted'];
-			$stats['events_updated'] += $appointments_result['events_updated'];
-			$stats['events_skipped'] += $appointments_result['events_skipped'];
-		}
+		// PHASE 2: DEAKTIVIERT
+		Repro_CT_Suite_Logger::log( "Phase 2 übersprungen - fokussiert auf Events-Import" );
 		
-		$total_processed = $stats['events_found'] + $stats['appointments_found'];
+		$total_processed = $stats['events_found']; // Nur Events
 		$total_imported = $stats['events_inserted'] + $stats['events_updated'];
 		
-		Repro_CT_Suite_Logger::log( "2-Phase Sync Ergebnis: {$total_processed} gefunden, {$total_imported} importiert" );
+		Repro_CT_Suite_Logger::log( "Events-Only Sync Ergebnis: {$total_processed} gefunden, {$total_imported} importiert" );
 		
 		return $stats;
 	}
