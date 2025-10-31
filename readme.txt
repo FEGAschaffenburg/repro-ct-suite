@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.4.0.0
+Stable tag: 0.4.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,15 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.4.0.1 =
+* **Fix**: Debug-Seite zeigt jetzt alle korrekten Tabellen für DB Version 6
+* **Feature**: rcts_schedule Tabelle in Debug-Übersicht hinzugefügt
+* **Fix**: AJAX-Handler für Tabellen-Reset vollständig mit neuer Schedule-Tabelle kompatibel
+* **UI**: Debug-Seite zeigt "Terminkalender (Schedule)" mit admin-page Icon
+* **Maintenance**: Konsistente Tabellenliste in Debug-View, AJAX-Handlers und Uninstall-Funktion
+* **Verification**: Alle Lösch-Funktionen (einzeln und komplett) funktionieren mit DB V6
+* Version: 0.4.0.1
 
 = 0.4.0.0 =
 * **MAJOR UPDATE**: Neues einheitliches Sync-System mit intelligenter 2-Phasen-Architektur

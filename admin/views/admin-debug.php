@@ -46,6 +46,12 @@ $tables_info = array(
 		'count' => 0,
 		'icon'  => 'groups',
 	),
+	'rcts_schedule' => array(
+		'label' => __( 'Terminkalender (Schedule)', 'repro-ct-suite' ),
+		'table' => $wpdb->prefix . 'rcts_schedule',
+		'count' => 0,
+		'icon'  => 'admin-page',
+	),
 );
 
 // Counts abrufen
