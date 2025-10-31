@@ -345,21 +345,37 @@ class Repro_CT_Suite_Sync_Service {
 			Repro_CT_Suite_Logger::log( "Event {$event['id']} Struktur-Check für Kalender {$external_calendar_id}" );
 		}
 		
-		// Prüfung 1: Direkte calendar property
-		if ( isset( $event['calendar'] ) && isset( $event['calendar']['id'] ) ) {
-			$event_calendar_id = (string) $event['calendar']['id'];
+		// Prüfung 1: calendar.domainIdentifier (richtige ChurchTools Event-Struktur)
+		if ( isset( $event['calendar'] ) && isset( $event['calendar']['domainIdentifier'] ) ) {
+			$event_calendar_id = (string) $event['calendar']['domainIdentifier'];
 			$matches = $event_calendar_id === (string) $external_calendar_id;
-			Repro_CT_Suite_Logger::log( "Event calendar.id: {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
+			Repro_CT_Suite_Logger::log( "Event calendar.domainIdentifier: {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
 			return $matches;
 		}
 		
-		// Prüfung 2: calendars Array
+		// Prüfung 1b: Fallback für ältere calendar.id Struktur
+		if ( isset( $event['calendar'] ) && isset( $event['calendar']['id'] ) ) {
+			$event_calendar_id = (string) $event['calendar']['id'];
+			$matches = $event_calendar_id === (string) $external_calendar_id;
+			Repro_CT_Suite_Logger::log( "Event calendar.id (fallback): {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
+			return $matches;
+		}
+		
+		// Prüfung 2: calendars Array mit domainIdentifier
 		if ( isset( $event['calendars'] ) && is_array( $event['calendars'] ) ) {
 			foreach ( $event['calendars'] as $calendar ) {
+				if ( isset( $calendar['domainIdentifier'] ) ) {
+					$event_calendar_id = (string) $calendar['domainIdentifier'];
+					if ( $event_calendar_id === (string) $external_calendar_id ) {
+						Repro_CT_Suite_Logger::log( "Event calendars[].domainIdentifier: {$event_calendar_id}, Match: YES" );
+						return true;
+					}
+				}
+				// Fallback für ältere id-Struktur
 				if ( isset( $calendar['id'] ) ) {
 					$event_calendar_id = (string) $calendar['id'];
 					if ( $event_calendar_id === (string) $external_calendar_id ) {
-						Repro_CT_Suite_Logger::log( "Event calendars[].id: {$event_calendar_id}, Match: YES" );
+						Repro_CT_Suite_Logger::log( "Event calendars[].id (fallback): {$event_calendar_id}, Match: YES" );
 						return true;
 					}
 				}
@@ -375,11 +391,19 @@ class Repro_CT_Suite_Sync_Service {
 			return $matches;
 		}
 		
-		// Prüfung 4: appointment mit calendar
+		// Prüfung 4: appointment mit calendar.domainIdentifier
+		if ( isset( $event['appointment'] ) && isset( $event['appointment']['calendar'] ) && isset( $event['appointment']['calendar']['domainIdentifier'] ) ) {
+			$event_calendar_id = (string) $event['appointment']['calendar']['domainIdentifier'];
+			$matches = $event_calendar_id === (string) $external_calendar_id;
+			Repro_CT_Suite_Logger::log( "Event appointment.calendar.domainIdentifier: {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
+			return $matches;
+		}
+		
+		// Prüfung 4b: Fallback für appointment.calendar.id
 		if ( isset( $event['appointment'] ) && isset( $event['appointment']['calendar'] ) && isset( $event['appointment']['calendar']['id'] ) ) {
 			$event_calendar_id = (string) $event['appointment']['calendar']['id'];
 			$matches = $event_calendar_id === (string) $external_calendar_id;
-			Repro_CT_Suite_Logger::log( "Event appointment.calendar.id: {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
+			Repro_CT_Suite_Logger::log( "Event appointment.calendar.id (fallback): {$event_calendar_id}, Ziel: {$external_calendar_id}, Match: " . ($matches ? 'YES' : 'NO') );
 			return $matches;
 		}
 		
