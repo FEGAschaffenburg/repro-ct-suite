@@ -193,10 +193,13 @@ class Repro_CT_Suite_Sync_Service {
 		Repro_CT_Suite_Logger::log( "Phase 1: Events API für Kalender {$external_calendar_id}" );
 		
 		$endpoint = '/events';
+		// KORREKTUR: Alle Events abrufen, dann clientseitig nach Kalender filtern
 		$response = $this->ct_client->get( $endpoint, array(
-			'calendar_ids' => array( $external_calendar_id ),
-			'from' => $args['from'],
-			'to'   => $args['to'],
+			'direction' => 'forward',
+			'include'   => 'eventServices',
+			'from'      => $args['from'],
+			'to'        => $args['to'],
+			'page'      => 1,
 		) );
 
 		if ( is_wp_error( $response ) ) {
@@ -207,25 +210,34 @@ class Repro_CT_Suite_Sync_Service {
 			return new WP_Error( 'invalid_events_response', 'Ungültige Events API-Antwort' );
 		}
 
-		$events = $response['data'];
-		$events_found = count( $events );
+		$all_events = $response['data'];
+		$total_events_found = count( $all_events );
 		
-		Repro_CT_Suite_Logger::log( "Phase 1: {$events_found} Events gefunden" );
+		Repro_CT_Suite_Logger::log( "Phase 1: {$total_events_found} Events (alle Kalender) gefunden, filtere für Kalender {$external_calendar_id}" );
 
 		$stats = array(
-			'events_found'    => $events_found,
+			'events_found'    => 0, // Wird nach Filterung gesetzt
 			'events_inserted' => 0,
 			'events_updated'  => 0,
 			'events_skipped'  => 0,
 		);
 
-		foreach ( $events as $event ) {
-			// Kalender-ID prüfen (Event kann mehrere Kalender haben)
-			if ( ! $this->is_event_relevant_for_calendar( $event, $external_calendar_id ) ) {
-				Repro_CT_Suite_Logger::log( "Event {$event['id']} nicht relevant für Kalender {$external_calendar_id}" );
-				$stats['events_skipped']++;
-				continue;
+		// Filtere Events für den spezifischen Kalender
+		$relevant_events = array();
+		foreach ( $all_events as $event ) {
+			if ( $this->is_event_relevant_for_calendar( $event, $external_calendar_id ) ) {
+				$relevant_events[] = $event;
 			}
+		}
+		
+		$events_found = count( $relevant_events );
+		$stats['events_found'] = $events_found;
+		
+		Repro_CT_Suite_Logger::log( "Phase 1: {$events_found} relevante Events für Kalender {$external_calendar_id} gefunden" );
+
+		foreach ( $relevant_events as $event ) {
+			// Event ist bereits als relevant validiert
+			Repro_CT_Suite_Logger::log( "Event {$event['id']} wird verarbeitet für Kalender {$external_calendar_id}" );
 			
 			// Appointment-IDs sammeln für Phase 2
 			if ( isset( $event['appointment'] ) && isset( $event['appointment']['id'] ) ) {

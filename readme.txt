@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.4.0.6
+Stable tag: 0.4.0.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,13 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.4.0.7 =
+* KRITISCHER FIX: Events API-Aufruf korrigiert für ChurchTools
+* Abrufen ALLER Events ohne calendar_ids Parameter
+* Clientseitige Filterung nach domainIdentifier
+* API-Parameter: direction=forward, include=eventServices, page=1
+* Behebt Problem dass Events mit falschen calendar_ids abgerufen wurden
 
 = 0.4.0.6 =
 * DEBUG: Erweiterte Kalender-Debug-Logs für bessere Diagnose
