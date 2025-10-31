@@ -345,6 +345,20 @@ class Repro_CT_Suite_Sync_Service {
 			Repro_CT_Suite_Logger::log( "Event {$event['id']} Struktur-Check für Kalender {$external_calendar_id}" );
 		}
 		
+		// Debug: Calendar-Objekt detailliert loggen
+		if ( isset( $event['calendar'] ) ) {
+			$calendar_keys = implode( ', ', array_keys( $event['calendar'] ) );
+			Repro_CT_Suite_Logger::log( "Event calendar verfügbare Keys: {$calendar_keys}" );
+			if ( isset( $event['calendar']['domainIdentifier'] ) ) {
+				Repro_CT_Suite_Logger::log( "Event calendar.domainIdentifier: '{$event['calendar']['domainIdentifier']}'" );
+			}
+			if ( isset( $event['calendar']['id'] ) ) {
+				Repro_CT_Suite_Logger::log( "Event calendar.id: '{$event['calendar']['id']}'" );
+			}
+		} else {
+			Repro_CT_Suite_Logger::log( "Event hat kein calendar-Objekt!" );
+		}
+		
 		// Prüfung 1: calendar.domainIdentifier (richtige ChurchTools Event-Struktur)
 		if ( isset( $event['calendar'] ) && isset( $event['calendar']['domainIdentifier'] ) ) {
 			$event_calendar_id = (string) $event['calendar']['domainIdentifier'];
