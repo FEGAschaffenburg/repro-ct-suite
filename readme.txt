@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.4.0.8
+Stable tag: 0.4.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.4.0.9 =
+* UPDATE-DETECTION: Aggressive Update-Prüfung mit Admin-Benachrichtigung
+* Zeigt aktuelle Plugin-Version im WordPress Admin an
+* Löscht alle Update-Caches bei jedem Admin-Besuch
+* Admin-Notice mit direktem Link zur Update-Prüfung
 
 = 0.4.0.8 =
 * AUTO-UPDATE: Erzwungene Update-Prüfung für bessere Plugin-Erkennung
