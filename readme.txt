@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.4.0.1
+Stable tag: 0.4.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,15 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.4.0.2 =
+* **Debug**: Debug-Seite zeigt Warnung bei ungewöhnlichen/doppelten Tabellen
+* **Feature**: Automatische Erkennung von Plugin-Tabellen mit ungewöhnlichen WordPress-Prefixen
+* **Fix**: Diagnose-Tool für doppelte Event-Services Anzeige hinzugefügt
+* **UI**: Debug-Warnung wird nur angezeigt, wenn mehr als 5 Plugin-Tabellen gefunden werden
+* **Maintenance**: Verbesserte Debug-Informationen mit Tabellenliste und WordPress-Prefix-Anzeige
+* **Investigation**: Hilft bei der Diagnose von Tabellen-Duplikaten durch verschiedene Installationen
+* Version: 0.4.0.2
 
 = 0.4.0.1 =
 * **Fix**: Debug-Seite zeigt jetzt alle korrekten Tabellen für DB Version 6
