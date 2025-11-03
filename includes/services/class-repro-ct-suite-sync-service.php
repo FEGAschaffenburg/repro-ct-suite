@@ -71,6 +71,9 @@ class Repro_CT_Suite_Sync_Service {
 					'external_id' => $calendar->external_id,
 					'name'        => $calendar->name,
 				);
+				Repro_CT_Suite_Logger::log( "Kalender-Mapping: Lokal-ID {$local_id} → Extern-ID {$calendar->external_id} ('{$calendar->name}')" );
+			} else {
+				Repro_CT_Suite_Logger::log( "WARNUNG: Kalender mit lokaler ID {$local_id} nicht gefunden oder hat keine externe ID", 'warning' );
 			}
 		}
 
@@ -89,14 +92,37 @@ class Repro_CT_Suite_Sync_Service {
 			'errors'              => 0,
 		);
 
-		// Pro Kalender: Termine abrufen und speichern
+		// OPTIMIERUNG: Einmal alle Events abrufen, nicht pro Kalender
+		$all_events_result = $this->fetch_all_events( $args );
+		if ( is_wp_error( $all_events_result ) ) {
+			return $all_events_result;
+		}
+		
+		$all_events = $all_events_result['events'];
+		$total_events_from_api = count( $all_events );
+		
+		Repro_CT_Suite_Logger::log( "API lieferte {$total_events_from_api} Events (alle Kalender)" );
+
+		// Pro Kalender: Events filtern und speichern  
 		foreach ( $external_calendar_ids as $cal_info ) {
 			$external_id = $cal_info['external_id'];
 			$cal_name    = $cal_info['name'];
 			
 			Repro_CT_Suite_Logger::log( "Bearbeite Kalender '{$cal_name}' (ID: {$external_id})..." );
 			
-			$result = $this->sync_calendar_events( $external_id, $args );
+			// Events für diesen Kalender filtern
+			$relevant_events = array();
+			foreach ( $all_events as $event ) {
+				if ( $this->is_event_relevant_for_calendar( $event, $external_id ) ) {
+					$relevant_events[] = $event;
+				}
+			}
+			
+			$events_found = count( $relevant_events );
+			Repro_CT_Suite_Logger::log( "Kalender {$external_id}: {$events_found} relevante Events gefunden" );
+			
+			// Events verarbeiten
+			$result = $this->process_calendar_events( $relevant_events, $external_id );
 			
 			if ( is_wp_error( $result ) ) {
 				Repro_CT_Suite_Logger::log( "Fehler bei Kalender {$external_id}: " . $result->get_error_message(), 'error' );
@@ -130,6 +156,81 @@ class Repro_CT_Suite_Sync_Service {
 		Repro_CT_Suite_Logger::log( "Events übersprungen: {$stats['events_skipped']}" );
 		if ( $stats['errors'] > 0 ) {
 			Repro_CT_Suite_Logger::log( "Fehler: {$stats['errors']}", 'warning' );
+		}
+
+		return $stats;
+	}
+
+	/**
+	 * Holt alle Events einmalig von der API (optimiert)
+	 *
+	 * @param array $args Sync-Parameter (from, to)
+	 * @return array|WP_Error {events: Event[], total: int}
+	 */
+	private function fetch_all_events( $args ) {
+		Repro_CT_Suite_Logger::log( "API-Call: Alle Events abrufen..." );
+		
+		$endpoint = '/events';
+		$response = $this->ct_client->get( $endpoint, array(
+			'direction' => 'forward',
+			'include'   => 'eventServices',
+			'from'      => $args['from'],
+			'to'        => $args['to'],
+			'page'      => 1,
+		) );
+
+		if ( is_wp_error( $response ) ) {
+			return new WP_Error( 'events_api_error', 'Events API Fehler: ' . $response->get_error_message() );
+		}
+
+		if ( ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
+			return new WP_Error( 'invalid_events_response', 'Ungültige Events API-Antwort' );
+		}
+
+		$events = $response['data'];
+		$total = count( $events );
+		
+		Repro_CT_Suite_Logger::log( "API lieferte {$total} Events (alle Kalender)" );
+		
+		return array(
+			'events' => $events,
+			'total'  => $total,
+		);
+	}
+
+	/**
+	 * Verarbeitet Events für einen spezifischen Kalender (optimiert)
+	 *
+	 * @param array  $events Gefilterte Events für diesen Kalender
+	 * @param string $external_calendar_id ChurchTools Kalender-ID
+	 * @return array|WP_Error Verarbeitungs-Statistiken
+	 */
+	private function process_calendar_events( $events, $external_calendar_id ) {
+		$stats = array(
+			'events_found'    => count( $events ),
+			'events_inserted' => 0,
+			'events_updated'  => 0,
+			'events_skipped'  => 0,
+		);
+
+		foreach ( $events as $event ) {
+			// Event verarbeiten und speichern
+			Repro_CT_Suite_Logger::log( "Event {$event['id']} - Starte process_event()" );
+			$result = $this->process_event( $event, $external_calendar_id );
+			
+			if ( is_wp_error( $result ) ) {
+				Repro_CT_Suite_Logger::log( "Event {$event['id']} - process_event FEHLER: " . $result->get_error_message(), 'error' );
+				$stats['events_skipped']++;
+				continue;
+			}
+			
+			Repro_CT_Suite_Logger::log( "Event {$event['id']} - process_event ERFOLGREICH: Action=" . $result['action'] . ", ID=" . $result['event_id'] );
+			
+			if ( $result['action'] === 'inserted' ) {
+				$stats['events_inserted']++;
+			} elseif ( $result['action'] === 'updated' ) {
+				$stats['events_updated']++;
+			}
 		}
 
 		return $stats;
@@ -239,6 +340,9 @@ class Repro_CT_Suite_Sync_Service {
 			// Event ist bereits als relevant validiert
 			Repro_CT_Suite_Logger::log( "Event {$event['id']} wird verarbeitet für Kalender {$external_calendar_id}" );
 			
+			// DEBUG: Event-Daten anzeigen
+			Repro_CT_Suite_Logger::log( "Event {$event['id']} Titel: " . ($event['title'] ?? 'KEIN TITEL') );
+			
 			// Appointment-IDs sammeln für Phase 2
 			if ( isset( $event['appointment'] ) && isset( $event['appointment']['id'] ) ) {
 				$imported_appointment_ids[] = $event['appointment']['id'];
@@ -246,13 +350,16 @@ class Repro_CT_Suite_Sync_Service {
 			}
 			
 			// Event verarbeiten und speichern
+			Repro_CT_Suite_Logger::log( "Event {$event['id']} - Starte process_event()" );
 			$result = $this->process_event( $event, $external_calendar_id );
 			
 			if ( is_wp_error( $result ) ) {
-				Repro_CT_Suite_Logger::log( 'Fehler bei Event: ' . $result->get_error_message(), 'warning' );
+				Repro_CT_Suite_Logger::log( "Event {$event['id']} - process_event FEHLER: " . $result->get_error_message(), 'error' );
 				$stats['events_skipped']++;
 				continue;
 			}
+			
+			Repro_CT_Suite_Logger::log( "Event {$event['id']} - process_event ERFOLGREICH: Action=" . $result['action'] . ", ID=" . $result['event_id'] );
 			
 			if ( $result['action'] === 'inserted' ) {
 				$stats['events_inserted']++;
