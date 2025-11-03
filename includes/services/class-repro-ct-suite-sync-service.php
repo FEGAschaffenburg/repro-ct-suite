@@ -579,34 +579,44 @@ class Repro_CT_Suite_Sync_Service {
 	 * @return array|WP_Error { action: 'inserted'|'updated'|'skipped', event_id: int }
 	 */
 	private function process_event( $event, $calendar_id ) {
+		Repro_CT_Suite_Logger::log( "process_event: Starte Datenextraktion für Event {$event['id']}" );
+		
 		// Event-Daten extrahieren und normalisieren
 		$extract_result = $this->extract_event_data( $event, $calendar_id );
 		
 		if ( is_wp_error( $extract_result ) ) {
+			Repro_CT_Suite_Logger::log( "process_event: extract_event_data FEHLER - " . $extract_result->get_error_message(), 'error' );
 			return $extract_result;
 		}
 
+		Repro_CT_Suite_Logger::log( "process_event: Datenextraktion erfolgreich für Event {$event['id']}" );
 		$event_data = $extract_result;
 
 		// Event in die Datenbank speichern (Insert oder Update)
+		Repro_CT_Suite_Logger::log( "process_event: Prüfe ob Event {$event['id']} bereits existiert" );
 		$exists = $this->events_repo->get_by_external_id( $event_data['external_id'] );
 		
 		if ( $exists ) {
 			// Update
+			Repro_CT_Suite_Logger::log( "process_event: Event {$event['id']} existiert bereits, führe Update durch" );
 			$success = $this->events_repo->update_by_id( $exists->id, $event_data );
 			$action = 'updated';
 			$event_id = $exists->id;
 		} else {
 			// Insert
+			Repro_CT_Suite_Logger::log( "process_event: Event {$event['id']} ist neu, führe Insert durch" );
 			$event_id = $this->events_repo->insert( $event_data );
 			$success = ! is_wp_error( $event_id );
 			$action = 'inserted';
 		}
 
 		if ( ! $success || is_wp_error( $event_id ) ) {
-			return new WP_Error( 'save_failed', 'Event konnte nicht gespeichert werden' );
+			$error_msg = is_wp_error( $event_id ) ? $event_id->get_error_message() : 'Unbekannter Fehler';
+			Repro_CT_Suite_Logger::log( "process_event: DB-Operation FEHLGESCHLAGEN für Event {$event['id']} - {$error_msg}", 'error' );
+			return new WP_Error( 'save_failed', 'Event konnte nicht gespeichert werden: ' . $error_msg );
 		}
 
+		Repro_CT_Suite_Logger::log( "process_event: DB-Operation ERFOLGREICH für Event {$event['id']} - Action: {$action}, DB-ID: {$event_id}" );
 		return array(
 			'action'   => $action,
 			'event_id' => $event_id,
@@ -639,10 +649,10 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Zeitdaten aus Event-Struktur extrahieren
 		if ( isset( $event['startDate'] ) ) {
-			$event_data['start_datetime'] = $this->normalize_datetime( $event['startDate'] );
+			$event_data['start_datetime'] = $this->format_datetime_for_db( $event['startDate'] );
 		}
 		if ( isset( $event['endDate'] ) ) {
-			$event_data['end_datetime'] = $this->normalize_datetime( $event['endDate'] );
+			$event_data['end_datetime'] = $this->format_datetime_for_db( $event['endDate'] );
 		}
 
 		// Location aus verschiedenen möglichen Feldern
@@ -760,5 +770,26 @@ class Repro_CT_Suite_Sync_Service {
 		);
 
 		return $event_data;
+	}
+
+	/**
+	 * Formatiert Datetime für Datenbank (MySQL DATETIME Format)
+	 *
+	 * @param string $datetime ChurchTools DateTime
+	 * @return string MySQL DATETIME (Y-m-d H:i:s)
+	 */
+	private function format_datetime_for_db( $datetime ) {
+		if ( empty( $datetime ) ) {
+			return '';
+		}
+		
+		// ChurchTools liefert meist ISO 8601 Format
+		$timestamp = strtotime( $datetime );
+		if ( $timestamp === false ) {
+			Repro_CT_Suite_Logger::log( "Warnung: Ungültiges Datumsformat: {$datetime}", 'warning' );
+			return '';
+		}
+		
+		return date( 'Y-m-d H:i:s', $timestamp );
 	}
 }
