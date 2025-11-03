@@ -594,17 +594,19 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Event in die Datenbank speichern (Insert oder Update)
 		Repro_CT_Suite_Logger::log( "process_event: Prüfe ob Event {$event['id']} bereits existiert" );
+		Repro_CT_Suite_Logger::log( "process_event: Suche Event mit external_id: '{$event_data['external_id']}'" );
+		
 		$exists = $this->events_repo->get_by_external_id( $event_data['external_id'] );
 		
 		if ( $exists ) {
 			// Update
-			Repro_CT_Suite_Logger::log( "process_event: Event {$event['id']} existiert bereits, führe Update durch" );
+			Repro_CT_Suite_Logger::log( "process_event: Event {$event['id']} existiert bereits (DB-ID: {$exists->id}), führe Update durch" );
 			$success = $this->events_repo->update_by_id( $exists->id, $event_data );
 			$action = 'updated';
 			$event_id = $exists->id;
 		} else {
 			// Insert
-			Repro_CT_Suite_Logger::log( "process_event: Event {$event['id']} ist neu, führe Insert durch" );
+			Repro_CT_Suite_Logger::log( "process_event: Event {$event['id']} ist neu (external_id '{$event_data['external_id']}' nicht gefunden), führe Insert durch" );
 			Repro_CT_Suite_Logger::log( "process_event: Event-Daten für Insert: " . wp_json_encode( $event_data ) );
 			
 			$event_id = $this->events_repo->insert( $event_data );
