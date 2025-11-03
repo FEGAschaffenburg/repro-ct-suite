@@ -85,4 +85,24 @@ abstract class Repro_CT_Suite_Repository_Base {
 		);
 		return (int) $count > 0;
 	}
+
+	/**
+	 * Fügt einen neuen Datensatz hinzu
+	 *
+	 * @param array $data Array mit zu speichernden Feldern
+	 * @return int|WP_Error Die neue ID oder WP_Error bei Fehler
+	 */
+	public function insert( $data ) {
+		// Automatische Zeitstempel hinzufügen
+		$data['created_at'] = $this->now();
+		$data['updated_at'] = $this->now();
+
+		$result = $this->db->insert( $this->table, $data );
+		
+		if ( $result === false ) {
+			return new WP_Error( 'db_insert_error', 'Datenbankfehler beim Einfügen: ' . $this->db->last_error );
+		}
+
+		return (int) $this->db->insert_id;
+	}
 }

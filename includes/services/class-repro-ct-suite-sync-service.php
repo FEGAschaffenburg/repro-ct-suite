@@ -605,7 +605,12 @@ class Repro_CT_Suite_Sync_Service {
 		} else {
 			// Insert
 			Repro_CT_Suite_Logger::log( "process_event: Event {$event['id']} ist neu, führe Insert durch" );
+			Repro_CT_Suite_Logger::log( "process_event: Event-Daten für Insert: " . wp_json_encode( $event_data ) );
+			
 			$event_id = $this->events_repo->insert( $event_data );
+			
+			Repro_CT_Suite_Logger::log( "process_event: Insert-Ergebnis: " . ( is_wp_error( $event_id ) ? $event_id->get_error_message() : "ID: {$event_id}" ) );
+			
 			$success = ! is_wp_error( $event_id );
 			$action = 'inserted';
 		}
