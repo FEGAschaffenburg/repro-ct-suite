@@ -3,7 +3,7 @@
  * Plugin Name:       Repro CT-Suite
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
  * Description:       ChurchTools-Integration für WordPress. Synchronisiert Termine und Events aus ChurchTools.
- * Version:           0.4.1.8
+ * Version:           0.4.1.9
  * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            FEGAschaffenburg
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Version mit 4 Zahlen: Major.Minor.Patch.Build
  * Build-Nummer erhöhen bei minimalen Änderungen
  */
-define( 'REPRO_CT_SUITE_VERSION', '0.4.1.8' );
+define( 'REPRO_CT_SUITE_VERSION', '0.4.1.9' );
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 define( 'REPRO_CT_SUITE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'REPRO_CT_SUITE_URL', plugin_dir_url( __FILE__ ) );
@@ -77,42 +77,15 @@ if ( is_admin() ) {
 		$github_token
 	);
 	
-	// Force update check on admin pages - aggressive clearing
-	add_action( 'admin_init', function() {
-		// Clear ALL update caches
-		delete_transient( 'repro_ct_suite_update_check' );
-		delete_transient( 'repro_ct_suite_release_info' );
-		delete_site_transient( 'update_plugins' );
-		delete_transient( 'repro_ct_suite_github_releases' );
-		
-		// Force WordPress to check for plugin updates
-		wp_clean_plugins_cache();
-		
-		// Force immediate update check
-		wp_update_plugins();
-	} );
-
-	// Add admin notice for available updates
-	add_action( 'admin_notices', function() {
-		$current_version = REPRO_CT_SUITE_VERSION;
-		$github_version = null;
-		
-		// Quick GitHub API check
-		$response = wp_remote_get( 'https://api.github.com/repos/FEGAschaffenburg/repro-ct-suite/releases/latest', array( 'timeout' => 10 ) );
-		if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
-			$data = json_decode( wp_remote_retrieve_body( $response ), true );
-			if ( isset( $data['tag_name'] ) ) {
-				$github_version = ltrim( $data['tag_name'], 'v' );
+	// Moderates Cache-Clearing nur für Plugin-Updates  
+	add_action( 'init', function() {
+		// Nur Cache für unser Plugin clearen, nicht bei jedem Admin-Load
+		if ( is_admin() && current_user_can( 'update_plugins' ) ) {
+			// Gelegentlich Update-Cache leeren (nicht bei jedem Request)
+			if ( ! get_transient( 'repro_ct_suite_last_check' ) ) {
+				delete_transient( 'repro_ct_suite_release_info' );
+				set_transient( 'repro_ct_suite_last_check', true, 300 ); // 5 Minuten
 			}
-		}
-		
-		if ( $github_version && version_compare( $current_version, $github_version, '<' ) ) {
-			echo '<div class="notice notice-warning is-dismissible">';
-			echo '<h3>🔄 Repro CT-Suite Update verfügbar!</h3>';
-			echo '<p><strong>Aktuelle Version:</strong> ' . esc_html( $current_version ) . '</p>';
-			echo '<p><strong>Neue Version:</strong> ' . esc_html( $github_version ) . '</p>';
-			echo '<p><a href="' . admin_url( 'plugins.php' ) . '" class="button button-primary">Jetzt aktualisieren</a></p>';
-			echo '</div>';
 		}
 	} );
 }
