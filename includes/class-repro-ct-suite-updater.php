@@ -237,7 +237,7 @@ class Repro_CT_Suite_Updater {
 	 */
 	public function get_release_info() {
 		$cache_key   = 'repro_ct_suite_release_info';
-		$cache_time  = 1 * HOUR_IN_SECONDS; // Kürzere Cache-Zeit für schnellere Updates
+		$cache_time  = 300; // Sehr kurze Cache-Zeit für schnelle Updates (5 Minuten)
 		$cached_data = get_transient( $cache_key );
 
 		// Cache nur in Produktion nutzen, in Debug-Modus immer frisch abrufen
