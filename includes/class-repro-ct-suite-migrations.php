@@ -23,15 +23,26 @@ class Repro_CT_Suite_Migrations {
 	public static function migrate() {
 		global $wpdb;
 
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		try {
+			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-		$charset_collate = $wpdb->get_charset_collate();
+			$charset_collate = $wpdb->get_charset_collate();
 
-		$calendars_table    = $wpdb->prefix . 'rcts_calendars';
-		$events_table       = $wpdb->prefix . 'rcts_events';
-		$appointments_table = $wpdb->prefix . 'rcts_appointments';
-		$services_table     = $wpdb->prefix . 'rcts_event_services';
-		$schedule_table     = $wpdb->prefix . 'rcts_schedule';
+			$calendars_table    = $wpdb->prefix . 'rcts_calendars';
+			$events_table       = $wpdb->prefix . 'rcts_events';
+			$appointments_table = $wpdb->prefix . 'rcts_appointments';
+			$services_table     = $wpdb->prefix . 'rcts_event_services';
+			$schedule_table     = $wpdb->prefix . 'rcts_schedule';
+
+			// Prüfe Datenbankverbindung
+			if ( empty( $wpdb->dbh ) ) {
+				throw new Exception( 'Keine Datenbankverbindung verfügbar.' );
+			}
+
+			// Prüfe ob WordPress DB-Funktionen verfügbar sind
+			if ( ! function_exists( 'dbDelta' ) ) {
+				throw new Exception( 'WordPress dbDelta Funktion nicht verfügbar.' );
+			}
 
 		// Calendars (Kalender aus ChurchTools)
 		$sql_calendars = "CREATE TABLE {$calendars_table} (
@@ -150,6 +161,11 @@ class Repro_CT_Suite_Migrations {
 		// Platzhalter für zukünftige Migrationen (z.B. Backfill der Schedule-Tabelle)
 
 		update_option( self::OPTION_KEY, self::DB_VERSION );
+		
+		} catch ( Exception $e ) {
+			error_log( 'Repro CT-Suite Migration Fehler: ' . $e->getMessage() );
+			throw $e; // Re-throw für AJAX Handler
+		}
 	}
 
 	/**
@@ -353,5 +369,12 @@ class Repro_CT_Suite_Migrations {
 		if ( version_compare( $current, self::DB_VERSION, '<' ) ) {
 			self::migrate();
 		}
+	}
+
+	/**
+	 * Führt Migrationen manuell aus (für AJAX-Calls)
+	 */
+	public static function run() {
+		return self::migrate();
 	}
 }

@@ -3,7 +3,7 @@
  * Plugin Name:       Repro CT-Suite
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
  * Description:       ChurchTools-Integration für WordPress. Synchronisiert Termine und Events aus ChurchTools.
- * Version:           0.4.0.9
+ * Version:           0.4.1.0
  * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            FEGAschaffenburg
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Version mit 4 Zahlen: Major.Minor.Patch.Build
  * Build-Nummer erhöhen bei minimalen Änderungen
  */
-define( 'REPRO_CT_SUITE_VERSION', '0.4.0.9' );
+define( 'REPRO_CT_SUITE_VERSION', '0.4.1.0' );
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 define( 'REPRO_CT_SUITE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'REPRO_CT_SUITE_URL', plugin_dir_url( __FILE__ ) );
@@ -87,13 +87,16 @@ if ( is_admin() ) {
 		// Force WordPress to check for plugin updates
 		wp_clean_plugins_cache();
 		
-		// Add admin notice about version
+		// Add admin notice about version - VERY VISIBLE
 		add_action( 'admin_notices', function() {
 			$current_version = REPRO_CT_SUITE_VERSION;
-			echo '<div class="notice notice-info"><p>';
-			echo '<strong>Repro CT-Suite:</strong> Aktuelle Version ' . esc_html( $current_version );
-			echo ' - <a href="' . admin_url( 'plugins.php' ) . '">Auf Updates prüfen</a>';
-			echo '</p></div>';
+			echo '<div class="notice notice-success is-dismissible" style="border-left: 4px solid #00a32a; background: #f0fff0;">';
+			echo '<h3 style="color: #00a32a; margin: 10px 0;">🚀 Repro CT-Suite v' . esc_html( $current_version ) . ' AKTIV</h3>';
+			echo '<p><strong>Status:</strong> Neueste Version mit Events-Fix installiert!</p>';
+			echo '<p><strong>API-Modus:</strong> Korrekte Events-Synchronisation aktiv</p>';
+			echo '<p><a href="' . admin_url( 'admin.php?page=repro-ct-suite-sync' ) . '" class="button button-primary">Sync jetzt testen</a> ';
+			echo '<a href="' . admin_url( 'plugins.php' ) . '" class="button">Plugins verwalten</a></p>';
+			echo '</div>';
 		} );
 	} );
 }

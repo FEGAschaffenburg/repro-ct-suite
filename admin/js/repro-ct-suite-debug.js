@@ -192,14 +192,41 @@
 						}
 					},
 					error: function(xhr, status, error) {
+						let errorMessage = 'Migration-Fehler: ' + error;
+						
+						// Detaillierte Fehlerinfo sammeln
+						if (xhr.responseText) {
+							try {
+								const response = JSON.parse(xhr.responseText);
+								if (response.data && response.data.message) {
+									errorMessage = 'Migration-Fehler: ' + response.data.message;
+								} else if (response.message) {
+									errorMessage = 'Migration-Fehler: ' + response.message;
+								}
+							} catch (e) {
+								// Falls Response kein JSON ist
+								errorMessage += ' (HTTP ' + xhr.status + ': ' + xhr.statusText + ')';
+								if (xhr.responseText && xhr.responseText.length < 300) {
+									errorMessage += ' - Response: ' + xhr.responseText.substring(0, 200);
+								}
+							}
+						}
+						
+						console.error('Migration AJAX Error:', {
+							status: xhr.status,
+							statusText: xhr.statusText,
+							responseText: xhr.responseText,
+							error: error
+						});
+						
 						$result
 							.removeClass('success')
 							.addClass('error')
 							.css('color', '#d63638')
-							.html('<span class="dashicons dashicons-dismiss"></span> Verbindungsfehler: ' + error)
+							.html('<span class="dashicons dashicons-dismiss"></span> ' + errorMessage)
 							.fadeIn();
 						
-						self.showNotice('Verbindungsfehler: ' + error, 'error');
+						self.showNotice(errorMessage, 'error');
 						self.setButtonLoading($button, false);
 					}
 				});
