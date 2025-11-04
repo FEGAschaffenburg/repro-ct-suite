@@ -117,8 +117,8 @@ class Repro_CT_Suite_Sync_Service {
 			$events_found = count( $relevant_events );
 			Repro_CT_Suite_Logger::log( "Kalender {$external_id}: {$events_found} relevante Events gefunden" );
 			
-			// Events verarbeiten
-			$result = $this->process_calendar_events( $relevant_events, $external_id );
+			// Events verarbeiten (mit args für Phase 2 Appointments)
+			$result = $this->process_calendar_events( $relevant_events, $external_id, $args );
 			
 			if ( is_wp_error( $result ) ) {
 				Repro_CT_Suite_Logger::log( "Fehler bei Kalender {$external_id}: " . $result->get_error_message(), 'error' );
@@ -132,6 +132,14 @@ class Repro_CT_Suite_Sync_Service {
 			$stats['events_inserted'] += $result['events_inserted'];
 			$stats['events_updated']  += $result['events_updated'];
 			$stats['events_skipped']  += $result['events_skipped'];
+			
+			// Appointments-Statistiken aggregieren (falls vorhanden)
+			if ( isset( $result['appointments_found'] ) ) {
+				if ( ! isset( $stats['appointments_found'] ) ) {
+					$stats['appointments_found'] = 0;
+				}
+				$stats['appointments_found'] += $result['appointments_found'];
+			}
 			
 			Repro_CT_Suite_Logger::log( "Kalender '{$cal_name}': {$result['events_found']} gefunden, {$result['events_inserted']} neu, {$result['events_updated']} aktualisiert" );
 		}
@@ -199,17 +207,27 @@ class Repro_CT_Suite_Sync_Service {
 	 *
 	 * @param array  $events Gefilterte Events für diesen Kalender
 	 * @param string $external_calendar_id ChurchTools Kalender-ID
+	 * @param array  $args Sync-Parameter (from, to) für Appointments-Abruf
 	 * @return array|WP_Error Verarbeitungs-Statistiken
 	 */
-	private function process_calendar_events( $events, $external_calendar_id ) {
+	private function process_calendar_events( $events, $external_calendar_id, $args = array() ) {
 		$stats = array(
-			'events_found'    => count( $events ),
-			'events_inserted' => 0,
-			'events_updated'  => 0,
-			'events_skipped'  => 0,
+			'events_found'       => count( $events ),
+			'appointments_found' => 0,
+			'events_inserted'    => 0,
+			'events_updated'     => 0,
+			'events_skipped'     => 0,
 		);
+		
+		$imported_appointment_ids = array();
 
+		// Phase 1: Events verarbeiten
 		foreach ( $events as $event ) {
+			// Appointment-IDs sammeln für Phase 2
+			if ( isset( $event['appointment'] ) && isset( $event['appointment']['id'] ) ) {
+				$imported_appointment_ids[] = $event['appointment']['id'];
+			}
+			
 			// Event verarbeiten und speichern
 			Repro_CT_Suite_Logger::log( "Event {$event['id']} - Starte process_event()" );
 			$result = $this->process_event( $event, $external_calendar_id );
@@ -227,6 +245,27 @@ class Repro_CT_Suite_Sync_Service {
 			} elseif ( $result['action'] === 'updated' ) {
 				$stats['events_updated']++;
 			}
+		}
+		
+		// Phase 2: Appointments ohne Events importieren
+		if ( ! empty( $args ) && isset( $args['from'] ) && isset( $args['to'] ) ) {
+			Repro_CT_Suite_Logger::log( "Phase 2: Starte Appointments-Import für Kalender {$external_calendar_id}" );
+			$appointments_result = $this->sync_phase2_appointments( $external_calendar_id, $args, $imported_appointment_ids );
+			
+			if ( is_wp_error( $appointments_result ) ) {
+				Repro_CT_Suite_Logger::log( "Phase 2 Fehler: " . $appointments_result->get_error_message(), 'error' );
+				// Nicht abbrechen, Phase 1 war ja erfolgreich
+			} else {
+				// Statistiken von Phase 2 übernehmen
+				$stats['appointments_found'] = $appointments_result['appointments_found'];
+				$stats['events_inserted'] += $appointments_result['events_inserted'];
+				$stats['events_updated'] += $appointments_result['events_updated'];
+				$stats['events_skipped'] += $appointments_result['events_skipped'];
+				
+				Repro_CT_Suite_Logger::log( "Phase 2 abgeschlossen: {$appointments_result['appointments_found']} Appointments gefunden, {$appointments_result['events_inserted']} neu importiert" );
+			}
+		} else {
+			Repro_CT_Suite_Logger::log( "Phase 2 übersprungen: Keine Zeitraum-Parameter vorhanden" );
 		}
 
 		return $stats;
