@@ -128,18 +128,25 @@ $total_pages = ceil( $total / $limit );
                     </td></tr>
                 <?php else : foreach ( $items as $item ) : 
                     // Typ bestimmen:
-                    // - Event: Hat appointment_id gesetzt (Event aus dem ein Appointment entstanden ist)
-                    // - Appointment: Hat keine appointment_id (reines Appointment ohne Event-Verknüpfung)
-                    $is_appointment = empty( $item->appointment_id );
+                    // - Appointment: Hat appointment_id gesetzt (reines Appointment aus Appointments-API)
+                    // - Event: Hat keine appointment_id (Event aus Events-API)
+                    $is_appointment = ! empty( $item->appointment_id );
                     $type_label = $is_appointment ? 'Appointment' : 'Event';
                     
                     // ChurchTools-IDs extrahieren:
-                    // Event-ID ist immer in event_id enthalten (Format: EventID_Timestamp)
-                    $parts = explode( '_', $item->event_id );
-                    $event_ct_id = $parts[0];
-                    
-                    // Appointment-ID ist nur bei Events gesetzt (nicht bei reinen Appointments)
-                    $appointment_ct_id = ! $is_appointment ? $item->appointment_id : null;
+                    if ( $is_appointment ) {
+                        // Bei Appointments:
+                        // - appointment_id enthält die ChurchTools Appointment-ID
+                        // - event_id ist zusammengesetzt: AppointmentID_Timestamp
+                        $appointment_ct_id = $item->appointment_id;
+                        $event_ct_id = null; // Appointments haben keine Event-ID
+                    } else {
+                        // Bei Events:
+                        // - event_id enthält die ChurchTools Event-ID
+                        // - appointment_id ist NULL
+                        $event_ct_id = $item->event_id;
+                        $appointment_ct_id = null;
+                    }
                     
                     // Kalender holen über calendar_id (calendar_id in Events ist die ChurchTools Kalender-ID)
                     $calendar = $item->calendar_id ? $calendars_repo->get_by_calendar_id( $item->calendar_id ) : null;
@@ -176,10 +183,11 @@ $total_pages = ceil( $total / $limit );
                             </span>
                         </td>
                         <td>
-                            <?php if ( $appointment_ct_id ) : ?>
-                                <strong>A:</strong> <?php echo esc_html( $appointment_ct_id ); ?><br>
+                            <?php if ( $is_appointment ) : ?>
+                                <strong>A:</strong> <?php echo esc_html( $appointment_ct_id ); ?>
+                            <?php else : ?>
+                                <strong>E:</strong> <?php echo esc_html( $event_ct_id ); ?>
                             <?php endif; ?>
-                            <strong>E:</strong> <?php echo esc_html( $event_ct_id ); ?>
                         </td>
                         <td>
                             <strong><?php echo esc_html( $item->title ); ?></strong>
