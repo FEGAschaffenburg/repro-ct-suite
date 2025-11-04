@@ -45,6 +45,9 @@ class Repro_CT_Suite_Admin {
 		// Form Handler für Kalenderauswahl
 		add_action( 'admin_init', array( $this, 'handle_calendar_selection' ) );
 		
+		// Sync Success Notice anzeigen
+		add_action( 'admin_notices', array( $this, 'show_sync_success_notice' ) );
+		
 		// Debug: Testen ob Hooks registriert werden
 		add_action( 'admin_init', function() {
 			Repro_CT_Suite_Logger::log( 'ADMIN_INIT Hook executed for calendar handler' );
@@ -156,6 +159,63 @@ class Repro_CT_Suite_Admin {
 				echo '</p></div>';
 			} );
 		}
+	}
+
+	/**
+	 * Zeigt eine Success-Notice nach erfolgreichem Sync an
+	 */
+	public function show_sync_success_notice() {
+		// Nur auf Plugin-Seiten anzeigen
+		if ( ! isset( $_GET['page'] ) || strpos( $_GET['page'], 'repro-ct-suite' ) === false ) {
+			return;
+		}
+
+		// Prüfen ob Sync-Notice vorhanden ist
+		$sync_notice = get_transient( 'repro_ct_suite_sync_notice' );
+		if ( ! $sync_notice ) {
+			return;
+		}
+
+		// Transient löschen (nur einmal anzeigen)
+		delete_transient( 'repro_ct_suite_sync_notice' );
+
+		// Notice-Typ bestimmen
+		$notice_class = isset( $sync_notice['type'] ) && $sync_notice['type'] === 'error' ? 'notice-error' : 'notice-success';
+		$message = isset( $sync_notice['message'] ) ? $sync_notice['message'] : '';
+
+		if ( empty( $message ) ) {
+			return;
+		}
+
+		?>
+		<div class="notice <?php echo esc_attr( $notice_class ); ?> is-dismissible">
+			<p><strong><?php echo esc_html( $message ); ?></strong></p>
+			<?php if ( isset( $sync_notice['stats'] ) ) : 
+				$stats = $sync_notice['stats'];
+			?>
+				<p>
+					<?php if ( isset( $stats['calendars_processed'] ) ) : ?>
+						📅 <?php printf( __( 'Kalender verarbeitet: %d', 'repro-ct-suite' ), $stats['calendars_processed'] ); ?><br>
+					<?php endif; ?>
+					<?php if ( isset( $stats['events_found'] ) ) : ?>
+						🔍 <?php printf( __( 'Events gefunden: %d', 'repro-ct-suite' ), $stats['events_found'] ); ?><br>
+					<?php endif; ?>
+					<?php if ( isset( $stats['appointments_found'] ) ) : ?>
+						📋 <?php printf( __( 'Termine gefunden: %d', 'repro-ct-suite' ), $stats['appointments_found'] ); ?><br>
+					<?php endif; ?>
+					<?php if ( isset( $stats['events_inserted'] ) ) : ?>
+						➕ <?php printf( __( 'Neu importiert: %d', 'repro-ct-suite' ), $stats['events_inserted'] ); ?><br>
+					<?php endif; ?>
+					<?php if ( isset( $stats['events_updated'] ) ) : ?>
+						🔄 <?php printf( __( 'Aktualisiert: %d', 'repro-ct-suite' ), $stats['events_updated'] ); ?><br>
+					<?php endif; ?>
+					<?php if ( isset( $stats['events_skipped'] ) && $stats['events_skipped'] > 0 ) : ?>
+						⏭️ <?php printf( __( 'Übersprungen: %d', 'repro-ct-suite' ), $stats['events_skipped'] ); ?><br>
+					<?php endif; ?>
+				</p>
+			<?php endif; ?>
+		</div>
+		<?php
 	}
 
 	/**
@@ -1059,6 +1119,26 @@ class Repro_CT_Suite_Admin {
 				'skipped_has_event' => ( isset( $appointments_result['skipped_has_event'] ) ? (int) $appointments_result['skipped_has_event'] : 0 ),
 			);
 			update_option( 'repro_ct_suite_last_sync_stats', $combined_stats );
+
+			// Notice für nächsten Seitenaufruf vorbereiten
+			$total_new = ( isset( $events_result['events_inserted'] ) ? (int) $events_result['events_inserted'] : 0 );
+			$total_updated = ( isset( $events_result['events_updated'] ) ? (int) $events_result['events_updated'] : 0 );
+			$appointments_found = ( isset( $events_result['appointments_found'] ) ? (int) $events_result['appointments_found'] : 0 );
+			
+			set_transient( 'repro_ct_suite_sync_notice', array(
+				'type' => 'success',
+				'message' => sprintf(
+					__( '✅ Synchronisation erfolgreich abgeschlossen!', 'repro-ct-suite' )
+				),
+				'stats' => array(
+					'calendars_processed' => isset( $events_result['calendars_processed'] ) ? $events_result['calendars_processed'] : 0,
+					'events_found' => isset( $events_result['events_found'] ) ? $events_result['events_found'] : 0,
+					'appointments_found' => $appointments_found,
+					'events_inserted' => $total_new,
+					'events_updated' => $total_updated,
+					'events_skipped' => isset( $events_result['events_skipped'] ) ? $events_result['events_skipped'] : 0,
+				)
+			), 60 ); // 60 Sekunden gültig
 
 			wp_send_json_success( array(
 				'message' => sprintf(
