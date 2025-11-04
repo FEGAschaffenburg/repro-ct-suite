@@ -51,6 +51,14 @@ if ( $log_exists && $log_size > 0 ) {
 				</div>
 				<div>
 					<button
+						id="repro-ct-suite-copy-log"
+						class="repro-ct-suite-btn repro-ct-suite-btn-sm repro-ct-suite-btn-secondary"
+						title="<?php esc_attr_e( 'Logs in die Zwischenablage kopieren', 'repro-ct-suite' ); ?>"
+					>
+						<span class="dashicons dashicons-clipboard"></span>
+						<?php esc_html_e( 'Logs kopieren', 'repro-ct-suite' ); ?>
+					</button>
+					<button
 						id="repro-ct-suite-refresh-log"
 						class="repro-ct-suite-btn repro-ct-suite-btn-sm repro-ct-suite-btn-secondary"
 					>

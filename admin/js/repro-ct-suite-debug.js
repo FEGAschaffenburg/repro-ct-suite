@@ -239,6 +239,72 @@
 		initLogHandlers: function() {
 			const self = this;
 
+			// Log kopieren
+			$('#repro-ct-suite-copy-log').on('click', function(e) {
+				e.preventDefault();
+				
+				const $button = $(this);
+				const $logViewer = $('#repro-ct-suite-log-viewer');
+				
+				// Text aus dem Log-Viewer extrahieren (nur Text, kein HTML)
+				const logText = $logViewer.text().trim();
+				
+				if (!logText || logText === 'Log wurde geleert') {
+					self.showNotice('Kein Log-Inhalt zum Kopieren vorhanden', 'warning');
+					return;
+				}
+				
+				// In die Zwischenablage kopieren
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					// Moderne Clipboard API
+					navigator.clipboard.writeText(logText).then(function() {
+						// Erfolgsmeldung
+						const originalIcon = $button.find('.dashicons');
+						const originalText = $button.contents().filter(function() {
+							return this.nodeType === 3; // Text-Node
+						}).text().trim();
+						
+						// Button temporär ändern
+						originalIcon.removeClass('dashicons-clipboard').addClass('dashicons-yes');
+						$button.contents().filter(function() {
+							return this.nodeType === 3;
+						}).replaceWith(' Kopiert!');
+						
+						// Nach 2 Sekunden zurücksetzen
+						setTimeout(function() {
+							originalIcon.removeClass('dashicons-yes').addClass('dashicons-clipboard');
+							$button.contents().filter(function() {
+								return this.nodeType === 3;
+							}).replaceWith(' Logs kopieren');
+						}, 2000);
+						
+					}).catch(function(err) {
+						self.showNotice('Fehler beim Kopieren: ' + err, 'error');
+					});
+				} else {
+					// Fallback für ältere Browser
+					const textarea = document.createElement('textarea');
+					textarea.value = logText;
+					textarea.style.position = 'fixed';
+					textarea.style.opacity = '0';
+					document.body.appendChild(textarea);
+					textarea.select();
+					
+					try {
+						const successful = document.execCommand('copy');
+						if (successful) {
+							self.showNotice('Logs in Zwischenablage kopiert', 'success');
+						} else {
+							self.showNotice('Kopieren fehlgeschlagen', 'error');
+						}
+					} catch (err) {
+						self.showNotice('Kopieren nicht unterstützt: ' + err, 'error');
+					}
+					
+					document.body.removeChild(textarea);
+				}
+			});
+
 			// Log aktualisieren
 			$('#repro-ct-suite-refresh-log').on('click', function(e) {
 				e.preventDefault();
