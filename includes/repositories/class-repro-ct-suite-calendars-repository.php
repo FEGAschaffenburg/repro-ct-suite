@@ -23,14 +23,14 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 	}
 
 	/**
-	 * Upsert (Insert oder Update) eines Kalenders anhand der external_id
+	 * Upsert (Insert oder Update) eines Kalenders anhand der calendar_id
 	 *
 	 * @param array $data Kalender-Daten.
 	 * @return int ID des Kalenders.
 	 */
-	public function upsert_by_external_id( $data ) {
+	public function upsert_by_calendar_id( $data ) {
 		$defaults = array(
-			'external_id'      => '',
+			'calendar_id'      => '',
 			'name'             => '',
 			'name_translated'  => null,
 			'color'            => null,
@@ -45,8 +45,8 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 
 		$existing_id = $this->db->get_var(
 			$this->db->prepare(
-				"SELECT id FROM {$this->table} WHERE external_id=%s",
-				$data['external_id']
+				"SELECT id FROM {$this->table} WHERE calendar_id=%s",
+				$data['calendar_id']
 			)
 		);
 
@@ -113,13 +113,13 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 	}
 
 	/**
-	 * Holt die externen IDs der ausgewählten Kalender (ChurchTools-IDs)
+	 * Holt die ChurchTools Calendar-IDs der ausgewählten Kalender
 	 *
-	 * @return array Liste der externen Calendar-IDs aus ChurchTools.
+	 * @return array Liste der Calendar-IDs aus ChurchTools.
 	 */
-	public function get_selected_external_ids() {
+	public function get_selected_calendar_ids() {
 		$sql = $this->db->prepare(
-			"SELECT external_id FROM {$this->table} WHERE is_selected=%d ORDER BY sort_order ASC",
+			"SELECT calendar_id FROM {$this->table} WHERE is_selected=%d ORDER BY sort_order ASC",
 			1
 		);
 		return $this->db->get_col( $sql );
@@ -182,16 +182,16 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 	}
 
 	/**
-	 * Holt einen Kalender anhand der external_id
+	 * Holt einen Kalender anhand der calendar_id (ChurchTools ID)
 	 *
-	 * @param string $external_id ChurchTools Calendar ID.
+	 * @param string $calendar_id ChurchTools Calendar ID.
 	 * @return object|null Kalender-Objekt oder null.
 	 */
-	public function get_by_external_id( $external_id ) {
+	public function get_by_calendar_id( $calendar_id ) {
 		return $this->db->get_row(
 			$this->db->prepare(
-				"SELECT * FROM {$this->table} WHERE external_id=%s",
-				$external_id
+				"SELECT * FROM {$this->table} WHERE calendar_id=%s",
+				$calendar_id
 			)
 		);
 	}

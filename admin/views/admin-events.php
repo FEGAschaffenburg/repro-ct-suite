@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Termine-Übersicht
  *
@@ -28,7 +28,7 @@ global $wpdb;
 $events_table = $wpdb->prefix . 'rcts_events';
 
 // SQL mit prepare() korrekt bauen
-$sql = "SELECT id, external_id, appointment_id, calendar_id, title, description, start_datetime, end_datetime FROM {$events_table} WHERE 1=1";
+$sql = "SELECT id, event_id, appointment_id, calendar_id, title, description, start_datetime, end_datetime FROM {$events_table} WHERE 1=1";
 
 // Filter hinzufügen
 if ( ! empty( $from ) ) { 
@@ -86,7 +86,7 @@ $total_pages = ceil( $total / $limit );
             <select name="calendar_id">
                 <option value=""><?php esc_html_e( 'Alle', 'repro-ct-suite' ); ?></option>
                 <?php foreach ( $calendars as $cal ) : ?>
-                    <option value="<?php echo esc_attr( $cal->external_id ); ?>" <?php selected( $calendar_filter, $cal->external_id ); ?>>
+                    <option value="<?php echo esc_attr( $cal->calendar_id ); ?>" <?php selected( $calendar_filter, $cal->calendar_id ); ?>>
                         <?php echo esc_html( $cal->name ); ?>
                     </option>
                 <?php endforeach; ?>
@@ -135,7 +135,7 @@ $total_pages = ceil( $total / $limit );
                     
                     // ChurchTools-IDs extrahieren:
                     // Event-ID ist immer in external_id enthalten (Format: EventID_Timestamp)
-                    $parts = explode( '_', $item->external_id );
+                    $parts = explode( '_', $item->event_id );
                     $event_ct_id = $parts[0];
                     
                     // Appointment-ID ist nur bei Events gesetzt (nicht bei reinen Appointments)

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -840,25 +840,25 @@ class Repro_CT_Suite_Admin {
 		$sync_service   = new Repro_CT_Suite_Sync_Service( $ct_client, $events_repo, $calendars_repo, $schedule_repo );
 
 		// Ausgewählte Kalender ermitteln (DIREKT externe ChurchTools-IDs)
-		$selected_external_calendar_ids = $calendars_repo->get_selected_external_ids();
+		$selected_calendar_ids = $calendars_repo->get_selected_calendar_ids();
 		
 		// DEBUG: Alle Kalender in der Datenbank anzeigen
 		error_log( '[DEBUG] CALENDAR DATABASE CHECK:' );
 		$all_calendars = $calendars_repo->get_all();
 		foreach ( $all_calendars as $cal ) {
-			error_log( sprintf( '[DEBUG] Kalender: ID=%d, external_id=%s, name=%s, is_selected=%d', 
-				$cal->id, $cal->external_id, $cal->name, $cal->is_selected ) );
+			error_log( sprintf( '[DEBUG] Kalender: ID=%d, calendar_id=%s, name=%s, is_selected=%d', 
+				$cal->id, $cal->calendar_id, $cal->name, $cal->is_selected ) );
 		}
-		error_log( '[DEBUG] Ausgewählte externe IDs: ' . implode( ', ', $selected_external_calendar_ids ) );
+		error_log( '[DEBUG] Ausgewählte externe IDs: ' . implode( ', ', $selected_calendar_ids ) );
 		
-		if ( empty( $selected_external_calendar_ids ) ) {
+		if ( empty( $selected_calendar_ids ) ) {
 			wp_send_json_error( array(
 				'message' => __( 'Keine Kalender für den Import ausgewählt. Bitte wählen Sie Kalender in den Einstellungen aus.', 'repro-ct-suite' )
 			) );
 			return;
 		}
 
-		Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe ChurchTools-IDs): ' . implode( ', ', $selected_external_calendar_ids ) );
+		Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe ChurchTools-IDs): ' . implode( ', ', $selected_calendar_ids ) );
 
 		// Sync-Zeitraum
 		$sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
@@ -870,7 +870,7 @@ class Repro_CT_Suite_Admin {
 
 		// Sync ausführen mit externen ChurchTools-IDs (kein lokales Mapping mehr!)
 		$result = $sync_service->sync_events( array(
-			'calendar_ids' => $selected_external_calendar_ids, // Direkt ChurchTools-IDs!
+			'calendar_ids' => $selected_calendar_ids, // Direkt ChurchTools-IDs!
 			'from'         => $from,
 			'to'           => $to,
 		) );
@@ -959,14 +959,14 @@ class Repro_CT_Suite_Admin {
 			}
 
 			// Externe Calendar-IDs für Events-Filterung holen
-			$selected_external_calendar_ids = array();
+			$selected_calendar_ids = array();
 			foreach ( $selected_calendar_ids as $local_id ) {
 				$calendar = $calendars_repo->get_by_id( $local_id );
-				if ( $calendar && ! empty( $calendar->external_id ) ) {
-					$selected_external_calendar_ids[] = (string) $calendar->external_id;
+				if ( $calendar && ! empty( $calendar->calendar_id ) ) {
+					$selected_calendar_ids[] = (string) $calendar->calendar_id;
 				}
 			}
-			Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe IDs): ' . ( $selected_external_calendar_ids ? implode( ',', $selected_external_calendar_ids ) : '[keine]' ) );
+			Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe IDs): ' . ( $selected_calendar_ids ? implode( ',', $selected_calendar_ids ) : '[keine]' ) );
 
 			// Zeitraum bestimmen (aus den gespeicherten Optionen)
 			$sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
@@ -988,7 +988,7 @@ class Repro_CT_Suite_Admin {
 			$events_result = $events_service->sync_events( array(
 				'from'         => $from,
 				'to'           => $to,
-				'calendar_ids' => $selected_external_calendar_ids, // Externe ChurchTools Calendar-IDs
+				'calendar_ids' => $selected_calendar_ids, // Externe ChurchTools Calendar-IDs
 			) );
 
 			if ( is_wp_error( $events_result ) ) {

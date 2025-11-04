@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Calendar Sync Service
  *
@@ -130,12 +130,12 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 		}
 
 		// Prüfe ob Kalender bereits existiert
-		$existing = $this->calendars_repo->get_by_external_id( $calendar_data['id'] );
+		$existing = $this->calendars_repo->get_by_calendar_id( $calendar_data['id'] );
 		$action = $existing ? 'update' : 'insert';
 
 		// Daten aufbereiten
 		$data = array(
-			'external_id'     => sanitize_text_field( $calendar_data['id'] ),
+			'calendar_id'     => sanitize_text_field( $calendar_data['id'] ),
 			'name'            => sanitize_text_field( $calendar_data['name'] ?? '' ),
 			'name_translated' => ! empty( $calendar_data['nameTranslated'] )
 				? sanitize_text_field( $calendar_data['nameTranslated'] )
@@ -155,7 +155,7 @@ class Repro_CT_Suite_Calendar_Sync_Service {
 			$data['is_selected'] = $data['is_public'];
 		}
 
-		$calendar_id = $this->calendars_repo->upsert_by_external_id( $data );
+		$calendar_id = $this->calendars_repo->upsert_by_calendar_id( $data );
 
 		if ( ! $calendar_id ) {
 			return new WP_Error(

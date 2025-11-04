@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Migrations {
 
-	const DB_VERSION = '7';
+	const DB_VERSION = '8';
 	const OPTION_KEY = 'repro_ct_suite_db_version';
 
 	/**
@@ -46,7 +46,7 @@ class Repro_CT_Suite_Migrations {
 		// Calendars (Kalender aus ChurchTools)
 		$sql_calendars = "CREATE TABLE {$calendars_table} (
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-			external_id VARCHAR(64) NOT NULL,
+			calendar_id VARCHAR(64) NOT NULL,
 			name VARCHAR(255) NOT NULL,
 			name_translated VARCHAR(255) NULL,
 			color VARCHAR(7) NULL,
@@ -57,13 +57,13 @@ class Repro_CT_Suite_Migrations {
 			updated_at DATETIME NOT NULL,
 			raw_payload LONGTEXT NULL,
 			PRIMARY KEY  (id),
-			UNIQUE KEY external_id (external_id),
+			UNIQUE KEY calendar_id (calendar_id),
 			KEY is_selected (is_selected)
 		) {$charset_collate};";
 
 		$sql_events = "CREATE TABLE {$events_table} (
 			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-			external_id VARCHAR(64) NOT NULL,
+			event_id VARCHAR(64) NULL,
 			calendar_id VARCHAR(64) NULL,
 			appointment_id BIGINT(20) UNSIGNED NULL,
 			title VARCHAR(255) NOT NULL,
@@ -76,7 +76,7 @@ class Repro_CT_Suite_Migrations {
 			updated_at DATETIME NOT NULL,
 			raw_payload LONGTEXT NULL,
 			PRIMARY KEY  (id),
-			UNIQUE KEY external_id (external_id),
+			KEY event_id (event_id),
 			KEY calendar_id (calendar_id),
 			KEY appointment_id (appointment_id),
 			KEY start_datetime (start_datetime),
@@ -145,6 +145,11 @@ class Repro_CT_Suite_Migrations {
 		// Migration von Version 6 auf 7: created_at Spalten hinzufügen
 		if ( version_compare( $current, '7', '<' ) ) {
 			self::migrate_add_created_at_v7();
+		}
+		
+		// Migration von Version 7 auf 8: external_id umbenennen zu event_id / calendar_id
+		if ( version_compare( $current, '8', '<' ) ) {
+			self::migrate_rename_external_id_v8();
 		}
 
 		// Platzhalter für zukünftige Migrationen (z.B. Backfill der Schedule-Tabelle)
@@ -405,6 +410,77 @@ class Repro_CT_Suite_Migrations {
 				$appointments_updated
 			) );
 		}
+	}
+
+	/**
+	 * Migration V8: external_id Spalten umbenennen
+	 * 
+	 * - In wp_rcts_calendars: external_id → calendar_id
+	 * - In wp_rcts_events: external_id → event_id
+	 */
+	private static function migrate_rename_external_id_v8() {
+		global $wpdb;
+		
+		$calendars_table = $wpdb->prefix . 'rcts_calendars';
+		$events_table = $wpdb->prefix . 'rcts_events';
+		
+		error_log( 'Repro CT-Suite: Starte Migration V8 - external_id umbenennen' );
+		
+		// 1. Calendars: external_id → calendar_id
+		$col_exists_cal = $wpdb->get_var( 
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+				WHERE TABLE_SCHEMA = %s 
+				AND TABLE_NAME = %s 
+				AND COLUMN_NAME = 'external_id'",
+				DB_NAME,
+				$calendars_table
+			)
+		);
+		
+		if ( $col_exists_cal > 0 ) {
+			error_log( 'Migration V8: Benenne external_id in calendar_id um (Calendars-Tabelle)' );
+			
+			// Index löschen
+			$wpdb->query( "ALTER TABLE {$calendars_table} DROP INDEX IF EXISTS external_id" );
+			
+			// Spalte umbenennen
+			$wpdb->query( "ALTER TABLE {$calendars_table} CHANGE COLUMN external_id calendar_id VARCHAR(64) NOT NULL" );
+			
+			// Index neu erstellen
+			$wpdb->query( "ALTER TABLE {$calendars_table} ADD UNIQUE KEY calendar_id (calendar_id)" );
+			
+			error_log( 'Migration V8: Calendars-Tabelle aktualisiert' );
+		}
+		
+		// 2. Events: external_id → event_id
+		$col_exists_evt = $wpdb->get_var( 
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+				WHERE TABLE_SCHEMA = %s 
+				AND TABLE_NAME = %s 
+				AND COLUMN_NAME = 'external_id'",
+				DB_NAME,
+				$events_table
+			)
+		);
+		
+		if ( $col_exists_evt > 0 ) {
+			error_log( 'Migration V8: Benenne external_id in event_id um (Events-Tabelle)' );
+			
+			// Index löschen
+			$wpdb->query( "ALTER TABLE {$events_table} DROP INDEX IF EXISTS external_id" );
+			
+			// Spalte umbenennen
+			$wpdb->query( "ALTER TABLE {$events_table} CHANGE COLUMN external_id event_id VARCHAR(64) NULL" );
+			
+			// Index neu erstellen
+			$wpdb->query( "ALTER TABLE {$events_table} ADD KEY event_id (event_id)" );
+			
+			error_log( 'Migration V8: Events-Tabelle aktualisiert' );
+		}
+		
+		error_log( 'Repro CT-Suite: Migration V8 abgeschlossen' );
 	}
 
 	/**

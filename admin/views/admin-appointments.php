@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Termine-Übersicht
  *
@@ -27,7 +27,7 @@ global $wpdb;
 $events_table = $wpdb->prefix . 'rcts_events';
 
 // SQL mit prepare() korrekt bauen
-$sql = "SELECT id, external_id, appointment_id, calendar_id, title, description, start_datetime, end_datetime, location_name FROM {$events_table} WHERE 1=1";
+$sql = "SELECT id, event_id, appointment_id, calendar_id, title, description, start_datetime, end_datetime, location_name FROM {$events_table} WHERE 1=1";
 
 // Filter hinzufügen
 if ( ! empty( $from ) ) { 
@@ -103,7 +103,7 @@ error_log( 'Termine gefunden: ' . count( $items ) );
                     
                     // ChurchTools-IDs extrahieren:
                     // Event-ID ist immer in external_id enthalten (Format: EventID_Timestamp)
-                    $parts = explode( '_', $row->external_id );
+                    $parts = explode( '_', $row->event_id );
                     $event_ct_id = $parts[0];
                     
                     // Appointment-ID ist nur bei Events gesetzt (nicht bei reinen Appointments)

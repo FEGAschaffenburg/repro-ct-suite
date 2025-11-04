@@ -13,10 +13,11 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 		parent::__construct( $wpdb->prefix . 'rcts_events' );
 	}
 
-	public function upsert_by_external_id( $data ) {
+	public function upsert_by_event_id( $data ) {
 		$defaults = array(
-			'external_id'   => '',
+			'event_id'      => '',
 			'calendar_id'   => null,
+			'appointment_id'=> null,
 			'title'         => '',
 			'description'   => null,
 			'start_datetime'=> null,
@@ -29,7 +30,7 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 
 		$data['updated_at'] = $this->now();
 
-		$existing_id = $this->db->get_var( $this->db->prepare( "SELECT id FROM {$this->table} WHERE external_id=%s", $data['external_id'] ) );
+		$existing_id = $this->db->get_var( $this->db->prepare( "SELECT id FROM {$this->table} WHERE event_id=%s", $data['event_id'] ) );
 		if ( $existing_id ) {
 			$this->db->update( $this->table, $data, array( 'id' => $existing_id ) );
 			return (int) $existing_id;
@@ -44,32 +45,32 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 	}
 
 	/**
-	 * Holt die interne ID eines Events anhand der external_id
+	 * Holt die interne ID eines Events anhand der event_id
 	 *
-	 * @param string $external_id Externe Event-ID aus ChurchTools
+	 * @param string $event_id Event-ID aus ChurchTools
 	 * @return int|null Interne ID oder null, wenn nicht gefunden
 	 */
-	public function get_id_by_external_id( $external_id ) {
+	public function get_id_by_event_id( $event_id ) {
 		$val = $this->db->get_var(
 			$this->db->prepare(
-				"SELECT id FROM {$this->table} WHERE external_id=%s",
-				$external_id
+				"SELECT id FROM {$this->table} WHERE event_id=%s",
+				$event_id
 			)
 		);
 		return $val !== null ? (int) $val : null;
 	}
 
 	/**
-	 * Holt ein Event-Objekt anhand der external_id
+	 * Holt ein Event-Objekt anhand der event_id
 	 *
-	 * @param string $external_id Externe Event-ID aus ChurchTools
+	 * @param string $event_id Event-ID aus ChurchTools
 	 * @return object|null Event-Objekt oder null, wenn nicht gefunden
 	 */
-	public function get_by_external_id( $external_id ) {
+	public function get_by_event_id( $event_id ) {
 		return $this->db->get_row(
 			$this->db->prepare(
-				"SELECT * FROM {$this->table} WHERE external_id=%s",
-				$external_id
+				"SELECT * FROM {$this->table} WHERE event_id=%s",
+				$event_id
 			)
 		);
 	}

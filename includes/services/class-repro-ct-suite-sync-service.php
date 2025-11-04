@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Unified Sync Service
  *
@@ -63,21 +63,21 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Direkte Verwendung der ChurchTools-IDs (kein lokales Mapping mehr!)
 		$external_calendar_ids = array();
-		foreach ( $args['calendar_ids'] as $external_id ) {
+		foreach ( $args['calendar_ids'] as $calendar_id ) {
 			// Optional: Kalender-Name aus der lokalen Tabelle holen für bessere Logs
-			$calendar = $this->calendars_repo->get_by_external_id( $external_id );
+			$calendar = $this->calendars_repo->get_by_calendar_id( $calendar_id );
 			$external_calendar_ids[] = array(
 				'external_id' => $external_id,
-				'name'        => $calendar ? $calendar->name : "Kalender {$external_id}",
+				'name'        => $calendar ? $calendar->name : "Kalender {$calendar_id}",
 			);
-			Repro_CT_Suite_Logger::log( "Kalender: ChurchTools-ID {$external_id}" . ( $calendar ? " ('{$calendar->name}')" : '' ) );
+			Repro_CT_Suite_Logger::log( "Kalender: ChurchTools-ID {$calendar_id}" . ( $calendar ? " ('{$calendar->name}')" : '' ) );
 		}
 
 		if ( empty( $external_calendar_ids ) ) {
 			return new WP_Error( 'no_external_ids', __( 'Keine ChurchTools-Kalender-IDs übergeben.', 'repro-ct-suite' ) );
 		}
 
-		Repro_CT_Suite_Logger::log( 'Externe Kalender-IDs: ' . implode( ', ', array_column( $external_calendar_ids, 'external_id' ) ) );
+		Repro_CT_Suite_Logger::log( 'Externe Kalender-IDs: ' . implode( ', ', array_column( $external_calendar_ids, 'calendar_id' ) ) );
 
 		$stats = array(
 			'calendars_processed' => 0,
@@ -101,7 +101,7 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Pro Kalender: Events filtern und speichern  
 		foreach ( $external_calendar_ids as $cal_info ) {
-			$external_id = $cal_info['external_id'];
+			$external_id = $cal_info['calendar_id'];
 			$cal_name    = $cal_info['name'];
 			
 			Repro_CT_Suite_Logger::log( "Bearbeite Kalender '{$cal_name}' (ID: {$external_id})..." );
@@ -109,7 +109,7 @@ class Repro_CT_Suite_Sync_Service {
 			// Events für diesen Kalender filtern
 			$relevant_events = array();
 			foreach ( $all_events as $event ) {
-				if ( $this->is_event_relevant_for_calendar( $event, $external_id ) ) {
+				if ( $this->is_event_relevant_for_calendar( $event, $calendar_id ) ) {
 					$relevant_events[] = $event;
 				}
 			}
@@ -118,10 +118,10 @@ class Repro_CT_Suite_Sync_Service {
 			Repro_CT_Suite_Logger::log( "Kalender {$external_id}: {$events_found} relevante Events gefunden" );
 			
 			// Events verarbeiten (mit args für Phase 2 Appointments)
-			$result = $this->process_calendar_events( $relevant_events, $external_id, $args );
+			$result = $this->process_calendar_events( $relevant_events, $calendar_id, $args );
 			
 			if ( is_wp_error( $result ) ) {
-				Repro_CT_Suite_Logger::log( "Fehler bei Kalender {$external_id}: " . $result->get_error_message(), 'error' );
+				Repro_CT_Suite_Logger::log( "Fehler bei Kalender {$calendar_id}: " . $result->get_error_message(), 'error' );
 				$stats['errors']++;
 				continue; // Nächsten Kalender versuchen
 			}
@@ -690,7 +690,7 @@ class Repro_CT_Suite_Sync_Service {
 		$event_data = $extract_result;
 
 		// Event in die Datenbank speichern (Insert oder Update)
-		$exists = $this->events_repo->get_by_external_id( $event_data['external_id'] );
+		$exists = $this->events_repo->get_by_calendar_id( $event_data['external_id'] );
 		
 		if ( $exists ) {
 			// Update
@@ -780,7 +780,7 @@ class Repro_CT_Suite_Sync_Service {
 		Repro_CT_Suite_Logger::log( "process_appointment: Event-Daten extrahiert, external_id={$event_data['external_id']}" );
 
 		// Event in die Datenbank speichern (Insert oder Update)
-		$exists = $this->events_repo->get_by_external_id( $event_data['external_id'] );
+		$exists = $this->events_repo->get_by_calendar_id( $event_data['external_id'] );
 		
 		if ( $exists ) {
 			// Event existiert bereits - ÜBERSPRINGEN statt Update
@@ -886,7 +886,7 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Eindeutige External-ID generieren
 		// Format: appointment_id + Startzeit für eindeutige Instanzen
-		$external_id = $appointment_id . '_' . gmdate( 'Ymd_His', strtotime( $start_raw ) );
+		$event_id = $appointment_id . '_' . gmdate( 'Ymd_His', strtotime( $start_raw ) );
 
 		// Event-Daten zusammenstellen
 		$event_data = array(
@@ -902,7 +902,7 @@ class Repro_CT_Suite_Sync_Service {
 			'raw_payload'     => wp_json_encode( $appointment ),
 		);
 
-		Repro_CT_Suite_Logger::log( "extract_appointment_data: Event-Daten erfolgreich extrahiert (external_id={$external_id})" );
+		Repro_CT_Suite_Logger::log( "extract_appointment_data: Event-Daten erfolgreich extrahiert (event_id={$event_id})" );
 
 		return $event_data;
 	}
