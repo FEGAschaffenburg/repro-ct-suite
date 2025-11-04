@@ -826,7 +826,9 @@ class Repro_CT_Suite_Sync_Service {
 			Repro_CT_Suite_Logger::log( "process_appointment: Aktualisiere Schedule-Repository für Event-ID={$event_id}" );
 			$event = $this->events_repo->get_by_id( $event_id );
 			if ( $event ) {
-				$this->schedule_repo->upsert_from_event( $event );
+				// Event-Objekt in Array konvertieren für schedule_repo
+				$event_array = (array) $event;
+				$this->schedule_repo->upsert_from_event( $event_array );
 				Repro_CT_Suite_Logger::log( "process_appointment: Schedule aktualisiert" );
 			}
 		}
