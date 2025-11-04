@@ -784,23 +784,47 @@ class Repro_CT_Suite_Sync_Service {
 		
 		if ( $exists ) {
 			Repro_CT_Suite_Logger::log( "process_appointment: Event existiert bereits (ID={$exists->id}), führe UPDATE aus" );
+			Repro_CT_Suite_Logger::log( "process_appointment: UPDATE - Event-Daten: " . wp_json_encode( array(
+				'external_id' => $event_data['external_id'],
+				'title' => $event_data['title'],
+				'start_datetime' => $event_data['start_datetime'],
+				'end_datetime' => $event_data['end_datetime'],
+			) ) );
+			
 			// Update
-			$success = $this->events_repo->update( $exists->id, $event_data );
-			$action = 'updated';
-			$event_id = $exists->id;
-			Repro_CT_Suite_Logger::log( "process_appointment: UPDATE " . ( $success ? "ERFOLGREICH" : "FEHLGESCHLAGEN" ) );
+			try {
+				$success = $this->events_repo->update( $exists->id, $event_data );
+				$action = 'updated';
+				$event_id = $exists->id;
+				Repro_CT_Suite_Logger::log( "process_appointment: UPDATE " . ( $success ? "ERFOLGREICH" : "FEHLGESCHLAGEN" ) );
+			} catch ( Exception $e ) {
+				Repro_CT_Suite_Logger::log( "process_appointment: UPDATE EXCEPTION: " . $e->getMessage(), 'error' );
+				return new WP_Error( 'update_exception', 'Update Exception: ' . $e->getMessage() );
+			}
 		} else {
 			Repro_CT_Suite_Logger::log( "process_appointment: Event ist neu, führe INSERT aus" );
-			// Insert
-			$event_id = $this->events_repo->insert( $event_data );
-			$success = ! is_wp_error( $event_id );
-			$action = 'inserted';
+			Repro_CT_Suite_Logger::log( "process_appointment: INSERT - Event-Daten: " . wp_json_encode( array(
+				'external_id' => $event_data['external_id'],
+				'title' => $event_data['title'],
+				'start_datetime' => $event_data['start_datetime'],
+				'end_datetime' => $event_data['end_datetime'],
+			) ) );
 			
-			if ( $success ) {
-				Repro_CT_Suite_Logger::log( "process_appointment: INSERT ERFOLGREICH, neue Event-ID={$event_id}" );
-			} else {
-				$error_msg = is_wp_error( $event_id ) ? $event_id->get_error_message() : 'Unbekannter Fehler';
-				Repro_CT_Suite_Logger::log( "process_appointment: INSERT FEHLGESCHLAGEN: {$error_msg}", 'error' );
+			// Insert
+			try {
+				$event_id = $this->events_repo->insert( $event_data );
+				$success = ! is_wp_error( $event_id );
+				$action = 'inserted';
+				
+				if ( $success ) {
+					Repro_CT_Suite_Logger::log( "process_appointment: INSERT ERFOLGREICH, neue Event-ID={$event_id}" );
+				} else {
+					$error_msg = is_wp_error( $event_id ) ? $event_id->get_error_message() : 'Unbekannter Fehler';
+					Repro_CT_Suite_Logger::log( "process_appointment: INSERT FEHLGESCHLAGEN: {$error_msg}", 'error' );
+				}
+			} catch ( Exception $e ) {
+				Repro_CT_Suite_Logger::log( "process_appointment: INSERT EXCEPTION: " . $e->getMessage(), 'error' );
+				return new WP_Error( 'insert_exception', 'Insert Exception: ' . $e->getMessage() );
 			}
 		}
 
