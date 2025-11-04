@@ -433,12 +433,33 @@ class Repro_CT_Suite_Sync_Service {
 		$tenant = get_option( 'repro_ct_suite_ct_tenant', '' );
 		$full_url = "https://{$tenant}.church.tools/api{$endpoint}?from={$args['from']}&to={$args['to']}";
 		
+		// Cookies für cURL-Befehl holen
+		$saved_cookies = get_option( 'repro_ct_suite_ct_cookies', array() );
+		$cookie_header = '';
+		if ( ! empty( $saved_cookies ) ) {
+			$cookie_parts = array();
+			foreach ( $saved_cookies as $name => $value ) {
+				$cookie_parts[] = $name . '=' . $value;
+			}
+			$cookie_header = implode( '; ', $cookie_parts );
+		}
+		
 		Repro_CT_Suite_Logger::log( "========================================" );
 		Repro_CT_Suite_Logger::log( "🌐 API GET REQUEST:" );
 		Repro_CT_Suite_Logger::log( "   URL: {$full_url}" );
 		Repro_CT_Suite_Logger::log( "   Endpoint: {$endpoint}" );
 		Repro_CT_Suite_Logger::log( "   Parameter: from={$args['from']}, to={$args['to']}" );
-		Repro_CT_Suite_Logger::log( "   cURL: curl -X GET '{$full_url}' -H 'accept: application/json'" );
+		Repro_CT_Suite_Logger::log( "   Cookies: " . ( ! empty( $saved_cookies ) ? count( $saved_cookies ) . " Cookie(s) vorhanden" : "❌ KEINE COOKIES!" ) );
+		Repro_CT_Suite_Logger::log( "" );
+		Repro_CT_Suite_Logger::log( "📋 cURL-Befehl zum Testen:" );
+		Repro_CT_Suite_Logger::log( "   curl -X GET '{$full_url}' \\" );
+		Repro_CT_Suite_Logger::log( "     -H 'accept: application/json' \\" );
+		Repro_CT_Suite_Logger::log( "     -H 'Content-Type: application/json' \\" );
+		if ( ! empty( $cookie_header ) ) {
+			Repro_CT_Suite_Logger::log( "     -H 'Cookie: {$cookie_header}'" );
+		} else {
+			Repro_CT_Suite_Logger::log( "     # ⚠️ KEINE COOKIES - Request wird vermutlich 401 Unauthorized zurückgeben" );
+		}
 		Repro_CT_Suite_Logger::log( "========================================" );
 		
 		$response = $this->ct_client->get( $endpoint, array(

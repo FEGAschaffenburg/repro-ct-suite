@@ -325,9 +325,15 @@ class Repro_CT_Suite_CT_Client {
 		if ( ! empty( $this->cookies ) ) {
 			$cookie_strings = array();
 			foreach ( $this->cookies as $name => $value ) {
+				// Gekürzte Cookie-Werte für Debug-Log (erste 20 + letzte 10 Zeichen)
+				$masked_value = strlen( $value ) > 30 ? substr( $value, 0, 20 ) . '...' . substr( $value, -10 ) : $value;
+				Repro_CT_Suite_Logger::log( "Cookie: {$name} = {$masked_value}" );
 				$cookie_strings[] = $name . '=' . $value;
 			}
 			$headers['Cookie'] = implode( '; ', $cookie_strings );
+			Repro_CT_Suite_Logger::log( "Cookie-Header gesetzt mit " . count( $this->cookies ) . " Cookie(s)" );
+		} else {
+			Repro_CT_Suite_Logger::log( "⚠️ Keine Cookies vorhanden - Request könnte fehlschlagen!", 'warning' );
 		}
 
 		return $headers;
