@@ -27,7 +27,7 @@ global $wpdb;
 $events_table = $wpdb->prefix . 'rcts_events';
 
 // SQL mit prepare() korrekt bauen
-$sql = "SELECT id, external_id, title, description, start_datetime, end_datetime, location_name FROM {$events_table} WHERE 1=1";
+$sql = "SELECT id, external_id, appointment_id, calendar_id, title, description, start_datetime, end_datetime, location_name FROM {$events_table} WHERE 1=1";
 
 // Filter hinzufügen
 if ( ! empty( $from ) ) { 
@@ -64,9 +64,14 @@ error_log( 'Termine gefunden: ' . count( $items ) );
             <?php esc_html_e( 'Bis', 'repro-ct-suite' ); ?>
             <input type="date" name="to" value="<?php echo esc_attr( $to ); ?>" />
         </label>
-        <button class="repro-ct-suite-btn repro-ct-suite-btn-secondary" style="margin-left:10px;">
+        <button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-secondary" style="margin-left:10px;">
             <span class="dashicons dashicons-filter"></span> <?php esc_html_e( 'Filtern', 'repro-ct-suite' ); ?>
         </button>
+        <?php if ( ! empty( $from ) || ! empty( $to ) ) : ?>
+            <a href="?page=repro-ct-suite-appointments" class="repro-ct-suite-btn" style="margin-left:10px; text-decoration:none;">
+                <span class="dashicons dashicons-dismiss"></span> <?php esc_html_e( 'Filter entfernen', 'repro-ct-suite' ); ?>
+            </a>
+        <?php endif; ?>
     </form>
 
     <div class="repro-ct-suite-card repro-ct-suite-mt-20">
@@ -77,19 +82,34 @@ error_log( 'Termine gefunden: ' . count( $items ) );
             <table class="widefat fixed striped">
                 <thead>
                     <tr>
-                        <th style="width:15%;"><?php esc_html_e( 'Datum', 'repro-ct-suite' ); ?></th>
-                        <th style="width:35%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
-                        <th style="width:25%;"><?php esc_html_e( 'Ort', 'repro-ct-suite' ); ?></th>
-                        <th style="width:15%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
-                        <th style="width:10%;"><?php esc_html_e( 'Aktionen', 'repro-ct-suite' ); ?></th>
+                        <th style="width:12%;"><?php esc_html_e( 'Datum', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'Typ', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'ID', 'repro-ct-suite' ); ?></th>
+                        <th style="width:30%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
+                        <th style="width:17%;"><?php esc_html_e( 'Ort', 'repro-ct-suite' ); ?></th>
+                        <th style="width:12%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'Aktionen', 'repro-ct-suite' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php if ( empty( $items ) ) : ?>
-                    <tr><td colspan="5"><?php esc_html_e( 'Keine Einträge gefunden.', 'repro-ct-suite' ); ?></td></tr>
-                <?php else : foreach ( $items as $row ) : ?>
+                    <tr><td colspan="7"><?php esc_html_e( 'Keine Einträge gefunden.', 'repro-ct-suite' ); ?></td></tr>
+                <?php else : foreach ( $items as $row ) : 
+                    // Typ bestimmen: Appointment wenn appointment_id gesetzt ist
+                    $is_appointment = ! empty( $row->appointment_id );
+                    $type_label = $is_appointment ? 'Appointment' : 'Event';
+                    $display_id = $is_appointment ? $row->appointment_id : $row->external_id;
+                ?>
                     <tr>
                         <td><?php echo esc_html( date_i18n( get_option('date_format') . ' H:i', strtotime( $row->start_datetime ) ) ); ?></td>
+                        <td>
+                            <?php if ( $is_appointment ) : ?>
+                                <span class="repro-ct-suite-badge" style="background:#667eea; color:#fff;"><?php echo esc_html( $type_label ); ?></span>
+                            <?php else : ?>
+                                <span class="repro-ct-suite-badge repro-ct-suite-badge-info"><?php echo esc_html( $type_label ); ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td><small><?php echo esc_html( $display_id ); ?></small></td>
                         <td><?php echo esc_html( $row->title ); ?></td>
                         <td><?php echo isset( $row->location_name ) ? esc_html( $row->location_name ) : ''; ?></td>
                         <td><?php echo ! empty( $row->end_datetime ) ? esc_html( date_i18n( get_option('date_format') . ' H:i', strtotime( $row->end_datetime ) ) ) : '—'; ?></td>
