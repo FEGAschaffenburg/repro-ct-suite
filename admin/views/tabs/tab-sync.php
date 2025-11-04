@@ -16,6 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// SOFORTIGE Ausgabe um zu testen ob Datei überhaupt geladen wird
+echo '<div style="background: red; color: white; padding: 20px; font-size: 20px; font-weight: bold;">DATEI WIRD GELADEN!</div>';
+flush();
+
 // DEBUG: Prüfen ob Datei geladen wird
 error_log( 'Repro CT-Suite: tab-sync.php wird geladen' );
 
