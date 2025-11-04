@@ -791,30 +791,37 @@ class Repro_CT_Suite_Sync_Service {
 		// ChurchTools liefert Appointments im Format:
 		// { "appointment": { "base": {...}, "calculated": {...} } }
 		// oder { "base": {...}, "calculated": {...} }
+		// ACHTUNG: In sync_phase2_appointments() wird bereits auf { "base": {...}, "calculated": {...} } normalisiert!
 
-		$base_data       = $appointment['appointment']['base'] ?? $appointment['base'] ?? null;
-		$calculated_data = $appointment['appointment']['calculated'] ?? $appointment['calculated'] ?? null;
+		$base_data       = $appointment['base'] ?? null;
+		$calculated_data = $appointment['calculated'] ?? null;
 
 		if ( ! $base_data ) {
+			Repro_CT_Suite_Logger::log( "extract_appointment_data: Keine base-Daten gefunden. Keys: " . implode( ', ', array_keys( $appointment ) ), 'error' );
 			return new WP_Error( 'invalid_format', 'Kein base-Objekt im Appointment gefunden' );
 		}
 
 		// Basis-Daten extrahieren
 		$appointment_id = $base_data['id'] ?? null;
-		$title          = $base_data['caption'] ?? $base_data['title'] ?? 'Unbenannter Termin';
-		$description    = $base_data['note'] ?? $base_data['description'] ?? '';
+		$title          = $base_data['title'] ?? $base_data['caption'] ?? 'Unbenannter Termin';
+		$description    = $base_data['description'] ?? $base_data['note'] ?? '';
+
+		Repro_CT_Suite_Logger::log( "extract_appointment_data: ID={$appointment_id}, Titel='{$title}'" );
 
 		// Berechnete Zeiten verwenden (falls vorhanden), sonst Basis-Zeiten
 		$start_raw = $calculated_data['startDate'] ?? $base_data['startDate'] ?? null;
 		$end_raw   = $calculated_data['endDate'] ?? $base_data['endDate'] ?? null;
 
 		if ( ! $start_raw ) {
+			Repro_CT_Suite_Logger::log( "extract_appointment_data: Kein Startdatum gefunden", 'error' );
 			return new WP_Error( 'missing_start', 'Kein Startdatum gefunden' );
 		}
 
 		// Zeiten normalisieren
 		$start_dt = gmdate( 'Y-m-d H:i:s', strtotime( $start_raw ) );
 		$end_dt   = $end_raw ? gmdate( 'Y-m-d H:i:s', strtotime( $end_raw ) ) : null;
+
+		Repro_CT_Suite_Logger::log( "extract_appointment_data: Start={$start_dt}, End={$end_dt}" );
 
 		// Eindeutige External-ID generieren
 		// Format: appointment_id + Startzeit für eindeutige Instanzen
@@ -833,6 +840,8 @@ class Repro_CT_Suite_Sync_Service {
 			'status'          => null,
 			'raw_payload'     => wp_json_encode( $appointment ),
 		);
+
+		Repro_CT_Suite_Logger::log( "extract_appointment_data: Event-Daten erfolgreich extrahiert (external_id={$external_id})" );
 
 		return $event_data;
 	}
