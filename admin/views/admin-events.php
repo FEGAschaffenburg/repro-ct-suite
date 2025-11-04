@@ -23,64 +23,43 @@ $page   = max( 1, (int) ( $_GET['paged'] ?? 1 ) );
 $limit  = 50;
 $offset = ($page - 1) * $limit;
 
-// Kombinierte Abfrage: Events + Appointments ohne Event
+// Kombinierte Abfrage: Alle Events (inkl. Appointments als Events)
 global $wpdb;
 $events_table = $wpdb->prefix . 'rcts_events';
-$appointments_table = $wpdb->prefix . 'rcts_appointments';
 
-$where_conditions = array();
-$params = array();
+// SQL mit prepare() korrekt bauen
+$sql = "SELECT id, external_id, appointment_id, calendar_id, title, description, start_datetime, end_datetime FROM {$events_table} WHERE 1=1";
 
-if ( ! empty( $from ) ) {
-	$where_conditions[] = 'start_datetime >= %s';
-	$params[] = $from;
+// Filter hinzufügen
+if ( ! empty( $from ) ) { 
+    $sql .= $wpdb->prepare( ' AND start_datetime >= %s', $from . ' 00:00:00' );
 }
-if ( ! empty( $to ) ) {
-	$where_conditions[] = 'start_datetime <= %s';
-	$params[] = $to;
+if ( ! empty( $to ) ) { 
+    $sql .= $wpdb->prepare( ' AND start_datetime <= %s', $to . ' 23:59:59' );
 }
 if ( ! empty( $calendar_filter ) ) {
-	$where_conditions[] = 'calendar_id = %s';
-	$params[] = $calendar_filter;
+    $sql .= $wpdb->prepare( ' AND calendar_id = %s', $calendar_filter );
 }
 
-$where_clause = count( $where_conditions ) > 0 ? 'WHERE ' . implode( ' AND ', $where_conditions ) : '';
+// Sortierung und Paginierung
+$sql .= ' ORDER BY start_datetime ASC';
+$sql .= $wpdb->prepare( ' LIMIT %d OFFSET %d', (int) $limit, (int) $offset );
 
-// UNION: Events + Appointments ohne event_id
-// WICHTIG: calendar_id in beiden Tabellen ist die externe ChurchTools Calendar-ID
-$sql = "
-	SELECT id, external_id, calendar_id, appointment_id, title, description, start_datetime, end_datetime, 'event' AS source
-	FROM {$events_table}
-	{$where_clause}
-	UNION ALL
-	SELECT id, external_id, calendar_id, NULL AS appointment_id, title, description, start_datetime, end_datetime, 'appointment' AS source
-	FROM {$appointments_table}
-	WHERE event_id IS NULL " . ( $where_clause ? 'AND ' . str_replace( 'WHERE ', '', $where_clause ) : '' ) . "
-	ORDER BY start_datetime ASC
-	LIMIT %d OFFSET %d
-";
-
-$params[] = (int) $limit;
-$params[] = (int) $offset;
-
-if ( count( $params ) > 0 ) {
-	$sql = $wpdb->prepare( $sql, ...$params );
-}
 $items = $wpdb->get_results( $sql );
 
 // Gesamtanzahl für Pagination
-$count_params = array_slice( $params, 0, -2 ); // ohne LIMIT/OFFSET
-$sql_count = "
-	SELECT COUNT(*) FROM (
-		SELECT id FROM {$events_table} {$where_clause}
-		UNION ALL
-		SELECT id FROM {$appointments_table} WHERE event_id IS NULL " . ( $where_clause ? 'AND ' . str_replace( 'WHERE ', '', $where_clause ) : '' ) . "
-	) AS combined
-";
-if ( count( $count_params ) > 0 ) {
-	$sql_count = $wpdb->prepare( $sql_count, ...$count_params );
+$sql_count = "SELECT COUNT(*) FROM {$events_table} WHERE 1=1";
+if ( ! empty( $from ) ) { 
+    $sql_count .= $wpdb->prepare( ' AND start_datetime >= %s', $from . ' 00:00:00' );
+}
+if ( ! empty( $to ) ) { 
+    $sql_count .= $wpdb->prepare( ' AND start_datetime <= %s', $to . ' 23:59:59' );
+}
+if ( ! empty( $calendar_filter ) ) {
+    $sql_count .= $wpdb->prepare( ' AND calendar_id = %s', $calendar_filter );
 }
 $total = (int) $wpdb->get_var( $sql_count );
+
 // Kalender für Filter-Dropdown
 $calendars = $calendars_repo->get_all();
 $total_pages = ceil( $total / $limit );
@@ -116,6 +95,11 @@ $total_pages = ceil( $total / $limit );
         <button class="repro-ct-suite-btn repro-ct-suite-btn-secondary" style="margin-left:10px;">
             <span class="dashicons dashicons-filter"></span> <?php esc_html_e( 'Filtern', 'repro-ct-suite' ); ?>
         </button>
+        <?php if ( ! empty( $from ) || ! empty( $to ) || ! empty( $calendar_filter ) ) : ?>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite-events' ) ); ?>" class="repro-ct-suite-btn" style="margin-left:10px;">
+                <span class="dashicons dashicons-dismiss"></span> <?php esc_html_e( 'Filter entfernen', 'repro-ct-suite' ); ?>
+            </a>
+        <?php endif; ?>
     </form>
 
     <div class="repro-ct-suite-card repro-ct-suite-mt-20">
@@ -128,24 +112,38 @@ $total_pages = ceil( $total / $limit );
                 <thead>
                     <tr>
                         <th style="width:12%;"><?php esc_html_e( 'Anfang', 'repro-ct-suite' ); ?></th>
-                        <th style="width:12%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
-                        <th style="width:23%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
-                        <th style="width:23%;"><?php esc_html_e( 'Beschreibung', 'repro-ct-suite' ); ?></th>
-                        <th style="width:14%;"><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
                         <th style="width:8%;"><?php esc_html_e( 'Typ', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'ID', 'repro-ct-suite' ); ?></th>
+                        <th style="width:20%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
+                        <th style="width:20%;"><?php esc_html_e( 'Beschreibung', 'repro-ct-suite' ); ?></th>
+                        <th style="width:12%;"><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
+                        <th style="width:12%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
                         <th style="width:8%;"><?php esc_html_e( 'Aktionen', 'repro-ct-suite' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php if ( empty( $items ) ) : ?>
-                    <tr><td colspan="7" style="text-align:center; padding:30px;">
+                    <tr><td colspan="8" style="text-align:center; padding:30px;">
                         <?php esc_html_e( 'Keine Termine gefunden. Führen Sie die Synchronisation aus, um Termine zu importieren.', 'repro-ct-suite' ); ?>
                     </td></tr>
                 <?php else : foreach ( $items as $item ) : 
-                    // Art bestimmen: Event (aus rcts_events) oder Termin (aus rcts_appointments ohne event_id)
-                    $type = $item->source === 'event' ? 'Event' : 'Termin';
-                    $type_class = $item->source === 'event' ? 'repro-ct-suite-badge-info' : 'repro-ct-suite-badge-success';
-                    $tooltip = $item->source === 'event' ? 'Event aus ChurchTools Events-API' : 'Termin aus Appointment (ohne Event-Verknüpfung)';
+                    // Typ bestimmen: Appointment wenn appointment_id gesetzt ist
+                    $is_appointment = ! empty( $item->appointment_id );
+                    $type_label = $is_appointment ? 'Appointment' : 'Event';
+                    
+                    // ChurchTools-IDs extrahieren
+                    if ( $is_appointment ) {
+                        // Bei Appointments: Beide IDs vorhanden
+                        $appointment_ct_id = $item->appointment_id;
+                        // Event-ID aus external_id extrahieren
+                        $parts = explode( '_', $item->external_id );
+                        $event_ct_id = $parts[0];
+                    } else {
+                        // Bei Events: Nur Event-ID vorhanden
+                        $parts = explode( '_', $item->external_id );
+                        $event_ct_id = $parts[0];
+                        $appointment_ct_id = null;
+                    }
                     
                     // Kalender holen über external_id (calendar_id in Events/Appointments ist die externe ChurchTools ID)
                     $calendar = $item->calendar_id ? $calendars_repo->get_by_external_id( $item->calendar_id ) : null;
@@ -163,6 +161,13 @@ $total_pages = ceil( $total / $limit );
                     
                     // Beschreibung kürzen
                     $description_preview = ! empty( $item->description ) ? wp_trim_words( strip_tags( $item->description ), 10, '...' ) : '—';
+                    
+                    // Kalender holen
+                    $calendar = $calendars_repo->get_by_id( $item->calendar_id );
+                    
+                    // Type badge
+                    $type_class = $is_appointment ? 'repro-ct-suite-badge-primary' : 'repro-ct-suite-badge-info';
+                    $tooltip = $is_appointment ? 'Appointment aus ChurchTools Appointments-API' : 'Event aus ChurchTools Events-API';
                     ?>
                     <tr>
                         <td>
@@ -170,12 +175,15 @@ $total_pages = ceil( $total / $limit );
                             <small><?php echo esc_html( $start_dt->format( 'H:i' ) ); ?> Uhr</small>
                         </td>
                         <td>
-                            <?php if ( $end_dt ) : ?>
-                                <strong><?php echo esc_html( $end_dt->format( get_option('date_format') ) ); ?></strong><br>
-                                <small><?php echo esc_html( $end_dt->format( 'H:i' ) ); ?> Uhr</small>
-                            <?php else : ?>
-                                —
+                            <span class="repro-ct-suite-badge <?php echo esc_attr( $type_class ); ?>" title="<?php echo esc_attr( $tooltip ); ?>">
+                                <?php echo esc_html( $type_label ); ?>
+                            </span>
+                        </td>
+                        <td>
+                            <?php if ( $appointment_ct_id ) : ?>
+                                <strong>A:</strong> <?php echo esc_html( $appointment_ct_id ); ?><br>
                             <?php endif; ?>
+                            <strong>E:</strong> <?php echo esc_html( $event_ct_id ); ?>
                         </td>
                         <td>
                             <strong><?php echo esc_html( $item->title ); ?></strong>
@@ -192,15 +200,18 @@ $total_pages = ceil( $total / $limit );
                             <?php endif; ?>
                         </td>
                         <td>
-                            <span class="repro-ct-suite-badge <?php echo esc_attr( $type_class ); ?>" title="<?php echo esc_attr( $tooltip ); ?>">
-                                <?php echo esc_html( $type ); ?>
-                            </span>
+                            <?php if ( $end_dt ) : ?>
+                                <strong><?php echo esc_html( $end_dt->format( get_option('date_format') ) ); ?></strong><br>
+                                <small><?php echo esc_html( $end_dt->format( 'H:i' ) ); ?> Uhr</small>
+                            <?php else : ?>
+                                —
+                            <?php endif; ?>
                         </td>
                         <td>
                             <button 
                                 class="repro-ct-suite-delete-item-btn" 
                                 data-id="<?php echo esc_attr( $item->id ); ?>" 
-                                data-type="<?php echo esc_attr( $item->source ); ?>"
+                                data-type="event"
                                 data-title="<?php echo esc_attr( $item->title ); ?>"
                                 title="<?php esc_attr_e( 'Löschen', 'repro-ct-suite' ); ?>"
                                 style="cursor:pointer; background:#dc3232; color:#fff; border:none; padding:4px 8px; border-radius:3px; font-size:12px;"
