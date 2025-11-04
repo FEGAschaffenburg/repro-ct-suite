@@ -492,9 +492,23 @@ class Repro_CT_Suite_Sync_Service {
 		$skipped_already_imported = 0;
 		$skipped_wrong_calendar = 0;
 
-		foreach ( $appointments as $appointment ) {
+		foreach ( $appointments as $appointment_data ) {
+			// ChurchTools API liefert zwei Formate:
+			// 1. NEU: { "appointment": { "base": {...}, "calculated": {...} }, "base": {...}, "calculated": {...} }
+			// 2. DEPRECATED: { "base": {...}, "calculated": {...} }
+			// Wir verwenden das neue Format wenn vorhanden, sonst deprecated
+			$appointment = isset( $appointment_data['appointment'] ) ? $appointment_data['appointment'] : $appointment_data;
+			
+			// Appointment-ID aus base extrahieren
+			$appointment_id = isset( $appointment['base']['id'] ) ? $appointment['base']['id'] : null;
+			
+			if ( ! $appointment_id ) {
+				Repro_CT_Suite_Logger::log( "Phase 2: Appointment ohne ID gefunden - übersprungen", 'warning' );
+				continue;
+			}
+			
 			// Prüfung 1: Bereits als Event importiert?
-			if ( in_array( $appointment['id'], $imported_appointment_ids ) ) {
+			if ( in_array( $appointment_id, $imported_appointment_ids ) ) {
 				$skipped_already_imported++;
 				continue;
 			}
@@ -505,7 +519,7 @@ class Repro_CT_Suite_Sync_Service {
 				continue;
 			}
 			
-			Repro_CT_Suite_Logger::log( "Phase 2: Zusätzliches Appointment {$appointment['id']} wird importiert" );
+			Repro_CT_Suite_Logger::log( "Phase 2: Zusätzliches Appointment {$appointment_id} wird importiert" );
 			
 			// Appointment verarbeiten und als Event speichern
 			$result = $this->process_appointment( $appointment, $external_calendar_id );
@@ -598,7 +612,8 @@ class Repro_CT_Suite_Sync_Service {
 	 */
 	private function is_appointment_relevant_for_calendar( $appointment, $external_calendar_id ) {
 		// Debug: Welche Kalender-Informationen hat das Appointment?
-		$appointment_title = isset( $appointment['caption'] ) ? $appointment['caption'] : 'Unbekannt';
+		$appointment_title = isset( $appointment['base']['title'] ) ? $appointment['base']['title'] : 
+			( isset( $appointment['base']['caption'] ) ? $appointment['base']['caption'] : 'Unbekannt' );
 		$has_calendar_id = isset( $appointment['calendar_id'] );
 		$has_calendar_obj = isset( $appointment['calendar'] );
 		$has_base_calendar = isset( $appointment['base']['calendar'] );
@@ -619,7 +634,7 @@ class Repro_CT_Suite_Sync_Service {
 			return $match;
 		}
 		
-		// Neu: base.calendar prüfen (aus der geloggten Struktur)
+		// Standard: base.calendar prüfen (laut ChurchTools API Doku)
 		if ( isset( $appointment['base']['calendar']['id'] ) ) {
 			$match = (string) $appointment['base']['calendar']['id'] === (string) $external_calendar_id;
 			Repro_CT_Suite_Logger::log( "base.calendar.id Check: {$appointment['base']['calendar']['id']} vs {$external_calendar_id} = " . ($match ? 'MATCH' : 'NO MATCH') );
