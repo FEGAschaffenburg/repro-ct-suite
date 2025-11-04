@@ -765,41 +765,61 @@ class Repro_CT_Suite_Sync_Service {
 	 * @return array|WP_Error { action: 'inserted'|'updated'|'skipped', event_id: int }
 	 */
 	private function process_appointment( $appointment, $calendar_id ) {
+		Repro_CT_Suite_Logger::log( "process_appointment: START für Kalender {$calendar_id}" );
+		
 		// Daten aus dem komplexen ChurchTools-Format extrahieren
 		$extract_result = $this->extract_appointment_data( $appointment, $calendar_id );
 		
 		if ( is_wp_error( $extract_result ) ) {
+			Repro_CT_Suite_Logger::log( "process_appointment: extract_appointment_data FEHLER: " . $extract_result->get_error_message(), 'error' );
 			return $extract_result;
 		}
 
 		$event_data = $extract_result;
+		
+		Repro_CT_Suite_Logger::log( "process_appointment: Event-Daten extrahiert, external_id={$event_data['external_id']}" );
 
 		// Event in die Datenbank speichern (Insert oder Update)
 		$exists = $this->events_repo->get_by_external_id( $event_data['external_id'] );
 		
 		if ( $exists ) {
+			Repro_CT_Suite_Logger::log( "process_appointment: Event existiert bereits (ID={$exists->id}), führe UPDATE aus" );
 			// Update
 			$success = $this->events_repo->update( $exists->id, $event_data );
 			$action = 'updated';
 			$event_id = $exists->id;
+			Repro_CT_Suite_Logger::log( "process_appointment: UPDATE " . ( $success ? "ERFOLGREICH" : "FEHLGESCHLAGEN" ) );
 		} else {
+			Repro_CT_Suite_Logger::log( "process_appointment: Event ist neu, führe INSERT aus" );
 			// Insert
 			$event_id = $this->events_repo->insert( $event_data );
 			$success = ! is_wp_error( $event_id );
 			$action = 'inserted';
+			
+			if ( $success ) {
+				Repro_CT_Suite_Logger::log( "process_appointment: INSERT ERFOLGREICH, neue Event-ID={$event_id}" );
+			} else {
+				$error_msg = is_wp_error( $event_id ) ? $event_id->get_error_message() : 'Unbekannter Fehler';
+				Repro_CT_Suite_Logger::log( "process_appointment: INSERT FEHLGESCHLAGEN: {$error_msg}", 'error' );
+			}
 		}
 
 		if ( ! $success || is_wp_error( $event_id ) ) {
+			Repro_CT_Suite_Logger::log( "process_appointment: Speichern fehlgeschlagen", 'error' );
 			return new WP_Error( 'save_failed', 'Event konnte nicht gespeichert werden' );
 		}
 
 		// Schedule-Repository aktualisieren (falls vorhanden)
 		if ( $this->schedule_repo && is_int( $event_id ) ) {
+			Repro_CT_Suite_Logger::log( "process_appointment: Aktualisiere Schedule-Repository für Event-ID={$event_id}" );
 			$event = $this->events_repo->get_by_id( $event_id );
 			if ( $event ) {
 				$this->schedule_repo->upsert_from_event( $event );
+				Repro_CT_Suite_Logger::log( "process_appointment: Schedule aktualisiert" );
 			}
 		}
+
+		Repro_CT_Suite_Logger::log( "process_appointment: ABGESCHLOSSEN - action={$action}, event_id={$event_id}" );
 
 		return array(
 			'action'   => $action,
