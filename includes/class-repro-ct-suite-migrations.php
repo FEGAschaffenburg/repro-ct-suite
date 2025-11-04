@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Migrations {
 
-	const DB_VERSION = '6';
+	const DB_VERSION = '7';
 	const OPTION_KEY = 'repro_ct_suite_db_version';
 
 	/**
@@ -54,6 +54,7 @@ class Repro_CT_Suite_Migrations {
 			is_public TINYINT(1) NOT NULL DEFAULT 0,
 			is_selected TINYINT(1) NOT NULL DEFAULT 0,
 			sort_order INT(11) NULL,
+			created_at DATETIME NOT NULL,
 			updated_at DATETIME NOT NULL,
 			raw_payload LONGTEXT NULL,
 			PRIMARY KEY  (id),
@@ -72,6 +73,7 @@ class Repro_CT_Suite_Migrations {
 			end_datetime DATETIME NULL,
 			location_name VARCHAR(255) NULL,
 			status VARCHAR(32) NULL,
+			created_at DATETIME NOT NULL,
 			updated_at DATETIME NOT NULL,
 			raw_payload LONGTEXT NULL,
 			PRIMARY KEY  (id),
@@ -92,6 +94,7 @@ class Repro_CT_Suite_Migrations {
 			start_datetime DATETIME NOT NULL,
 			end_datetime DATETIME NULL,
 			is_all_day TINYINT(1) NOT NULL DEFAULT 0,
+			created_at DATETIME NOT NULL,
 			updated_at DATETIME NOT NULL,
 			raw_payload LONGTEXT NULL,
 			PRIMARY KEY  (id),
@@ -110,6 +113,7 @@ class Repro_CT_Suite_Migrations {
 			status VARCHAR(32) NULL,
 			notes TEXT NULL,
 			start_datetime DATETIME NULL,
+			created_at DATETIME NOT NULL,
 			updated_at DATETIME NOT NULL,
 			PRIMARY KEY  (id),
 			KEY event_id (event_id),
@@ -135,6 +139,7 @@ class Repro_CT_Suite_Migrations {
 			is_all_day TINYINT(1) NOT NULL DEFAULT 0,
 			location_name VARCHAR(255) NULL,
 			status VARCHAR(32) NULL,
+			created_at DATETIME NOT NULL,
 			updated_at DATETIME NOT NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY unique_source (source_type, source_local_id),
@@ -157,6 +162,11 @@ class Repro_CT_Suite_Migrations {
 		if ( version_compare( $current, '6', '<' ) ) {
 			self::migrate_to_unified_sync_v6();
 		}
+		
+		// Migration von Version 6 auf 7: created_at Spalten hinzufügen
+		if ( version_compare( $current, '7', '<' ) ) {
+			self::migrate_add_created_at_v7();
+		}
 
 		// Platzhalter für zukünftige Migrationen (z.B. Backfill der Schedule-Tabelle)
 
@@ -166,6 +176,63 @@ class Repro_CT_Suite_Migrations {
 			error_log( 'Repro CT-Suite Migration Fehler: ' . $e->getMessage() );
 			throw $e; // Re-throw für AJAX Handler
 		}
+	}
+
+	/**
+	 * Migration V7: created_at Spalten hinzufügen
+	 * 
+	 * Fügt created_at Spalten zu allen Tabellen hinzu, damit die
+	 * Repository Base Class funktioniert.
+	 */
+	private static function migrate_add_created_at_v7() {
+		global $wpdb;
+		
+		$calendars_table = $wpdb->prefix . 'rcts_calendars';
+		$events_table = $wpdb->prefix . 'rcts_events';
+		$appointments_table = $wpdb->prefix . 'rcts_appointments';
+		$services_table = $wpdb->prefix . 'rcts_event_services';
+		$schedule_table = $wpdb->prefix . 'rcts_schedule';
+		
+		error_log( 'Repro CT-Suite: Starte Migration V7 - created_at Spalten hinzufügen' );
+		
+		$current_time = current_time( 'mysql' );
+		
+		// Calendars Tabelle
+		$column_exists = $wpdb->get_results( "SHOW COLUMNS FROM {$calendars_table} LIKE 'created_at'" );
+		if ( empty( $column_exists ) ) {
+			$wpdb->query( "ALTER TABLE {$calendars_table} ADD COLUMN created_at DATETIME NOT NULL DEFAULT '{$current_time}' AFTER sort_order" );
+			error_log( 'Migration V7: created_at Spalte zu Calendars-Tabelle hinzugefügt' );
+		}
+		
+		// Events Tabelle
+		$column_exists = $wpdb->get_results( "SHOW COLUMNS FROM {$events_table} LIKE 'created_at'" );
+		if ( empty( $column_exists ) ) {
+			$wpdb->query( "ALTER TABLE {$events_table} ADD COLUMN created_at DATETIME NOT NULL DEFAULT '{$current_time}' AFTER status" );
+			error_log( 'Migration V7: created_at Spalte zu Events-Tabelle hinzugefügt' );
+		}
+		
+		// Appointments Tabelle
+		$column_exists = $wpdb->get_results( "SHOW COLUMNS FROM {$appointments_table} LIKE 'created_at'" );
+		if ( empty( $column_exists ) ) {
+			$wpdb->query( "ALTER TABLE {$appointments_table} ADD COLUMN created_at DATETIME NOT NULL DEFAULT '{$current_time}' AFTER is_all_day" );
+			error_log( 'Migration V7: created_at Spalte zu Appointments-Tabelle hinzugefügt' );
+		}
+		
+		// Services Tabelle
+		$column_exists = $wpdb->get_results( "SHOW COLUMNS FROM {$services_table} LIKE 'created_at'" );
+		if ( empty( $column_exists ) ) {
+			$wpdb->query( "ALTER TABLE {$services_table} ADD COLUMN created_at DATETIME NOT NULL DEFAULT '{$current_time}' AFTER start_datetime" );
+			error_log( 'Migration V7: created_at Spalte zu Services-Tabelle hinzugefügt' );
+		}
+		
+		// Schedule Tabelle
+		$column_exists = $wpdb->get_results( "SHOW COLUMNS FROM {$schedule_table} LIKE 'created_at'" );
+		if ( empty( $column_exists ) ) {
+			$wpdb->query( "ALTER TABLE {$schedule_table} ADD COLUMN created_at DATETIME NOT NULL DEFAULT '{$current_time}' AFTER status" );
+			error_log( 'Migration V7: created_at Spalte zu Schedule-Tabelle hinzugefügt' );
+		}
+		
+		error_log( 'Migration V7: created_at Spalten erfolgreich hinzugefügt' );
 	}
 
 	/**

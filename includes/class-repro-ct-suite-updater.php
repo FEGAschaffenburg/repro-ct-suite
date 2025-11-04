@@ -114,6 +114,11 @@ class Repro_CT_Suite_Updater {
 		$current_normalized = $this->normalize_version( $current_version );
 		$latest_normalized  = $this->normalize_version( $latest_version );
 
+		error_log( '[DEBUG] GITHUB UPDATER - Version Comparison:' );
+		error_log( '[DEBUG] Current: ' . $current_version . ' -> ' . $current_normalized );
+		error_log( '[DEBUG] Latest:  ' . $latest_version . ' -> ' . $latest_normalized );
+		error_log( '[DEBUG] Update needed: ' . ( version_compare( $current_normalized, $latest_normalized, '<' ) ? 'YES' : 'NO' ) );
+
 		if ( version_compare( $current_normalized, $latest_normalized, '<' ) ) {
 			// Hole das erste Asset (sollte die ZIP-Datei sein).
 			$package_url = $release_info->zipball_url;
@@ -236,12 +241,18 @@ class Repro_CT_Suite_Updater {
 	 * @return object|false
 	 */
 	public function get_release_info() {
+		// DEBUG: GitHub API Aufruf protokollieren
+		error_log( '[DEBUG] GITHUB UPDATER - Release Info Check:' );
+		error_log( '[DEBUG] API URL: ' . $this->github_api_url . '/releases/latest' );
+		error_log( '[DEBUG] Access Token: ' . ( empty( $this->access_token ) ? 'LEER (öffentliches Repo)' : 'GESETZT' ) );
+
 		$cache_key   = 'repro_ct_suite_release_info';
 		$cache_time  = 300; // Sehr kurze Cache-Zeit für schnelle Updates (5 Minuten)
 		$cached_data = get_transient( $cache_key );
 
 		// Cache nur in Produktion nutzen, in Debug-Modus immer frisch abrufen
 		if ( false !== $cached_data && ! defined( 'WP_DEBUG' ) ) {
+			error_log( '[DEBUG] GITHUB UPDATER - Verwende Cache-Daten' );
 			return $cached_data;
 		}
 
@@ -258,18 +269,24 @@ class Repro_CT_Suite_Updater {
 			$args['headers']['Authorization'] = 'token ' . $this->access_token;
 		}
 
+		error_log( '[DEBUG] GITHUB UPDATER - Starte API-Aufruf...' );
 		$response = wp_remote_get( $url, $args );
 
 		if ( is_wp_error( $response ) ) {
 			// Logge Fehler für Debugging
+			$error_message = $response->get_error_message();
+			error_log( '[DEBUG] GITHUB UPDATER - API-Fehler: ' . $error_message );
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( 'Repro CT-Suite Update Check Fehler: ' . $response->get_error_message() );
+				error_log( 'Repro CT-Suite Update Check Fehler: ' . $error_message );
 			}
 			return false;
 		}
 
 		$response_code = wp_remote_retrieve_response_code( $response );
+		error_log( '[DEBUG] GITHUB UPDATER - HTTP Response Code: ' . $response_code );
+		
 		if ( 200 !== $response_code ) {
+			error_log( '[DEBUG] GITHUB UPDATER - HTTP Error: ' . $response_code );
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				error_log( 'Repro CT-Suite Update Check HTTP Error: ' . $response_code );
 			}
@@ -277,15 +294,20 @@ class Repro_CT_Suite_Updater {
 		}
 
 		$body = wp_remote_retrieve_body( $response );
+		error_log( '[DEBUG] GITHUB UPDATER - Response Body Length: ' . strlen( $body ) );
+		
 		$data = json_decode( $body );
 
 		if ( ! $data || isset( $data->message ) ) {
+			$json_error = $data->message ?? 'Invalid JSON';
+			error_log( '[DEBUG] GITHUB UPDATER - JSON Error: ' . $json_error );
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( 'Repro CT-Suite Update Check JSON Error: ' . ( $data->message ?? 'Invalid JSON' ) );
+				error_log( 'Repro CT-Suite Update Check JSON Error: ' . $json_error );
 			}
 			return false;
 		}
 
+		error_log( '[DEBUG] GITHUB UPDATER - Erfolg! Latest Version: ' . ( $data->tag_name ?? 'UNBEKANNT' ) );
 		set_transient( $cache_key, $data, $cache_time );
 
 		return $data;

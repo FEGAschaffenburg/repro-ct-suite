@@ -42,7 +42,7 @@ class Repro_CT_Suite_Sync_Service {
 	 * Vereinfachter Ansatz: Ruft pro Kalender /calendars/{id}/appointments ab
 	 * und speichert alle gefundenen Termine als Events.
 	 *
-	 * @param array $args { calendar_ids: int[] (lokale IDs), from: Y-m-d, to: Y-m-d }
+	 * @param array $args { calendar_ids: int[] (ChurchTools externe IDs), from: Y-m-d, to: Y-m-d }
 	 * @return array|WP_Error Statistiken oder WP_Error
 	 */
 	public function sync_events( $args = array() ) {
@@ -59,26 +59,22 @@ class Repro_CT_Suite_Sync_Service {
 
 		Repro_CT_Suite_Logger::header( 'UNIFIED SYNC START - Alle Termine' );
 		Repro_CT_Suite_Logger::log( 'Zeitraum: ' . $args['from'] . ' bis ' . $args['to'] );
-		Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (lokale IDs): ' . implode( ', ', $args['calendar_ids'] ) );
+		Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (ChurchTools-IDs): ' . implode( ', ', $args['calendar_ids'] ) );
 
-		// Lokale Kalender-IDs zu externen ChurchTools-IDs mappen
+		// Direkte Verwendung der ChurchTools-IDs (kein lokales Mapping mehr!)
 		$external_calendar_ids = array();
-		foreach ( $args['calendar_ids'] as $local_id ) {
-			$calendar = $this->calendars_repo->get_by_id( (int) $local_id );
-			if ( $calendar && ! empty( $calendar->external_id ) ) {
-				$external_calendar_ids[] = array(
-					'local_id'    => $local_id,
-					'external_id' => $calendar->external_id,
-					'name'        => $calendar->name,
-				);
-				Repro_CT_Suite_Logger::log( "Kalender-Mapping: Lokal-ID {$local_id} → Extern-ID {$calendar->external_id} ('{$calendar->name}')" );
-			} else {
-				Repro_CT_Suite_Logger::log( "WARNUNG: Kalender mit lokaler ID {$local_id} nicht gefunden oder hat keine externe ID", 'warning' );
-			}
+		foreach ( $args['calendar_ids'] as $external_id ) {
+			// Optional: Kalender-Name aus der lokalen Tabelle holen für bessere Logs
+			$calendar = $this->calendars_repo->get_by_external_id( $external_id );
+			$external_calendar_ids[] = array(
+				'external_id' => $external_id,
+				'name'        => $calendar ? $calendar->name : "Kalender {$external_id}",
+			);
+			Repro_CT_Suite_Logger::log( "Kalender: ChurchTools-ID {$external_id}" . ( $calendar ? " ('{$calendar->name}')" : '' ) );
 		}
 
 		if ( empty( $external_calendar_ids ) ) {
-			return new WP_Error( 'no_external_ids', __( 'Keine gültigen ChurchTools-Kalender-IDs gefunden.', 'repro-ct-suite' ) );
+			return new WP_Error( 'no_external_ids', __( 'Keine ChurchTools-Kalender-IDs übergeben.', 'repro-ct-suite' ) );
 		}
 
 		Repro_CT_Suite_Logger::log( 'Externe Kalender-IDs: ' . implode( ', ', array_column( $external_calendar_ids, 'external_id' ) ) );

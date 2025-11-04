@@ -42,6 +42,14 @@ class Repro_CT_Suite_Admin {
 		// Update-Check Handler
 		add_action( 'admin_init', array( $this, 'check_manual_update_request' ) );
 		
+		// Form Handler für Kalenderauswahl
+		add_action( 'admin_init', array( $this, 'handle_calendar_selection' ) );
+		
+		// Debug: Testen ob Hooks registriert werden
+		add_action( 'admin_init', function() {
+			Repro_CT_Suite_Logger::log( 'ADMIN_INIT Hook executed for calendar handler' );
+		} );
+		
 		// AJAX Handlers
 		add_action( 'wp_ajax_repro_ct_suite_clear_tables', array( $this, 'ajax_clear_tables' ) );
 		add_action( 'wp_ajax_repro_ct_suite_clear_single_table', array( $this, 'ajax_clear_single_table' ) );
@@ -341,8 +349,15 @@ class Repro_CT_Suite_Admin {
 	 * Handle calendar selection update.
 	 */
 	public function handle_calendar_selection() {
+		// Genereller Debug um zu sehen ob der Handler überhaupt aufgerufen wird
+		if ( isset( $_POST ) && ! empty( $_POST ) ) {
+			Repro_CT_Suite_Logger::log( 'HANDLE_CALENDAR_SELECTION - POST received with keys: ' . implode( ', ', array_keys( $_POST ) ) );
+		}
+		
 		// Kalenderauswahl speichern
 		if ( isset( $_POST['repro_ct_suite_action'] ) && $_POST['repro_ct_suite_action'] === 'save_calendar_selection' ) {
+			Repro_CT_Suite_Logger::log( 'CALENDAR SELECTION - Processing calendar selection save' );
+			
 			if ( ! check_admin_referer( 'repro_ct_suite_calendar_selection', 'repro_ct_suite_calendar_selection_nonce' ) ) {
 				wp_die( __( 'Sicherheitsprüfung fehlgeschlagen.', 'repro-ct-suite' ) );
 			}
@@ -359,7 +374,14 @@ class Repro_CT_Suite_Admin {
 				? array_map( 'intval', $_POST['selected_calendars'] )
 				: array();
 
+			// Debug-Ausgabe
+			Repro_CT_Suite_Logger::log( 'CALENDAR SELECTION SAVE:' );
+			Repro_CT_Suite_Logger::log( 'POST data: ' . print_r( $_POST['selected_calendars'] ?? 'NOT SET', true ) );
+			Repro_CT_Suite_Logger::log( 'Selected IDs: ' . implode( ', ', $selected_ids ) );
+
 			$result = $calendars_repo->update_selected( $selected_ids );
+
+			Repro_CT_Suite_Logger::log( 'Update result: ' . ( $result ? 'SUCCESS' : 'FAILED' ) );
 
 			if ( $result ) {
 				add_settings_error(
@@ -616,8 +638,25 @@ class Repro_CT_Suite_Admin {
 			$username = get_option( 'repro_ct_suite_ct_username', '' );
 			$encrypted_password = get_option( 'repro_ct_suite_ct_password', '' );
 			
+			// DEBUG: Credential-Status protokollieren
+			error_log( '[REPRO CT-SUITE] Credential Status:' );
+			error_log( '[REPRO CT-SUITE] - Tenant: "' . $tenant . '" (Länge: ' . strlen($tenant) . ')' );
+			error_log( '[REPRO CT-SUITE] - Username: "' . $username . '" (Länge: ' . strlen($username) . ')' );
+			error_log( '[REPRO CT-SUITE] - Encrypted Password: ' . (empty($encrypted_password) ? 'LEER' : 'VORHANDEN (' . strlen($encrypted_password) . ' Zeichen)') );
+			
 			// Passwort entschlüsseln
 			$password = Repro_CT_Suite_Crypto::decrypt( $encrypted_password );
+			error_log( '[REPRO CT-SUITE] - Decrypted Password: ' . (empty($password) ? 'LEER' : 'VORHANDEN (' . strlen($password) . ' Zeichen)') );
+			
+			// Prüfung ob alle Credentials vorhanden sind
+			if ( empty($tenant) || empty($username) || empty($password) ) {
+				error_log( '[REPRO CT-SUITE] ❌ FEHLENDE CREDENTIALS!' );
+				error_log( '[REPRO CT-SUITE] - Tenant leer: ' . (empty($tenant) ? 'JA' : 'NEIN') );
+				error_log( '[REPRO CT-SUITE] - Username leer: ' . (empty($username) ? 'JA' : 'NEIN') );
+				error_log( '[REPRO CT-SUITE] - Password leer: ' . (empty($password) ? 'JA' : 'NEIN') );
+			} else {
+				error_log( '[REPRO CT-SUITE] ✓ Alle Credentials vorhanden' );
+			}
 			
 			// CT_Client mit Credentials instanziieren
 			$ct_client = new Repro_CT_Suite_CT_Client( $tenant, $username, $password );
@@ -780,6 +819,12 @@ class Repro_CT_Suite_Admin {
 		$username = get_option( 'repro_ct_suite_ct_username', '' );
 		$password = get_option( 'repro_ct_suite_ct_password', '' );
 
+		// DEBUG: Credentials ausgeben
+		error_log( '[DEBUG] EVENTS SYNC - CREDENTIALS CHECK:' );
+		error_log( '[DEBUG] Tenant: "' . $tenant . '"' );
+		error_log( '[DEBUG] Username: "' . $username . '"' );
+		error_log( '[DEBUG] Password: ' . ( empty( $password ) ? 'LEER' : 'GESETZT (' . strlen( $password ) . ' Zeichen)' ) );
+
 		if ( empty( $tenant ) || empty( $username ) || empty( $password ) ) {
 			wp_send_json_error( array(
 				'message' => __( 'ChurchTools-Verbindung nicht konfiguriert. Bitte prüfen Sie die Einstellungen.', 'repro-ct-suite' )
@@ -794,15 +839,26 @@ class Repro_CT_Suite_Admin {
 		$schedule_repo  = new Repro_CT_Suite_Schedule_Repository();
 		$sync_service   = new Repro_CT_Suite_Sync_Service( $ct_client, $events_repo, $calendars_repo, $schedule_repo );
 
-		// Ausgewählte Kalender ermitteln
-		$selected_calendar_ids = $calendars_repo->get_selected_ids();
+		// Ausgewählte Kalender ermitteln (DIREKT externe ChurchTools-IDs)
+		$selected_external_calendar_ids = $calendars_repo->get_selected_external_ids();
 		
-		if ( empty( $selected_calendar_ids ) ) {
+		// DEBUG: Alle Kalender in der Datenbank anzeigen
+		error_log( '[DEBUG] CALENDAR DATABASE CHECK:' );
+		$all_calendars = $calendars_repo->get_all();
+		foreach ( $all_calendars as $cal ) {
+			error_log( sprintf( '[DEBUG] Kalender: ID=%d, external_id=%s, name=%s, is_selected=%d', 
+				$cal->id, $cal->external_id, $cal->name, $cal->is_selected ) );
+		}
+		error_log( '[DEBUG] Ausgewählte externe IDs: ' . implode( ', ', $selected_external_calendar_ids ) );
+		
+		if ( empty( $selected_external_calendar_ids ) ) {
 			wp_send_json_error( array(
 				'message' => __( 'Keine Kalender für den Import ausgewählt. Bitte wählen Sie Kalender in den Einstellungen aus.', 'repro-ct-suite' )
 			) );
 			return;
 		}
+
+		Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe ChurchTools-IDs): ' . implode( ', ', $selected_external_calendar_ids ) );
 
 		// Sync-Zeitraum
 		$sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
@@ -811,11 +867,10 @@ class Repro_CT_Suite_Admin {
 		$to   = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_to_days * DAY_IN_SECONDS ) );
 
 		Repro_CT_Suite_Logger::log( 'Zeitraum: von ' . $from . ' bis ' . $to );
-		Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (lokale IDs): ' . implode( ',', $selected_calendar_ids ) );
 
-		// Sync ausführen
+		// Sync ausführen mit externen ChurchTools-IDs (kein lokales Mapping mehr!)
 		$result = $sync_service->sync_events( array(
-			'calendar_ids' => $selected_calendar_ids,
+			'calendar_ids' => $selected_external_calendar_ids, // Direkt ChurchTools-IDs!
 			'from'         => $from,
 			'to'           => $to,
 		) );

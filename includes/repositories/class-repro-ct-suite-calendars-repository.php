@@ -100,13 +100,26 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 	}
 
 	/**
-	 * Holt IDs der ausgewählten Kalender
+	 * Holt die IDs der ausgewählten Kalender (lokale WordPress-IDs)
 	 *
 	 * @return array Liste der Calendar-IDs.
 	 */
 	public function get_selected_ids() {
 		$sql = $this->db->prepare(
 			"SELECT id FROM {$this->table} WHERE is_selected=%d ORDER BY sort_order ASC",
+			1
+		);
+		return $this->db->get_col( $sql );
+	}
+
+	/**
+	 * Holt die externen IDs der ausgewählten Kalender (ChurchTools-IDs)
+	 *
+	 * @return array Liste der externen Calendar-IDs aus ChurchTools.
+	 */
+	public function get_selected_external_ids() {
+		$sql = $this->db->prepare(
+			"SELECT external_id FROM {$this->table} WHERE is_selected=%d ORDER BY sort_order ASC",
 			1
 		);
 		return $this->db->get_col( $sql );
@@ -136,16 +149,24 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 	 * @return bool Erfolg.
 	 */
 	public function update_selected( $selected_ids ) {
+		// Logger laden falls nicht verfügbar
+		if ( ! class_exists( 'Repro_CT_Suite_Logger' ) ) {
+			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'class-repro-ct-suite-logger.php';
+		}
+		
+		Repro_CT_Suite_Logger::log( 'CALENDAR REPO - update_selected called with IDs: ' . implode( ', ', $selected_ids ) );
+		
 		// Alle deselektieren
-		$this->db->update(
-			$this->table,
-			array( 'is_selected' => 0 ),
-			array( '1' => '1' )
+		$deselect_result = $this->db->query(
+			"UPDATE {$this->table} SET is_selected = 0"
 		);
+		
+		Repro_CT_Suite_Logger::log( 'CALENDAR REPO - Deselect all result: ' . ( $deselect_result !== false ? 'SUCCESS' : 'FAILED' ) );
 
 		// Ausgewählte setzen
 		if ( empty( $selected_ids ) ) {
-			return true;
+			Repro_CT_Suite_Logger::log( 'CALENDAR REPO - No calendars to select, returning true' );
+			return $deselect_result !== false;
 		}
 
 		$ids_placeholder = implode( ',', array_fill( 0, count( $selected_ids ), '%d' ) );
@@ -154,7 +175,10 @@ class Repro_CT_Suite_Calendars_Repository extends Repro_CT_Suite_Repository_Base
 			...$selected_ids
 		);
 
-		return (bool) $this->db->query( $sql );
+		$select_result = $this->db->query( $sql );
+		Repro_CT_Suite_Logger::log( 'CALENDAR REPO - Select result: ' . ( $select_result !== false ? 'SUCCESS' : 'FAILED' ) );
+
+		return $deselect_result !== false && $select_result !== false;
 	}
 
 	/**

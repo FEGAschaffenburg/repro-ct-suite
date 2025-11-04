@@ -103,6 +103,7 @@ $selected_count = $calendars_repo->count_selected();
 										<input type="checkbox" id="select-all-calendars">
 									</th>
 									<th><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
+									<th><?php esc_html_e( 'ChurchTools-ID', 'repro-ct-suite' ); ?></th>
 									<th><?php esc_html_e( 'Sichtbarkeit', 'repro-ct-suite' ); ?></th>
 									<th><?php esc_html_e( 'Farbe', 'repro-ct-suite' ); ?></th>
 								</tr>
@@ -124,6 +125,9 @@ $selected_count = $calendars_repo->count_selected();
 											<?php if ( $calendar->name !== $calendar->name_translated && ! empty( $calendar->name_translated ) ) : ?>
 												<br><span class="description"><?php echo esc_html( $calendar->name ); ?></span>
 											<?php endif; ?>
+										</td>
+										<td>
+											<code><?php echo esc_html( $calendar->external_id ); ?></code>
 										</td>
 										<td>
 											<?php if ( $calendar->is_public ) : ?>

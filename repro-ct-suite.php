@@ -3,7 +3,7 @@
  * Plugin Name:       Repro CT-Suite
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
  * Description:       ChurchTools-Integration für WordPress. Synchronisiert Termine und Events aus ChurchTools.
- * Version:           0.4.2.0
+ * Version:           0.4.4.0
  * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            FEGAschaffenburg
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Version mit 4 Zahlen: Major.Minor.Patch.Build
  * Build-Nummer erhöhen bei minimalen Änderungen
  */
-define( 'REPRO_CT_SUITE_VERSION', '0.4.2.0' );
+	define( 'REPRO_CT_SUITE_VERSION', '0.4.4.0' );
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 define( 'REPRO_CT_SUITE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'REPRO_CT_SUITE_URL', plugin_dir_url( __FILE__ ) );
@@ -68,14 +68,23 @@ require_once REPRO_CT_SUITE_PATH . 'includes/class-repro-ct-suite-updater.php';
  * übergeben werden. Für öffentliche Repositories ist dies nicht erforderlich.
  */
 if ( is_admin() ) {
-	$github_token = ''; // Leer lassen für öffentliche Repositories
-	
-	new Repro_CT_Suite_Updater(
-		__FILE__,
-		'FEGAschaffenburg',
-		'repro-ct-suite',
-		$github_token
-	);
+	// GitHub Updater in späterem Hook laden um "Headers already sent" zu vermeiden
+	add_action( 'admin_init', function() {
+		$github_token = ''; // Leer lassen für öffentliche Repositories
+		
+		// Update-Cache löschen um neue Version zu erkennen
+		if ( isset( $_GET['force-check'] ) ) {
+			delete_transient( 'repro_ct_suite_github_release_cache' );
+			delete_site_transient( 'update_plugins' );
+		}
+		
+		new Repro_CT_Suite_Updater(
+			__FILE__,
+			'FEGAschaffenburg',
+			'repro-ct-suite',
+			$github_token
+		);
+	});
 	
 	// Moderates Cache-Clearing nur für Plugin-Updates  
 	add_action( 'init', function() {
