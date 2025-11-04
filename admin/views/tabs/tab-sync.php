@@ -27,11 +27,27 @@ $sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
 $sync_to_days   = get_option( 'repro_ct_suite_sync_to_days', 90 );
 
 // Kalender laden
-require_once plugin_dir_path( dirname( dirname( dirname( __FILE__ ) ) ) ) . 'includes/repositories/class-repro-ct-suite-repository-base.php';
-require_once plugin_dir_path( dirname( dirname( dirname( __FILE__ ) ) ) ) . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
-$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
-$calendars = $calendars_repo->get_all();
-$selected_count = $calendars_repo->count_selected();
+$calendars = array();
+$selected_count = 0;
+$calendars_repo = null;
+
+try {
+	$plugin_path = defined( 'REPRO_CT_SUITE_PATH' ) ? REPRO_CT_SUITE_PATH : plugin_dir_path( dirname( dirname( dirname( __FILE__ ) ) ) );
+	
+	if ( ! class_exists( 'Repro_CT_Suite_Repository_Base' ) ) {
+		require_once $plugin_path . 'includes/repositories/class-repro-ct-suite-repository-base.php';
+	}
+	
+	if ( ! class_exists( 'Repro_CT_Suite_Calendars_Repository' ) ) {
+		require_once $plugin_path . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
+	}
+	
+	$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
+	$calendars = $calendars_repo->get_all();
+	$selected_count = $calendars_repo->count_selected();
+} catch ( Exception $e ) {
+	error_log( 'Repro CT-Suite: Fehler beim Laden der Kalender in tab-sync.php: ' . $e->getMessage() );
+}
 ?>
 
 <div class="repro-ct-suite-sync-wrapper">
