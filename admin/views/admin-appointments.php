@@ -25,27 +25,26 @@ $offset = ($page - 1) * $limit;
 // Events holen
 global $wpdb;
 $events_table = $wpdb->prefix . 'rcts_events';
-$where = 'WHERE 1=1';
-$params = array();
-// Filter mit korrektem DATETIME Format
+
+// SQL mit prepare() korrekt bauen
+$sql = "SELECT id, external_id, title, description, start_datetime, end_datetime, location_name FROM {$events_table} WHERE 1=1";
+
+// Filter hinzufügen
 if ( ! empty( $from ) ) { 
-    $where .= ' AND start_datetime >= %s'; 
-    $params[] = $from . ' 00:00:00';  // Tagesanfang
+    $sql .= $wpdb->prepare( ' AND start_datetime >= %s', $from . ' 00:00:00' );
 }
 if ( ! empty( $to ) ) { 
-    $where .= ' AND start_datetime <= %s'; 
-    $params[] = $to . ' 23:59:59';  // Tagesende
+    $sql .= $wpdb->prepare( ' AND start_datetime <= %s', $to . ' 23:59:59' );
 }
-$params[] = (int) $limit;
-$params[] = (int) $offset;
-$sql_events = $wpdb->prepare(
-    "SELECT id, external_id, title, description, start_datetime, end_datetime, location_name FROM {$events_table} {$where} ORDER BY start_datetime ASC LIMIT %d OFFSET %d",
-    ...$params
-);
-$items = $wpdb->get_results( $sql_events );
+
+// Sortierung und Paginierung
+$sql .= ' ORDER BY start_datetime ASC';
+$sql .= $wpdb->prepare( ' LIMIT %d OFFSET %d', (int) $limit, (int) $offset );
+
+$items = $wpdb->get_results( $sql );
 
 // Debug: SQL-Query und Anzahl loggen
-error_log( 'Termine-Filter SQL: ' . $sql_events );
+error_log( 'Termine-Filter SQL: ' . $sql );
 error_log( 'Termine gefunden: ' . count( $items ) );
 
 ?>
