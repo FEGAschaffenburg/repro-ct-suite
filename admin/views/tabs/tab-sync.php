@@ -16,21 +16,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// SOFORTIGE Ausgabe um zu testen ob Datei überhaupt geladen wird
-echo '<div style="background: red; color: white; padding: 20px; font-size: 20px; font-weight: bold;">DATEI WIRD GELADEN!</div>';
-flush();
-
-// DEBUG: Prüfen ob Datei geladen wird
-error_log( 'Repro CT-Suite: tab-sync.php wird geladen' );
-
 // Credentials prüfen
 $ct_tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
 $ct_username = get_option( 'repro_ct_suite_ct_username', '' );
 $ct_password = get_option( 'repro_ct_suite_ct_password', '' );
 $is_configured = ! empty( $ct_tenant ) && ! empty( $ct_username ) && ! empty( $ct_password );
-
-// DEBUG: Zeige exakte Werte
-error_log( 'DEBUG Credentials: Tenant="' . $ct_tenant . '", Username="' . $ct_username . '", Password=' . ( empty( $ct_password ) ? 'LEER' : 'VORHANDEN' ) );
 
 // Zeitraum-Einstellungen
 $sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
@@ -59,17 +49,6 @@ try {
 	error_log( 'Repro CT-Suite: Fehler beim Laden der Kalender in tab-sync.php: ' . $e->getMessage() );
 }
 ?>
-
-<!-- DEBUG: Tab Sync wird gerendert -->
-<div style="background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 20px;">
-	<strong>DEBUG:</strong> Tab Sync geladen.<br>
-	<strong>Tenant:</strong> "<?php echo esc_html( $ct_tenant ); ?>"<br>
-	<strong>Username:</strong> "<?php echo esc_html( $ct_username ); ?>"<br>
-	<strong>Password:</strong> <?php echo empty( $ct_password ) ? 'LEER' : 'VORHANDEN (' . strlen( $ct_password ) . ' Zeichen)'; ?><br>
-	<strong>Configured:</strong> <?php echo $is_configured ? 'Ja' : 'Nein'; ?> | 
-	<strong>Kalender:</strong> <?php echo count( $calendars ); ?> | 
-	<strong>Ausgewählt:</strong> <?php echo $selected_count; ?>
-</div>
 
 <div class="repro-ct-suite-sync-wrapper">
 

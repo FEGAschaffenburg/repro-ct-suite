@@ -20,17 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Aktuellen Tab ermitteln (Standard: dashboard)
 $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
-
-// DEBUG
-error_log( 'Repro CT-Suite: Active Tab = ' . $active_tab );
 ?>
 
 <div class="wrap repro-ct-suite-admin-wrapper">
-	
-	<!-- DEBUG: Active Tab Anzeige -->
-	<div style="background: #d1ecf1; border: 1px solid #0c5460; padding: 10px; margin-bottom: 10px;">
-		<strong>DEBUG:</strong> Active Tab = <code><?php echo esc_html( $active_tab ); ?></code>
-	</div>
 	
 	<!-- Header-Bereich -->
 	<div class="repro-ct-suite-header">
