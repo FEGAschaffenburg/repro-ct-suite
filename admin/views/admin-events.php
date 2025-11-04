@@ -71,44 +71,78 @@ $total_pages = ceil( $total / $limit );
         <p><?php esc_html_e( 'Übersicht aller Termine aus ChurchTools über das neue unified sync system.', 'repro-ct-suite' ); ?></p>
     </div>
 
-    <form method="get" class="repro-ct-suite-mt-10">
-        <input type="hidden" name="page" value="repro-ct-suite-events" />
-        <label>
-            <?php esc_html_e( 'Von', 'repro-ct-suite' ); ?>
-            <input type="date" name="from" value="<?php echo esc_attr( $from ); ?>" />
-        </label>
-        <label style="margin-left:10px;">
-            <?php esc_html_e( 'Bis', 'repro-ct-suite' ); ?>
-            <input type="date" name="to" value="<?php echo esc_attr( $to ); ?>" />
-        </label>
-        <label style="margin-left:10px;">
-            <?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?>
-            <select name="calendar_id">
-                <option value=""><?php esc_html_e( 'Alle', 'repro-ct-suite' ); ?></option>
-                <?php foreach ( $calendars as $cal ) : ?>
-                    <option value="<?php echo esc_attr( $cal->calendar_id ); ?>" <?php selected( $calendar_filter, $cal->calendar_id ); ?>>
-                        <?php echo esc_html( $cal->name ); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <button class="repro-ct-suite-btn repro-ct-suite-btn-secondary" style="margin-left:10px;">
-            <span class="dashicons dashicons-filter"></span> <?php esc_html_e( 'Filtern', 'repro-ct-suite' ); ?>
-        </button>
-        <?php if ( ! empty( $from ) || ! empty( $to ) || ! empty( $calendar_filter ) ) : ?>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite-events' ) ); ?>" class="repro-ct-suite-btn" style="margin-left:10px;">
-                <span class="dashicons dashicons-dismiss"></span> <?php esc_html_e( 'Filter entfernen', 'repro-ct-suite' ); ?>
-            </a>
-        <?php endif; ?>
-    </form>
-
     <div class="repro-ct-suite-card repro-ct-suite-mt-20">
-        <div class="repro-ct-suite-card-header">
-            <h3><?php esc_html_e( 'Terminkalender-Übersicht', 'repro-ct-suite' ); ?></h3>
-            <span class="repro-ct-suite-badge"><?php printf( esc_html__( '%d Einträge', 'repro-ct-suite' ), $total ); ?></span>
-        </div>
-        <div class="repro-ct-suite-card-body">
-            <table class="widefat fixed striped">
+        <div class="repro-ct-suite-card-body" style="padding:0;">
+            
+            <!-- Filter in Tabbar-Form integriert -->
+            <form method="get" style="padding: 15px; background: #f9f9f9; border-bottom: 1px solid #ddd;">
+                <input type="hidden" name="page" value="repro-ct-suite-events" />
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <label style="display: flex; flex-direction: column; min-width: 150px;">
+                        <span style="font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #666;">
+                            <?php esc_html_e( 'Von', 'repro-ct-suite' ); ?>
+                        </span>
+                        <input type="date" name="from" value="<?php echo esc_attr( $from ); ?>" style="padding: 6px;" />
+                    </label>
+                    <label style="display: flex; flex-direction: column; min-width: 150px;">
+                        <span style="font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #666;">
+                            <?php esc_html_e( 'Bis', 'repro-ct-suite' ); ?>
+                        </span>
+                        <input type="date" name="to" value="<?php echo esc_attr( $to ); ?>" style="padding: 6px;" />
+                    </label>
+                    <label style="display: flex; flex-direction: column; min-width: 200px; flex: 1;">
+                        <span style="font-size: 11px; font-weight: 600; margin-bottom: 4px; color: #666;">
+                            <?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?>
+                        </span>
+                        <select name="calendar_id" style="padding: 6px;">
+                            <option value=""><?php esc_html_e( 'Alle Kalender', 'repro-ct-suite' ); ?></option>
+                            <?php foreach ( $calendars as $cal ) : ?>
+                                <option value="<?php echo esc_attr( $cal->calendar_id ); ?>" <?php selected( $calendar_filter, $cal->calendar_id ); ?>>
+                                    <?php echo esc_html( $cal->name ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <div style="display: flex; gap: 10px; align-items: flex-end;">
+                        <button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-primary" style="white-space: nowrap;">
+                            <span class="dashicons dashicons-filter"></span> <?php esc_html_e( 'Filtern', 'repro-ct-suite' ); ?>
+                        </button>
+                        <?php if ( ! empty( $from ) || ! empty( $to ) || ! empty( $calendar_filter ) ) : ?>
+                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=repro-ct-suite-events' ) ); ?>" 
+                               class="repro-ct-suite-btn repro-ct-suite-btn-secondary" 
+                               style="white-space: nowrap;">
+                                <span class="dashicons dashicons-dismiss"></span> <?php esc_html_e( 'Zurücksetzen', 'repro-ct-suite' ); ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php if ( ! empty( $from ) || ! empty( $to ) || ! empty( $calendar_filter ) ) : ?>
+                    <div style="margin-top: 10px; padding: 8px 12px; background: #fff; border-radius: 4px; font-size: 12px; color: #666;">
+                        <strong><?php esc_html_e( 'Aktive Filter:', 'repro-ct-suite' ); ?></strong>
+                        <?php if ( ! empty( $from ) ) : ?>
+                            <span style="margin-left: 10px;">Von: <strong><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $from ) ) ); ?></strong></span>
+                        <?php endif; ?>
+                        <?php if ( ! empty( $to ) ) : ?>
+                            <span style="margin-left: 10px;">Bis: <strong><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $to ) ) ); ?></strong></span>
+                        <?php endif; ?>
+                        <?php if ( ! empty( $calendar_filter ) ) : 
+                            $selected_cal = null;
+                            foreach ( $calendars as $cal ) {
+                                if ( $cal->calendar_id === $calendar_filter ) {
+                                    $selected_cal = $cal;
+                                    break;
+                                }
+                            }
+                            if ( $selected_cal ) : ?>
+                                <span style="margin-left: 10px;">Kalender: <strong><?php echo esc_html( $selected_cal->name ); ?></strong></span>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </form>
+            
+            <!-- Tabelle -->
+            <table class="widefat fixed striped" style="margin: 0;">
                 <thead>
                     <tr>
                         <th style="width:12%;"><?php esc_html_e( 'Anfang', 'repro-ct-suite' ); ?></th>
@@ -227,11 +261,13 @@ $total_pages = ceil( $total / $limit );
                 <?php endforeach; endif; ?>
                 </tbody>
             </table>
+        </div>
+    </div>
 
-            <?php if ( $total_pages > 1 ) : ?>
-                <div class="tablenav" style="margin-top:20px;">
-                    <div class="tablenav-pages">
-                        <span class="displaying-num"><?php printf( esc_html__( '%d Einträge', 'repro-ct-suite' ), $total ); ?></span>
+    <?php if ( $total_pages > 1 ) : ?>
+        <div class="tablenav repro-ct-suite-mt-20">
+            <div class="tablenav-pages">
+                <span class="displaying-num"><?php printf( esc_html__( '%d Einträge', 'repro-ct-suite' ), $total ); ?></span>
                         <?php
                         $base_url = add_query_arg( array(
                             'page' => 'repro-ct-suite-events',
@@ -251,8 +287,6 @@ $total_pages = ceil( $total / $limit );
                     </div>
                 </div>
             <?php endif; ?>
-        </div>
-    </div>
 
     <div class="repro-ct-suite-card repro-ct-suite-mt-20">
         <div class="repro-ct-suite-card-header">
