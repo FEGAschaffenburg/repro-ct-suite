@@ -127,23 +127,19 @@ $total_pages = ceil( $total / $limit );
                         <?php esc_html_e( 'Keine Termine gefunden. Führen Sie die Synchronisation aus, um Termine zu importieren.', 'repro-ct-suite' ); ?>
                     </td></tr>
                 <?php else : foreach ( $items as $item ) : 
-                    // Typ bestimmen: Appointment wenn appointment_id gesetzt ist
+                    // Typ bestimmen:
+                    // - Appointment: Hat appointment_id gesetzt (aus Appointments-API) 
+                    // - Event: Hat keine appointment_id (nur aus Events-API)
                     $is_appointment = ! empty( $item->appointment_id );
                     $type_label = $is_appointment ? 'Appointment' : 'Event';
                     
-                    // ChurchTools-IDs extrahieren
-                    if ( $is_appointment ) {
-                        // Bei Appointments: Beide IDs vorhanden
-                        $appointment_ct_id = $item->appointment_id;
-                        // Event-ID aus external_id extrahieren
-                        $parts = explode( '_', $item->external_id );
-                        $event_ct_id = $parts[0];
-                    } else {
-                        // Bei Events: Nur Event-ID vorhanden
-                        $parts = explode( '_', $item->external_id );
-                        $event_ct_id = $parts[0];
-                        $appointment_ct_id = null;
-                    }
+                    // ChurchTools-IDs extrahieren:
+                    // Event-ID ist immer in external_id enthalten (Format: EventID_Timestamp)
+                    $parts = explode( '_', $item->external_id );
+                    $event_ct_id = $parts[0];
+                    
+                    // Appointment-ID ist nur bei Appointments gesetzt
+                    $appointment_ct_id = $is_appointment ? $item->appointment_id : null;
                     
                     // Kalender holen über external_id (calendar_id in Events/Appointments ist die externe ChurchTools ID)
                     $calendar = $item->calendar_id ? $calendars_repo->get_by_external_id( $item->calendar_id ) : null;

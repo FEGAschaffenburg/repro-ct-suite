@@ -95,23 +95,19 @@ error_log( 'Termine gefunden: ' . count( $items ) );
                 <?php if ( empty( $items ) ) : ?>
                     <tr><td colspan="7"><?php esc_html_e( 'Keine Einträge gefunden.', 'repro-ct-suite' ); ?></td></tr>
                 <?php else : foreach ( $items as $row ) : 
-                    // Typ bestimmen: Appointment wenn appointment_id gesetzt ist
+                    // Typ bestimmen: 
+                    // - Appointment: Hat appointment_id gesetzt (aus Appointments-API)
+                    // - Event: Hat keine appointment_id (nur aus Events-API)
                     $is_appointment = ! empty( $row->appointment_id );
                     $type_label = $is_appointment ? 'Appointment' : 'Event';
                     
-                    // ChurchTools-IDs extrahieren
-                    if ( $is_appointment ) {
-                        // Bei Appointments: Beide IDs vorhanden
-                        $appointment_ct_id = $row->appointment_id;
-                        // Event-ID aus external_id extrahieren
-                        $parts = explode( '_', $row->external_id );
-                        $event_ct_id = $parts[0];
-                    } else {
-                        // Bei Events: Nur Event-ID vorhanden
-                        $parts = explode( '_', $row->external_id );
-                        $event_ct_id = $parts[0];
-                        $appointment_ct_id = null;
-                    }
+                    // ChurchTools-IDs extrahieren:
+                    // Event-ID ist immer in external_id enthalten (Format: EventID_Timestamp)
+                    $parts = explode( '_', $row->external_id );
+                    $event_ct_id = $parts[0];
+                    
+                    // Appointment-ID ist nur bei Appointments gesetzt
+                    $appointment_ct_id = $is_appointment ? $row->appointment_id : null;
                 ?>
                     <tr>
                         <td><?php echo esc_html( date_i18n( get_option('date_format') . ' H:i', strtotime( $row->start_datetime ) ) ); ?></td>
