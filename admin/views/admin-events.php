@@ -127,10 +127,10 @@ $total_pages = ceil( $total / $limit );
                         <?php esc_html_e( 'Keine Termine gefunden. Führen Sie die Synchronisation aus, um Termine zu importieren.', 'repro-ct-suite' ); ?>
                     </td></tr>
                 <?php else : foreach ( $items as $item ) : 
-                    // Typ bestimmen:
-                    // - Termin: Hat appointment_id gesetzt UND nicht NULL (reines Appointment aus Appointments-API)
-                    // - Event: Hat keine appointment_id oder appointment_id ist NULL (Event aus Events-API)
-                    $is_appointment = isset( $item->appointment_id ) && $item->appointment_id !== null && $item->appointment_id !== '';
+                    // Typ bestimmen anhand der event_id-Struktur:
+                    // - Event: event_id ist eine reine Zahl (z.B. "2011") - ChurchTools Event-ID
+                    // - Termin: event_id ist zusammengesetzt mit Unterstrich (z.B. "5011_20251109_103000")
+                    $is_appointment = strpos( $item->event_id, '_' ) !== false;
                     $type_label = $is_appointment ? 'Termin' : 'Event';
                     
                     // ChurchTools-IDs extrahieren:
