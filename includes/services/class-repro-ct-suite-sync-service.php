@@ -727,10 +727,19 @@ class Repro_CT_Suite_Sync_Service {
 			return new WP_Error( 'missing_event_id', 'Event hat keine ID' );
 		}
 
+		// Appointment-ID extrahieren (falls Event ein Appointment hat)
+		$appointment_id = null;
+		if ( isset( $event['appointment']['id'] ) ) {
+			$appointment_id = $event['appointment']['id'];
+		} elseif ( isset( $event['appointmentId'] ) ) {
+			$appointment_id = $event['appointmentId'];
+		}
+
 		// Basis-Daten extrahieren
 		$event_data = array(
 			'event_id'       => (string) $event['id'],
 			'calendar_id'    => $calendar_id,
+			'appointment_id' => $appointment_id,
 			'title'          => $event['name'] ?? $event['designation'] ?? 'Unbenannt',
 			'description'    => $event['note'] ?? '',
 			'location_name'  => '',
