@@ -109,7 +109,7 @@ class Repro_CT_Suite_Sync_Service {
 			// Events für diesen Kalender filtern
 			$relevant_events = array();
 			foreach ( $all_events as $event ) {
-				if ( $this->is_event_relevant_for_calendar( $event, $calendar_id ) ) {
+				if ( $this->is_event_relevant_for_calendar( $event, $external_id ) ) {
 					$relevant_events[] = $event;
 				}
 			}
@@ -118,10 +118,10 @@ class Repro_CT_Suite_Sync_Service {
 			Repro_CT_Suite_Logger::log( "Kalender {$external_id}: {$events_found} relevante Events gefunden" );
 			
 			// Events verarbeiten (mit args für Phase 2 Appointments)
-			$result = $this->process_calendar_events( $relevant_events, $calendar_id, $args );
+			$result = $this->process_calendar_events( $relevant_events, $external_id, $args );
 			
 			if ( is_wp_error( $result ) ) {
-				Repro_CT_Suite_Logger::log( "Fehler bei Kalender {$calendar_id}: " . $result->get_error_message(), 'error' );
+				Repro_CT_Suite_Logger::log( "Fehler bei Kalender {$external_id}: " . $result->get_error_message(), 'error' );
 				$stats['errors']++;
 				continue; // Nächsten Kalender versuchen
 			}
