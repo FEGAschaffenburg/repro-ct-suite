@@ -423,6 +423,7 @@ class Repro_CT_Suite_Sync_Service {
 	 * @return array|WP_Error Phase 2 Statistiken
 	 */
 	private function sync_phase2_appointments( $external_calendar_id, $args, $imported_appointment_ids ) {
+		Repro_CT_Suite_Logger::log( "========================================" );
 		Repro_CT_Suite_Logger::log( "Phase 2: Appointments API für Kalender {$external_calendar_id}" );
 		Repro_CT_Suite_Logger::log( "Phase 2: Bereits importierte Appointment-IDs: " . implode( ', ', $imported_appointment_ids ) );
 		
@@ -432,8 +433,13 @@ class Repro_CT_Suite_Sync_Service {
 		$tenant = get_option( 'repro_ct_suite_ct_tenant', '' );
 		$full_url = "https://{$tenant}.church.tools/api{$endpoint}?from={$args['from']}&to={$args['to']}";
 		
-		Repro_CT_Suite_Logger::log( "Phase 2: API-URL: {$full_url}" );
-		Repro_CT_Suite_Logger::log( "Phase 2: Zeitraum: {$args['from']} bis {$args['to']}" );
+		Repro_CT_Suite_Logger::log( "========================================" );
+		Repro_CT_Suite_Logger::log( "🌐 API GET REQUEST:" );
+		Repro_CT_Suite_Logger::log( "   URL: {$full_url}" );
+		Repro_CT_Suite_Logger::log( "   Endpoint: {$endpoint}" );
+		Repro_CT_Suite_Logger::log( "   Parameter: from={$args['from']}, to={$args['to']}" );
+		Repro_CT_Suite_Logger::log( "   cURL: curl -X GET '{$full_url}' -H 'accept: application/json'" );
+		Repro_CT_Suite_Logger::log( "========================================" );
 		
 		$response = $this->ct_client->get( $endpoint, array(
 			'from' => $args['from'],
