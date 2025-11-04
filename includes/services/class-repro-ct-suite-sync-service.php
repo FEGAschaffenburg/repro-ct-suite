@@ -143,13 +143,13 @@ class Repro_CT_Suite_Sync_Service {
 		}
 
 		Repro_CT_Suite_Logger::separator();
-		Repro_CT_Suite_Logger::log( 'EVENTS-ONLY SYNC ABGESCHLOSSEN' );
-		Repro_CT_Suite_Logger::log( 'Hinweis: Phase 2 (Appointments) temporär deaktiviert' );
+		Repro_CT_Suite_Logger::log( 'UNIFIED SYNC ABGESCHLOSSEN (Events + Appointments)' );
 		Repro_CT_Suite_Logger::log( "Kalender verarbeitet: {$stats['calendars_processed']}" );
 		Repro_CT_Suite_Logger::log( "Events gefunden: {$stats['events_found']}" );
-		Repro_CT_Suite_Logger::log( "Events eingefügt: {$stats['events_inserted']}" );
-		Repro_CT_Suite_Logger::log( "Events aktualisiert: {$stats['events_updated']}" );
-		Repro_CT_Suite_Logger::log( "Events übersprungen: {$stats['events_skipped']}" );
+		Repro_CT_Suite_Logger::log( "Appointments gefunden: " . ($stats['appointments_found'] ?? 0) );
+		Repro_CT_Suite_Logger::log( "Termine eingefügt: {$stats['events_inserted']}" );
+		Repro_CT_Suite_Logger::log( "Termine aktualisiert: {$stats['events_updated']}" );
+		Repro_CT_Suite_Logger::log( "Termine übersprungen: {$stats['events_skipped']}" );
 		if ( $stats['errors'] > 0 ) {
 			Repro_CT_Suite_Logger::log( "Fehler: {$stats['errors']}", 'warning' );
 		}
@@ -242,14 +242,14 @@ class Repro_CT_Suite_Sync_Service {
 	 * @return array|WP_Error Einzelkalender-Statistiken
 	 */
 	private function sync_calendar_events( $external_calendar_id, $args ) {
-		Repro_CT_Suite_Logger::log( "=== EVENTS-ONLY SYNC für Kalender {$external_calendar_id} ===" );
+		Repro_CT_Suite_Logger::log( "=== UNIFIED SYNC für Kalender {$external_calendar_id} ===" );
 		
 		$stats = array(
-			'events_found'    => 0,
-			'appointments_found' => 0, // Bleibt 0 da deaktiviert
-			'events_inserted' => 0,
-			'events_updated'  => 0,
-			'events_skipped'  => 0,
+			'events_found'       => 0,
+			'appointments_found' => 0,
+			'events_inserted'    => 0,
+			'events_updated'     => 0,
+			'events_skipped'     => 0,
 		);
 		
 		$imported_appointment_ids = array(); // Für spätere Nutzung
@@ -267,13 +267,27 @@ class Repro_CT_Suite_Sync_Service {
 		$stats['events_updated'] += $events_result['events_updated'];
 		$stats['events_skipped'] += $events_result['events_skipped'];
 		
-		// PHASE 2: DEAKTIVIERT
-		Repro_CT_Suite_Logger::log( "Phase 2 übersprungen - fokussiert auf Events-Import" );
+		// PHASE 2: Appointments ohne Events importieren
+		Repro_CT_Suite_Logger::log( "Phase 2: Starte Appointments-Import (ohne bereits importierte Events)" );
+		$appointments_result = $this->sync_phase2_appointments( $external_calendar_id, $args, $imported_appointment_ids );
 		
-		$total_processed = $stats['events_found']; // Nur Events
+		if ( is_wp_error( $appointments_result ) ) {
+			Repro_CT_Suite_Logger::log( "Phase 2 Fehler: " . $appointments_result->get_error_message(), 'error' );
+			// Nicht abbrechen, Phase 1 war ja erfolgreich
+		} else {
+			// Statistiken von Phase 2 übernehmen
+			$stats['appointments_found'] = $appointments_result['appointments_found'];
+			$stats['events_inserted'] += $appointments_result['events_inserted'];
+			$stats['events_updated'] += $appointments_result['events_updated'];
+			$stats['events_skipped'] += $appointments_result['events_skipped'];
+			
+			Repro_CT_Suite_Logger::log( "Phase 2 abgeschlossen: {$appointments_result['appointments_found']} Appointments gefunden, {$appointments_result['events_inserted']} neu importiert" );
+		}
+		
+		$total_processed = $stats['events_found'] + ($stats['appointments_found'] ?? 0);
 		$total_imported = $stats['events_inserted'] + $stats['events_updated'];
 		
-		Repro_CT_Suite_Logger::log( "Events-Only Sync Ergebnis: {$total_processed} gefunden, {$total_imported} importiert" );
+		Repro_CT_Suite_Logger::log( "Unified Sync Ergebnis: {$total_processed} gefunden ({$stats['events_found']} Events + " . ($stats['appointments_found'] ?? 0) . " Appointments), {$total_imported} importiert" );
 		
 		return $stats;
 	}
@@ -380,8 +394,12 @@ class Repro_CT_Suite_Sync_Service {
 	 */
 	private function sync_phase2_appointments( $external_calendar_id, $args, $imported_appointment_ids ) {
 		Repro_CT_Suite_Logger::log( "Phase 2: Appointments API für Kalender {$external_calendar_id}" );
+		Repro_CT_Suite_Logger::log( "Phase 2: Bereits importierte Appointment-IDs: " . implode( ', ', $imported_appointment_ids ) );
 		
 		$endpoint = '/calendars/' . rawurlencode( $external_calendar_id ) . '/appointments';
+		Repro_CT_Suite_Logger::log( "Phase 2: API-Endpoint: {$endpoint}" );
+		Repro_CT_Suite_Logger::log( "Phase 2: Zeitraum: {$args['from']} bis {$args['to']}" );
+		
 		$response = $this->ct_client->get( $endpoint, array(
 			'from' => $args['from'],
 			'to'   => $args['to'],
@@ -391,12 +409,41 @@ class Repro_CT_Suite_Sync_Service {
 			return new WP_Error( 'appointments_api_error', 'Appointments API Fehler: ' . $response->get_error_message() );
 		}
 
+		Repro_CT_Suite_Logger::log( "Phase 2: API-Response erhalten, prüfe Struktur..." );
+		
 		if ( ! isset( $response['data'] ) || ! is_array( $response['data'] ) ) {
+			Repro_CT_Suite_Logger::log( "Phase 2: Response verfügbare Keys: " . implode( ', ', array_keys( $response ) ), 'error' );
 			return new WP_Error( 'invalid_appointments_response', 'Ungültige Appointments API-Antwort' );
 		}
 
 		$appointments = $response['data'];
 		$appointments_found = count( $appointments );
+		
+		Repro_CT_Suite_Logger::log( "Phase 2: {$appointments_found} Appointments gefunden in API-Response" );
+		
+		// DEBUG: Erste Appointment-Struktur analysieren
+		if ( $appointments_found > 0 ) {
+			$first_appointment = $appointments[0];
+			Repro_CT_Suite_Logger::log( "Phase 2: Struktur des ersten Appointments analysieren..." );
+			Repro_CT_Suite_Logger::log( "Phase 2: Appointment Keys: " . implode( ', ', array_keys( $first_appointment ) ) );
+			
+			if ( isset( $first_appointment['id'] ) ) {
+				Repro_CT_Suite_Logger::log( "Phase 2: Appointment ID: {$first_appointment['id']}" );
+			}
+			if ( isset( $first_appointment['caption'] ) ) {
+				Repro_CT_Suite_Logger::log( "Phase 2: Appointment Caption: {$first_appointment['caption']}" );
+			}
+			if ( isset( $first_appointment['base'] ) ) {
+				Repro_CT_Suite_Logger::log( "Phase 2: Appointment hat 'base' - Keys: " . implode( ', ', array_keys( $first_appointment['base'] ) ) );
+			}
+			if ( isset( $first_appointment['calculated'] ) ) {
+				Repro_CT_Suite_Logger::log( "Phase 2: Appointment hat 'calculated' - Keys: " . implode( ', ', array_keys( $first_appointment['calculated'] ) ) );
+			}
+			
+			// Vollständige Struktur loggen
+			Repro_CT_Suite_Logger::log( "Phase 2: Komplette Struktur des ersten Appointments:" );
+			Repro_CT_Suite_Logger::log( print_r( $first_appointment, true ) );
+		}
 		
 		Repro_CT_Suite_Logger::log( "Phase 2: {$appointments_found} Appointments gefunden" );
 
