@@ -777,10 +777,19 @@ class Repro_CT_Suite_Sync_Service {
 
 		$event_data = $extract_result;
 		
-		Repro_CT_Suite_Logger::log( "process_appointment: Event-Daten extrahiert, event_id={$event_data['event_id']}" );
+		Repro_CT_Suite_Logger::log( "process_appointment: Event-Daten extrahiert, event_id={$event_data['event_id']}, appointment_id={$event_data['appointment_id']}" );
 
-		// Event in die Datenbank speichern (Insert oder Update)
+		// Duplikatsprüfung: Prüfe sowohl nach event_id als auch nach appointment_id
+		// Fall 1: Event wurde bereits aus diesem Appointment erstellt (gleiche event_id)
 		$exists = $this->events_repo->get_by_event_id( $event_data['event_id'] );
+		
+		// Fall 2: Event wurde in Phase 1 aus Events-API geholt und hat diese appointment_id
+		if ( ! $exists && ! empty( $event_data['appointment_id'] ) ) {
+			$exists = $this->events_repo->get_by_appointment_id( $event_data['appointment_id'] );
+			if ( $exists ) {
+				Repro_CT_Suite_Logger::log( "process_appointment: Event mit appointment_id={$event_data['appointment_id']} existiert bereits (ID={$exists->id}, event_id={$exists->event_id})" );
+			}
+		}
 		
 		if ( $exists ) {
 			// Event existiert bereits - ÜBERSPRINGEN statt Update

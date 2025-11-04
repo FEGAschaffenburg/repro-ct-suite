@@ -74,4 +74,19 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 			)
 		);
 	}
+
+	/**
+	 * Holt ein Event-Objekt anhand der appointment_id
+	 *
+	 * @param string|int $appointment_id Appointment-ID aus ChurchTools
+	 * @return object|null Event-Objekt oder null, wenn nicht gefunden
+	 */
+	public function get_by_appointment_id( $appointment_id ) {
+		return $this->db->get_row(
+			$this->db->prepare(
+				"SELECT * FROM {$this->table} WHERE appointment_id=%s",
+				$appointment_id
+			)
+		);
+	}
 }
