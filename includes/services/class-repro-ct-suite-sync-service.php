@@ -783,24 +783,12 @@ class Repro_CT_Suite_Sync_Service {
 		$exists = $this->events_repo->get_by_external_id( $event_data['external_id'] );
 		
 		if ( $exists ) {
-			Repro_CT_Suite_Logger::log( "process_appointment: Event existiert bereits (ID={$exists->id}), führe UPDATE aus" );
-			Repro_CT_Suite_Logger::log( "process_appointment: UPDATE - Event-Daten: " . wp_json_encode( array(
-				'external_id' => $event_data['external_id'],
-				'title' => $event_data['title'],
-				'start_datetime' => $event_data['start_datetime'],
-				'end_datetime' => $event_data['end_datetime'],
-			) ) );
-			
-			// Update
-			try {
-				$success = $this->events_repo->update( $exists->id, $event_data );
-				$action = 'updated';
-				$event_id = $exists->id;
-				Repro_CT_Suite_Logger::log( "process_appointment: UPDATE " . ( $success ? "ERFOLGREICH" : "FEHLGESCHLAGEN" ) );
-			} catch ( Exception $e ) {
-				Repro_CT_Suite_Logger::log( "process_appointment: UPDATE EXCEPTION: " . $e->getMessage(), 'error' );
-				return new WP_Error( 'update_exception', 'Update Exception: ' . $e->getMessage() );
-			}
+			// Event existiert bereits - ÜBERSPRINGEN statt Update
+			Repro_CT_Suite_Logger::log( "process_appointment: Event existiert bereits (ID={$exists->id}) - ÜBERSPRUNGEN (kein Update)" );
+			return array(
+				'action'   => 'skipped',
+				'event_id' => $exists->id,
+			);
 		} else {
 			Repro_CT_Suite_Logger::log( "process_appointment: Event ist neu, führe INSERT aus" );
 			Repro_CT_Suite_Logger::log( "process_appointment: INSERT - Event-Daten: " . wp_json_encode( array(
