@@ -128,9 +128,9 @@ $total_pages = ceil( $total / $limit );
                     </td></tr>
                 <?php else : foreach ( $items as $item ) : 
                     // Typ bestimmen:
-                    // - Appointment: Hat appointment_id gesetzt (reines Appointment aus Appointments-API)
-                    // - Event: Hat keine appointment_id (Event aus Events-API)
-                    $is_appointment = ! empty( $item->appointment_id );
+                    // - Termin: Hat appointment_id gesetzt UND nicht NULL (reines Appointment aus Appointments-API)
+                    // - Event: Hat keine appointment_id oder appointment_id ist NULL (Event aus Events-API)
+                    $is_appointment = isset( $item->appointment_id ) && $item->appointment_id !== null && $item->appointment_id !== '';
                     $type_label = $is_appointment ? 'Termin' : 'Event';
                     
                     // ChurchTools-IDs extrahieren:
