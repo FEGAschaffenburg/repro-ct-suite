@@ -32,10 +32,28 @@ function repro_ct_suite_cleanup_site() {
         'repro_ct_suite_sync_to_days',
         // DB-Version
         'repro_ct_suite_db_version',
+        // Auto-Update
+        'repro_ct_suite_auto_update',
+        // Syslog-Option
+        'repro_ct_suite_syslog',
+        // Sync-Status (falls gespeichert)
+        'repro_ct_suite_last_sync_time',
+        'repro_ct_suite_last_sync_stats',
     );
 
     foreach ( $option_keys as $opt ) {
         delete_option( $opt );
+    }
+    
+    // Auch alle Transients löschen
+    $transients = array(
+        'repro_ct_suite_github_release_cache',
+        'repro_ct_suite_last_check',
+        'repro_ct_suite_release_info',
+    );
+    
+    foreach ( $transients as $transient ) {
+        delete_transient( $transient );
     }
 
     // Custom Tabellen entfernen
