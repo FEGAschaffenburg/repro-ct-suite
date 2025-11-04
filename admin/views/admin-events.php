@@ -131,7 +131,7 @@ $total_pages = ceil( $total / $limit );
                     // - Appointment: Hat appointment_id gesetzt (reines Appointment aus Appointments-API)
                     // - Event: Hat keine appointment_id (Event aus Events-API)
                     $is_appointment = ! empty( $item->appointment_id );
-                    $type_label = $is_appointment ? 'Appointment' : 'Event';
+                    $type_label = $is_appointment ? 'Termin' : 'Event';
                     
                     // ChurchTools-IDs extrahieren:
                     if ( $is_appointment ) {
@@ -168,9 +168,9 @@ $total_pages = ceil( $total / $limit );
                     // Kalender holen
                     $calendar = $calendars_repo->get_by_id( $item->calendar_id );
                     
-                    // Type badge
-                    $type_class = $is_appointment ? 'repro-ct-suite-badge-primary' : 'repro-ct-suite-badge-info';
-                    $tooltip = $is_appointment ? 'Appointment aus ChurchTools Appointments-API' : 'Event aus ChurchTools Events-API';
+                    // Type badge - Termin (Appointment) = Grün, Event = Blau
+                    $type_class = $is_appointment ? 'repro-ct-suite-badge-success' : 'repro-ct-suite-badge-info';
+                    $tooltip = $is_appointment ? 'Termin aus ChurchTools Appointments-API' : 'Event aus ChurchTools Events-API';
                     ?>
                     <tr>
                         <td>
