@@ -29,16 +29,10 @@ $tables_info = array(
 		'icon'  => 'calendar-alt',
 	),
 	'rcts_events' => array(
-		'label' => __( 'Events', 'repro-ct-suite' ),
+		'label' => __( 'Events & Termine', 'repro-ct-suite' ),
 		'table' => $wpdb->prefix . 'rcts_events',
 		'count' => 0,
 		'icon'  => 'megaphone',
-	),
-	'rcts_appointments' => array(
-		'label' => __( 'Termine (Appointments)', 'repro-ct-suite' ),
-		'table' => $wpdb->prefix . 'rcts_appointments',
-		'count' => 0,
-		'icon'  => 'clock',
 	),
 	'rcts_event_services' => array(
 		'label' => __( 'Event-Services', 'repro-ct-suite' ),
@@ -62,7 +56,7 @@ foreach ( $tables_info as $key => &$info ) {
 	}
 }
 
-// DEBUG: Prüfe auf doppelte oder ungewöhnliche Tabellen
+// DEBUG: Prüfe auf ungewöhnliche Tabellen (mehr als erwartet)
 $debug_all_plugin_tables = $wpdb->get_results( "SHOW TABLES LIKE '%rcts_%'" );
 $debug_table_list = array();
 foreach ( $debug_all_plugin_tables as $table ) {
@@ -70,8 +64,8 @@ foreach ( $debug_all_plugin_tables as $table ) {
 	$debug_table_list[] = $table_name;
 }
 
-// DEBUG-Info für Entwickler (nur anzeigen wenn mehr als 5 Plugin-Tabellen existieren)
-$show_debug_info = count( $debug_table_list ) > 5;
+// Zeige Warnung wenn mehr als 4 Tabellen gefunden wurden
+$show_debug_info = count( $debug_table_list ) > 4;
 
 // DB-Version abrufen
 $current_db_version = get_option( 'repro_ct_suite_db_version', '0' );
@@ -185,7 +179,7 @@ if ( $log_exists && $log_size > 0 ) {
 			</div>
 			<p class="description" style="margin-top: 10px; color: #856404;">
 				<?php esc_html_e( 'WordPress-Präfix:', 'repro-ct-suite' ); ?> <code><?php echo esc_html( $wpdb->prefix ); ?></code><br>
-				<?php esc_html_e( 'Dies könnte die Ursache für doppelte Anzeigen sein. Alte Plugin-Installationen oder ungewöhnliche Prefixe können Duplikate verursachen.', 'repro-ct-suite' ); ?>
+				<?php esc_html_e( 'Erwartet werden 4 Tabellen (calendars, events, event_services, schedule). Zusätzliche Tabellen könnten auf alte Installationen oder Migrationen hinweisen.', 'repro-ct-suite' ); ?>
 			</p>
 		</div>
 	</div>
