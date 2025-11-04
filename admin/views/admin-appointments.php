@@ -99,14 +99,18 @@ error_log( 'Termine gefunden: ' . count( $items ) );
                     $is_appointment = ! empty( $row->appointment_id );
                     $type_label = $is_appointment ? 'Appointment' : 'Event';
                     
-                    // ChurchTools-ID extrahieren
+                    // ChurchTools-IDs extrahieren
                     if ( $is_appointment ) {
-                        // Bei Appointments: appointment_id ist die ChurchTools-ID
-                        $ct_id = $row->appointment_id;
-                    } else {
-                        // Bei Events: ID aus external_id extrahieren (Format: "ID_Timestamp")
+                        // Bei Appointments: Beide IDs vorhanden
+                        $appointment_ct_id = $row->appointment_id;
+                        // Event-ID aus external_id extrahieren
                         $parts = explode( '_', $row->external_id );
-                        $ct_id = $parts[0];
+                        $event_ct_id = $parts[0];
+                    } else {
+                        // Bei Events: Nur Event-ID vorhanden
+                        $parts = explode( '_', $row->external_id );
+                        $event_ct_id = $parts[0];
+                        $appointment_ct_id = null;
                     }
                 ?>
                     <tr>
@@ -118,7 +122,14 @@ error_log( 'Termine gefunden: ' . count( $items ) );
                                 <span class="repro-ct-suite-badge repro-ct-suite-badge-info"><?php echo esc_html( $type_label ); ?></span>
                             <?php endif; ?>
                         </td>
-                        <td><small><?php echo esc_html( $ct_id ); ?></small></td>
+                        <td>
+                            <small>
+                                <?php if ( $appointment_ct_id ) : ?>
+                                    <strong>A:</strong> <?php echo esc_html( $appointment_ct_id ); ?><br>
+                                <?php endif; ?>
+                                <strong>E:</strong> <?php echo esc_html( $event_ct_id ); ?>
+                            </small>
+                        </td>
                         <td><?php echo esc_html( $row->title ); ?></td>
                         <td><?php echo isset( $row->location_name ) ? esc_html( $row->location_name ) : ''; ?></td>
                         <td><?php echo ! empty( $row->end_datetime ) ? esc_html( date_i18n( get_option('date_format') . ' H:i', strtotime( $row->end_datetime ) ) ) : '—'; ?></td>
