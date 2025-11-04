@@ -27,8 +27,15 @@ global $wpdb;
 $events_table = $wpdb->prefix . 'rcts_events';
 $where = 'WHERE 1=1';
 $params = array();
-if ( ! empty( $from ) ) { $where .= ' AND start_datetime >= %s'; $params[] = $from; }
-if ( ! empty( $to ) )   { $where .= ' AND start_datetime <= %s'; $params[] = $to; }
+// Filter mit korrektem DATETIME Format
+if ( ! empty( $from ) ) { 
+    $where .= ' AND start_datetime >= %s'; 
+    $params[] = $from . ' 00:00:00';  // Tagesanfang
+}
+if ( ! empty( $to ) ) { 
+    $where .= ' AND start_datetime <= %s'; 
+    $params[] = $to . ' 23:59:59';  // Tagesende
+}
 $params[] = (int) $limit;
 $params[] = (int) $offset;
 $sql_events = $wpdb->prepare(
@@ -36,6 +43,10 @@ $sql_events = $wpdb->prepare(
     ...$params
 );
 $items = $wpdb->get_results( $sql_events );
+
+// Debug: SQL-Query und Anzahl loggen
+error_log( 'Termine-Filter SQL: ' . $sql_events );
+error_log( 'Termine gefunden: ' . count( $items ) );
 
 ?>
 <div class="wrap repro-ct-suite-admin-wrapper">
