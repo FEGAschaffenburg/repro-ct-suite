@@ -597,16 +597,36 @@ class Repro_CT_Suite_Sync_Service {
 	 * @return bool
 	 */
 	private function is_appointment_relevant_for_calendar( $appointment, $external_calendar_id ) {
+		// Debug: Welche Kalender-Informationen hat das Appointment?
+		$appointment_title = isset( $appointment['caption'] ) ? $appointment['caption'] : 'Unbekannt';
+		$has_calendar_id = isset( $appointment['calendar_id'] );
+		$has_calendar_obj = isset( $appointment['calendar'] );
+		$has_base_calendar = isset( $appointment['base']['calendar'] );
+		
+		Repro_CT_Suite_Logger::log( "Kalender-Check für '{$appointment_title}': calendar_id=" . ($has_calendar_id ? 'JA' : 'NEIN') . ", calendar=" . ($has_calendar_obj ? 'JA' : 'NEIN') . ", base.calendar=" . ($has_base_calendar ? 'JA' : 'NEIN') );
+		
 		// Appointments haben normalerweise einen direkten calendar_id
 		if ( isset( $appointment['calendar_id'] ) ) {
-			return (string) $appointment['calendar_id'] === (string) $external_calendar_id;
+			$match = (string) $appointment['calendar_id'] === (string) $external_calendar_id;
+			Repro_CT_Suite_Logger::log( "calendar_id Check: {$appointment['calendar_id']} vs {$external_calendar_id} = " . ($match ? 'MATCH' : 'NO MATCH') );
+			return $match;
 		}
 		
 		// Alternativ: calendar-Objekt prüfen
 		if ( isset( $appointment['calendar'] ) && isset( $appointment['calendar']['id'] ) ) {
-			return (string) $appointment['calendar']['id'] === (string) $external_calendar_id;
+			$match = (string) $appointment['calendar']['id'] === (string) $external_calendar_id;
+			Repro_CT_Suite_Logger::log( "calendar.id Check: {$appointment['calendar']['id']} vs {$external_calendar_id} = " . ($match ? 'MATCH' : 'NO MATCH') );
+			return $match;
 		}
 		
+		// Neu: base.calendar prüfen (aus der geloggten Struktur)
+		if ( isset( $appointment['base']['calendar']['id'] ) ) {
+			$match = (string) $appointment['base']['calendar']['id'] === (string) $external_calendar_id;
+			Repro_CT_Suite_Logger::log( "base.calendar.id Check: {$appointment['base']['calendar']['id']} vs {$external_calendar_id} = " . ($match ? 'MATCH' : 'NO MATCH') );
+			return $match;
+		}
+		
+		Repro_CT_Suite_Logger::log( "Keine Kalender-ID gefunden - REJECTED" );
 		return false;
 	}
 	
