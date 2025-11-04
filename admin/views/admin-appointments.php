@@ -96,9 +96,9 @@ error_log( 'Termine gefunden: ' . count( $items ) );
                     <tr><td colspan="7"><?php esc_html_e( 'Keine Einträge gefunden.', 'repro-ct-suite' ); ?></td></tr>
                 <?php else : foreach ( $items as $row ) : 
                     // Typ bestimmen: 
-                    // - Appointment: Hat appointment_id gesetzt (aus Appointments-API)
-                    // - Event: Hat keine appointment_id (nur aus Events-API)
-                    $is_appointment = ! empty( $row->appointment_id );
+                    // - Event: Hat appointment_id gesetzt (Event aus dem ein Appointment entstanden ist)
+                    // - Appointment: Hat keine appointment_id (reines Appointment ohne Event-Verknüpfung)
+                    $is_appointment = empty( $row->appointment_id );
                     $type_label = $is_appointment ? 'Appointment' : 'Event';
                     
                     // ChurchTools-IDs extrahieren:
@@ -106,8 +106,8 @@ error_log( 'Termine gefunden: ' . count( $items ) );
                     $parts = explode( '_', $row->external_id );
                     $event_ct_id = $parts[0];
                     
-                    // Appointment-ID ist nur bei Appointments gesetzt
-                    $appointment_ct_id = $is_appointment ? $row->appointment_id : null;
+                    // Appointment-ID ist nur bei Events gesetzt (nicht bei reinen Appointments)
+                    $appointment_ct_id = ! $is_appointment ? $row->appointment_id : null;
                 ?>
                     <tr>
                         <td><?php echo esc_html( date_i18n( get_option('date_format') . ' H:i', strtotime( $row->start_datetime ) ) ); ?></td>
