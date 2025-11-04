@@ -16,6 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// DEBUG: Prüfen ob Datei geladen wird
+error_log( 'Repro CT-Suite: tab-sync.php wird geladen' );
+
 // Credentials prüfen
 $ct_tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
 $ct_username = get_option( 'repro_ct_suite_ct_username', '' );
@@ -49,6 +52,14 @@ try {
 	error_log( 'Repro CT-Suite: Fehler beim Laden der Kalender in tab-sync.php: ' . $e->getMessage() );
 }
 ?>
+
+<!-- DEBUG: Tab Sync wird gerendert -->
+<div style="background: #fff3cd; border: 1px solid #ffc107; padding: 10px; margin-bottom: 20px;">
+	<strong>DEBUG:</strong> Tab Sync geladen. 
+	Configured: <?php echo $is_configured ? 'Ja' : 'Nein'; ?> | 
+	Kalender: <?php echo count( $calendars ); ?> | 
+	Ausgewählt: <?php echo $selected_count; ?>
+</div>
 
 <div class="repro-ct-suite-sync-wrapper">
 
