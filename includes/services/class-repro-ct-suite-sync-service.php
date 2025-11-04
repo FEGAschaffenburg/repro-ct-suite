@@ -427,7 +427,12 @@ class Repro_CT_Suite_Sync_Service {
 		Repro_CT_Suite_Logger::log( "Phase 2: Bereits importierte Appointment-IDs: " . implode( ', ', $imported_appointment_ids ) );
 		
 		$endpoint = '/calendars/' . rawurlencode( $external_calendar_id ) . '/appointments';
-		Repro_CT_Suite_Logger::log( "Phase 2: API-Endpoint: {$endpoint}" );
+		
+		// Vollständige URL für Transparenz
+		$tenant = get_option( 'repro_ct_suite_ct_tenant', '' );
+		$full_url = "https://{$tenant}.church.tools/api{$endpoint}?from={$args['from']}&to={$args['to']}";
+		
+		Repro_CT_Suite_Logger::log( "Phase 2: API-URL: {$full_url}" );
 		Repro_CT_Suite_Logger::log( "Phase 2: Zeitraum: {$args['from']} bis {$args['to']}" );
 		
 		$response = $this->ct_client->get( $endpoint, array(
