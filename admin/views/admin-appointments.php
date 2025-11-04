@@ -102,7 +102,7 @@ error_log( 'Termine gefunden: ' . count( $items ) );
                     $type_label = $is_appointment ? 'Appointment' : 'Event';
                     
                     // ChurchTools-IDs extrahieren:
-                    // Event-ID ist immer in external_id enthalten (Format: EventID_Timestamp)
+                    // Event-ID ist immer in event_id enthalten (Format: EventID_Timestamp)
                     $parts = explode( '_', $row->event_id );
                     $event_ct_id = $parts[0];
                     

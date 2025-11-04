@@ -43,7 +43,7 @@ class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base 
 		foreach ( $events as $e ) {
 			$this->upsert_from_event( array(
 				'id' => (int) $e->id,
-				'external_id' => $e->external_id,
+				'event_id' => $e->event_id,
 				'calendar_id' => $e->calendar_id,
 				'title' => $e->title,
 				'description' => $e->description,
@@ -68,7 +68,7 @@ class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base 
 		foreach ( $appointments as $a ) {
 			$this->upsert_from_appointment( array(
 				'id' => (int) $a->id,
-				'external_id' => $a->external_id,
+				'event_id' => $a->event_id,
 				'calendar_id' => $a->calendar_id,
 				'title' => $a->title,
 				'description' => $a->description,

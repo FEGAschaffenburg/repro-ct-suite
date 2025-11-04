@@ -925,14 +925,14 @@ class Repro_CT_Suite_Admin {
 			}
 
 			// Externe Calendar-IDs für Events-Filterung holen
-			$selected_external_calendar_ids = array();
+			$selected_calendar_ids_ct = array();
 			foreach ( $selected_calendar_ids as $local_id ) {
 				$calendar = $calendars_repo->get_by_id( $local_id );
-				if ( $calendar && ! empty( $calendar->external_id ) ) {
-					$selected_external_calendar_ids[] = (string) $calendar->external_id;
+				if ( $calendar && ! empty( $calendar->calendar_id ) ) {
+					$selected_calendar_ids_ct[] = (string) $calendar->calendar_id;
 				}
 			}
-			Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe IDs): ' . ( $selected_external_calendar_ids ? implode( ',', $selected_external_calendar_ids ) : '[keine]' ) );
+			Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (ChurchTools IDs): ' . ( $selected_calendar_ids_ct ? implode( ',', $selected_calendar_ids_ct ) : '[keine]' ) );
 
 			// Zeitraum bestimmen (aus den gespeicherten Optionen)
 			$sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );

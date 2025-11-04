@@ -134,15 +134,15 @@ $total_pages = ceil( $total / $limit );
                     $type_label = $is_appointment ? 'Appointment' : 'Event';
                     
                     // ChurchTools-IDs extrahieren:
-                    // Event-ID ist immer in external_id enthalten (Format: EventID_Timestamp)
+                    // Event-ID ist immer in event_id enthalten (Format: EventID_Timestamp)
                     $parts = explode( '_', $item->event_id );
                     $event_ct_id = $parts[0];
                     
                     // Appointment-ID ist nur bei Events gesetzt (nicht bei reinen Appointments)
                     $appointment_ct_id = ! $is_appointment ? $item->appointment_id : null;
                     
-                    // Kalender holen über external_id (calendar_id in Events/Appointments ist die externe ChurchTools ID)
-                    $calendar = $item->calendar_id ? $calendars_repo->get_by_external_id( $item->calendar_id ) : null;
+                    // Kalender holen über calendar_id (calendar_id in Events ist die ChurchTools Kalender-ID)
+                    $calendar = $item->calendar_id ? $calendars_repo->get_by_calendar_id( $item->calendar_id ) : null;
                     
                     // WordPress-Zeitzone berücksichtigen
                     $wp_timezone = wp_timezone();

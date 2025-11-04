@@ -143,7 +143,7 @@ try {
 											<?php endif; ?>
 										</td>
 										<td>
-											<code><?php echo esc_html( $calendar->external_id ); ?></code>
+											<code><?php echo esc_html( $calendar->calendar_id ); ?></code>
 										</td>
 										<td>
 											<?php if ( $calendar->is_public ) : ?>
