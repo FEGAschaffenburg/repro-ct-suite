@@ -67,14 +67,14 @@ class Repro_CT_Suite_Sync_Service {
 			// Optional: Kalender-Name aus der lokalen Tabelle holen für bessere Logs
 			$calendar = $this->calendars_repo->get_by_calendar_id( $calendar_id );
 			$external_calendar_ids[] = array(
-				'external_id' => $external_id,
+				'calendar_id' => $calendar_id,
 				'name'        => $calendar ? $calendar->name : "Kalender {$calendar_id}",
 			);
 			Repro_CT_Suite_Logger::log( "Kalender: ChurchTools-ID {$calendar_id}" . ( $calendar ? " ('{$calendar->name}')" : '' ) );
 		}
 
 		if ( empty( $external_calendar_ids ) ) {
-			return new WP_Error( 'no_external_ids', __( 'Keine ChurchTools-Kalender-IDs übergeben.', 'repro-ct-suite' ) );
+			return new WP_Error( 'no_calendar_ids', __( 'Keine ChurchTools-Kalender-IDs übergeben.', 'repro-ct-suite' ) );
 		}
 
 		Repro_CT_Suite_Logger::log( 'Externe Kalender-IDs: ' . implode( ', ', array_column( $external_calendar_ids, 'calendar_id' ) ) );
@@ -690,7 +690,7 @@ class Repro_CT_Suite_Sync_Service {
 		$event_data = $extract_result;
 
 		// Event in die Datenbank speichern (Insert oder Update)
-		$exists = $this->events_repo->get_by_calendar_id( $event_data['external_id'] );
+		$exists = $this->events_repo->get_by_event_id( $event_data['event_id'] );
 		
 		if ( $exists ) {
 			// Update
@@ -729,7 +729,7 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Basis-Daten extrahieren
 		$event_data = array(
-			'external_id'    => (string) $event['id'],
+			'event_id'       => (string) $event['id'],
 			'calendar_id'    => $calendar_id,
 			'title'          => $event['name'] ?? $event['designation'] ?? 'Unbenannt',
 			'description'    => $event['note'] ?? '',
@@ -777,10 +777,10 @@ class Repro_CT_Suite_Sync_Service {
 
 		$event_data = $extract_result;
 		
-		Repro_CT_Suite_Logger::log( "process_appointment: Event-Daten extrahiert, external_id={$event_data['external_id']}" );
+		Repro_CT_Suite_Logger::log( "process_appointment: Event-Daten extrahiert, event_id={$event_data['event_id']}" );
 
 		// Event in die Datenbank speichern (Insert oder Update)
-		$exists = $this->events_repo->get_by_calendar_id( $event_data['external_id'] );
+		$exists = $this->events_repo->get_by_event_id( $event_data['event_id'] );
 		
 		if ( $exists ) {
 			// Event existiert bereits - ÜBERSPRINGEN statt Update
@@ -792,7 +792,7 @@ class Repro_CT_Suite_Sync_Service {
 		} else {
 			Repro_CT_Suite_Logger::log( "process_appointment: Event ist neu, führe INSERT aus" );
 			Repro_CT_Suite_Logger::log( "process_appointment: INSERT - Event-Daten: " . wp_json_encode( array(
-				'external_id' => $event_data['external_id'],
+				'event_id' => $event_data['event_id'],
 				'title' => $event_data['title'],
 				'start_datetime' => $event_data['start_datetime'],
 				'end_datetime' => $event_data['end_datetime'],
@@ -890,7 +890,7 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Event-Daten zusammenstellen
 		$event_data = array(
-			'external_id'     => $external_id,
+			'event_id'        => $event_id,
 			'calendar_id'     => $calendar_id, // ChurchTools Kalender-ID
 			'appointment_id'  => $appointment_id,
 			'title'           => sanitize_text_field( $title ),
