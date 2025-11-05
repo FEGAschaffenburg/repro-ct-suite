@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.7.1
+Stable tag: 0.7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.7.2 =
+* KRITISCHER FIX: SQL-Fehler "Column 'calendar_id' in WHERE is ambiguous" behoben
+* Shortcode-Query: Alle WHERE-Bedingungen verwenden jetzt Tabellen-Präfix (e.calendar_id, e.start_datetime)
+* Behebt Fehler beim Shortcode [rcts_events calendar_ids="1,2"]
 
 = 0.7.1 =
 * KRITISCHER FIX: Automatischer Sync (Cron-Job) funktional

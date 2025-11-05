@@ -104,20 +104,20 @@ class Repro_CT_Suite_Shortcodes {
 
 		// Base Query
 		$where = array();
-		$where[] = $wpdb->prepare( 'start_datetime >= %s', $from_date );
-		$where[] = $wpdb->prepare( 'start_datetime <= %s', $to_date );
+		$where[] = $wpdb->prepare( 'e.start_datetime >= %s', $from_date );
+		$where[] = $wpdb->prepare( 'e.start_datetime <= %s', $to_date );
 
 		// Kalender-Filter
 		if ( ! empty( $atts['calendar_ids'] ) ) {
 			$calendar_ids = array_map( 'intval', explode( ',', $atts['calendar_ids'] ) );
 			$placeholders = implode( ',', array_fill( 0, count( $calendar_ids ), '%d' ) );
-			$where[] = $wpdb->prepare( "calendar_id IN ($placeholders)", $calendar_ids );
+			$where[] = $wpdb->prepare( "e.calendar_id IN ($placeholders)", $calendar_ids );
 		}
 
 		// Vergangene Events filtern
 		if ( $atts['show_past'] === 'false' ) {
 			$now = current_time( 'mysql' );
-			$where[] = $wpdb->prepare( 'start_datetime >= %s', $now );
+			$where[] = $wpdb->prepare( 'e.start_datetime >= %s', $now );
 		}
 
 		// Query zusammenbauen
