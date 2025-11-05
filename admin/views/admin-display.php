@@ -20,6 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Aktuellen Tab ermitteln (Standard: dashboard)
 $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
+
+// Prüfen ob Cron aktiv ist
+$auto_sync_enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
 ?>
 
 <div class="wrap repro-ct-suite-admin-wrapper">
@@ -30,7 +33,7 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 			<span class="dashicons dashicons-admin-generic"></span>
 			<?php echo esc_html( get_admin_page_title() ); ?>
 		</h1>
-		<p><?php esc_html_e( 'ChurchTools-Integration für WordPress. Synchronisieren Sie Termine aus ChurchTools Events-API und Appointments.', 'repro-ct-suite' ); ?></p>
+		<p><?php esc_html_e( 'ChurchTools-Integration für WordPress. Synchronisieren Sie Termine aus ChurchTools.', 'repro-ct-suite' ); ?></p>
 	</div>
 
 	<!-- Tab-Navigation -->
@@ -48,16 +51,18 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 					<?php esc_html_e( 'Einstellungen', 'repro-ct-suite' ); ?>
 				</a>
 			</li>
+			<?php if ( ! $auto_sync_enabled ) : ?>
 			<li>
 				<a href="#sync" class="<?php echo $active_tab === 'sync' ? 'active' : ''; ?>">
 					<span class="dashicons dashicons-update"></span>
-					<?php esc_html_e( 'Synchronisation', 'repro-ct-suite' ); ?>
+					<?php esc_html_e( 'Sync', 'repro-ct-suite' ); ?>
 				</a>
 			</li>
+			<?php endif; ?>
 			<li>
-				<a href="#logs" class="<?php echo $active_tab === 'logs' ? 'active' : ''; ?>">
-					<span class="dashicons dashicons-list-view"></span>
-					<?php esc_html_e( 'Logs', 'repro-ct-suite' ); ?>
+				<a href="#update" class="<?php echo $active_tab === 'update' ? 'active' : ''; ?>">
+					<span class="dashicons dashicons-download"></span>
+					<?php esc_html_e( 'Update', 'repro-ct-suite' ); ?>
 				</a>
 			</li>
 		</ul>
@@ -73,14 +78,16 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-settings.php'; ?>
 	</div>
 
-	<!-- Tab: Synchronisation -->
+	<?php if ( ! $auto_sync_enabled ) : ?>
+	<!-- Tab: Synchronisation (nur wenn kein Cron aktiv) -->
 	<div id="sync" class="repro-ct-suite-tab-content <?php echo $active_tab === 'sync' ? 'active' : ''; ?>">
 		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-sync.php'; ?>
 	</div>
+	<?php endif; ?>
 
-	<!-- Tab: Logs -->
-	<div id="logs" class="repro-ct-suite-tab-content <?php echo $active_tab === 'logs' ? 'active' : ''; ?>">
-		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-logs.php'; ?>
+	<!-- Tab: Update -->
+	<div id="update" class="repro-ct-suite-tab-content <?php echo $active_tab === 'update' ? 'active' : ''; ?>">
+		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-update.php'; ?>
 	</div>
 
 </div>

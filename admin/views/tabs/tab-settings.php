@@ -420,3 +420,113 @@ if ( $test_result !== false ) {
 		</ul>
 	</div>
 </div>
+
+<?php
+// Cron-Einstellungen
+if ( isset( $_POST['repro_ct_suite_save_cron_settings'] ) ) {
+	check_admin_referer( 'repro_ct_suite_cron_settings' );
+	
+	$auto_sync_enabled = isset( $_POST['repro_ct_suite_auto_sync_enabled'] ) ? 1 : 0;
+	$sync_interval = absint( $_POST['repro_ct_suite_sync_interval'] ?? 60 );
+	$sync_interval_unit = sanitize_text_field( $_POST['repro_ct_suite_sync_interval_unit'] ?? 'minutes' );
+	
+	if ( $sync_interval_unit === 'minutes' && $sync_interval < 30 ) {
+		$sync_interval = 30;
+	}
+	
+	update_option( 'repro_ct_suite_auto_sync_enabled', $auto_sync_enabled );
+	update_option( 'repro_ct_suite_sync_interval', $sync_interval );
+	update_option( 'repro_ct_suite_sync_interval_unit', $sync_interval_unit );
+	
+	require_once plugin_dir_path( dirname( dirname( dirname( __FILE__ ) ) ) ) . 'includes/class-repro-ct-suite-cron.php';
+	Repro_CT_Suite_Cron::reschedule_sync_job();
+	
+	echo '<div class="notice notice-success is-dismissible"><p>';
+	esc_html_e( 'Cron-Einstellungen gespeichert.', 'repro-ct-suite' );
+	echo '</p></div>';
+}
+
+$auto_sync_enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
+$sync_interval = get_option( 'repro_ct_suite_sync_interval', 60 );
+$sync_interval_unit = get_option( 'repro_ct_suite_sync_interval_unit', 'minutes' );
+$next_scheduled = wp_next_scheduled( 'repro_ct_suite_auto_sync' );
+$last_sync = get_option( 'repro_ct_suite_last_auto_sync', 0 );
+?>
+
+<div class="repro-ct-suite-card repro-ct-suite-mt-20" id="cron">
+	<div class="repro-ct-suite-card-header">
+		<span class="dashicons dashicons-clock"></span>
+		<h3><?php esc_html_e( 'Automatischer Sync', 'repro-ct-suite' ); ?></h3>
+	</div>
+	<div class="repro-ct-suite-card-body">
+		<form method="post" action="">
+			<?php wp_nonce_field( 'repro_ct_suite_cron_settings' ); ?>
+			
+			<table class="form-table">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<?php esc_html_e( 'Automatischer Sync', 'repro-ct-suite' ); ?>
+						</th>
+						<td>
+							<label>
+								<input type="checkbox" name="repro_ct_suite_auto_sync_enabled" value="1" <?php checked( $auto_sync_enabled, 1 ); ?> />
+								<?php esc_html_e( 'Aktiviert', 'repro-ct-suite' ); ?>
+							</label>
+							<p class="description">
+								<?php esc_html_e( 'Wenn aktiviert, werden Termine automatisch im gewählten Intervall synchronisiert.', 'repro-ct-suite' ); ?>
+			</p>
+						</td>
+					</tr>
+					
+					<tr>
+						<th scope="row">
+							<?php esc_html_e( 'Intervall', 'repro-ct-suite' ); ?>
+						</th>
+						<td>
+							<input type="number" name="repro_ct_suite_sync_interval" value="<?php echo esc_attr( $sync_interval ); ?>" min="1" max="999" class="small-text" />
+							<select name="repro_ct_suite_sync_interval_unit">
+								<option value="minutes" <?php selected( $sync_interval_unit, 'minutes' ); ?>><?php esc_html_e( 'Minuten', 'repro-ct-suite' ); ?></option>
+								<option value="hours" <?php selected( $sync_interval_unit, 'hours' ); ?>><?php esc_html_e( 'Stunden', 'repro-ct-suite' ); ?></option>
+								<option value="days" <?php selected( $sync_interval_unit, 'days' ); ?>><?php esc_html_e( 'Tage', 'repro-ct-suite' ); ?></option>
+							</select>
+							<p class="description">
+								<?php esc_html_e( 'Mindestens 30 Minuten. Empfohlen: 2-6 Stunden.', 'repro-ct-suite' ); ?>
+							</p>
+						</td>
+					</tr>
+					
+					<?php if ( $auto_sync_enabled ) : ?>
+					<tr>
+						<th scope="row">
+							<?php esc_html_e( 'Status', 'repro-ct-suite' ); ?>
+						</th>
+						<td>
+							<?php if ( $next_scheduled ) : ?>
+								<strong><?php esc_html_e( 'Nächster Sync:', 'repro-ct-suite' ); ?></strong>
+								<?php echo esc_html( date_i18n( 'd.m.Y H:i', $next_scheduled ) ); ?>
+								(<?php echo esc_html( human_time_diff( time(), $next_scheduled ) ); ?>)
+								<br>
+							<?php endif; ?>
+							<?php if ( $last_sync ) : ?>
+								<strong><?php esc_html_e( 'Letzter Sync:', 'repro-ct-suite' ); ?></strong>
+								<?php echo esc_html( date_i18n( 'd.m.Y H:i', $last_sync ) ); ?>
+								(<?php echo esc_html( human_time_diff( $last_sync, time() ) ); ?> <?php esc_html_e( 'her', 'repro-ct-suite' ); ?>)
+							<?php endif; ?>
+						</td>
+					</tr>
+					<?php endif; ?>
+				</tbody>
+			</table>
+			
+			<p class="submit">
+				<button type="submit" name="repro_ct_suite_save_cron_settings" class="button button-primary">
+					<?php esc_html_e( 'Einstellungen speichern', 'repro-ct-suite' ); ?>
+				</button>
+			</p>
+		</form>
+	</div>
+</div>
+
+	</div>
+</div>

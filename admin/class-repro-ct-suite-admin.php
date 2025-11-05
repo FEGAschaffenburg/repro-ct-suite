@@ -275,6 +275,9 @@ class Repro_CT_Suite_Admin {
 	 * Add admin menu pages.
 	 */
 	public function add_admin_menu() {
+		// Prüfen ob Cron aktiv ist
+		$auto_sync_enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
+		
 		// Hauptmenü (Dashboard)
 		add_menu_page(
 			__( 'Repro CT-Suite', 'repro-ct-suite' ),
@@ -296,45 +299,17 @@ class Repro_CT_Suite_Admin {
 			array( $this, 'display_admin_page' )
 		);
 
-		// Submenu: Termine (vereinheitlichte Terminverwaltung)
-		add_submenu_page(
-			'repro-ct-suite',
-			__( 'Termine', 'repro-ct-suite' ),
-			__( 'Termine', 'repro-ct-suite' ),
-			'manage_options',
-			'repro-ct-suite-events',
-			array( $this, 'display_events_page' )
-		);
-
-		// Submenu: Einstellungen
-		add_submenu_page(
-			'repro-ct-suite',
-			__( 'Einstellungen', 'repro-ct-suite' ),
-			__( 'Einstellungen', 'repro-ct-suite' ),
-			'manage_options',
-			'repro-ct-suite-settings',
-			array( $this, 'display_settings_page' )
-		);
-
-		// Submenu: Update-Info (immer sichtbar)
-		add_submenu_page(
-			'repro-ct-suite',
-			__( 'Update-Info', 'repro-ct-suite' ),
-			__( 'Update-Info', 'repro-ct-suite' ),
-			'manage_options',
-			'repro-ct-suite-update',
-			array( $this, 'display_update_page' )
-		);
-
-		// Submenu: Debug (immer sichtbar für Admins)
-		add_submenu_page(
-			'repro-ct-suite',
-			__( 'Debug', 'repro-ct-suite' ),
-			__( 'Debug', 'repro-ct-suite' ),
-			'manage_options',
-			'repro-ct-suite-debug',
-			array( $this, 'display_debug_page' )
-		);
+		// Submenu: Termine (nur wenn Cron nicht aktiv)
+		if ( ! $auto_sync_enabled ) {
+			add_submenu_page(
+				'repro-ct-suite',
+				__( 'Termine', 'repro-ct-suite' ),
+				__( 'Termine', 'repro-ct-suite' ),
+				'manage_options',
+				'repro-ct-suite-events',
+				array( $this, 'display_events_page' )
+			);
+		}
 	}
 
 	/**
@@ -345,31 +320,10 @@ class Repro_CT_Suite_Admin {
 	}
 
 	/**
-	 * Display the update info page.
-	 */
-	public function display_update_page() {
-		include_once plugin_dir_path( __FILE__ ) . 'views/admin-update.php';
-	}
-
-	/**
 	 * Display the events (Terminkalender) page.
 	 */
 	public function display_events_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
-	}
-
-	/**
-	 * Display the settings page.
-	 */
-	public function display_settings_page() {
-		include_once plugin_dir_path( __FILE__ ) . 'views/admin-settings.php';
-	}
-
-	/**
-	 * Display the debug page.
-	 */
-	public function display_debug_page() {
-		include_once plugin_dir_path( __FILE__ ) . 'views/admin-debug.php';
 	}
 
 	/**
