@@ -179,14 +179,13 @@ class Repro_CT_Suite_Cron {
 	public static function execute_sync() {
 		// Logger initialisieren
 		require_once plugin_dir_path( __FILE__ ) . 'class-repro-ct-suite-logger.php';
-		$logger = Repro_CT_Suite_Logger::get_instance();
 		
-		$logger->info( '🔄 Automatischer Sync gestartet' );
+		Repro_CT_Suite_Logger::log( '🔄 Automatischer Sync gestartet', 'info' );
 		
 		// Prüfen ob Sync aktiviert ist
 		$enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
 		if ( ! $enabled ) {
-			$logger->warning( 'Auto-Sync ist deaktiviert - Abbruch' );
+			Repro_CT_Suite_Logger::log( 'Auto-Sync ist deaktiviert - Abbruch', 'warning' );
 			return;
 		}
 		
@@ -196,7 +195,7 @@ class Repro_CT_Suite_Cron {
 		$password = get_option( 'repro_ct_suite_ct_password', '' );
 		
 		if ( empty( $tenant ) || empty( $username ) || empty( $password ) ) {
-			$logger->error( 'ChurchTools-Zugangsdaten nicht konfiguriert - Abbruch' );
+			Repro_CT_Suite_Logger::log( 'ChurchTools-Zugangsdaten nicht konfiguriert - Abbruch', 'error' );
 			return;
 		}
 		
@@ -206,7 +205,7 @@ class Repro_CT_Suite_Cron {
 		$selected_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$calendars_table} WHERE is_selected = 1" );
 		
 		if ( $selected_count === 0 ) {
-			$logger->warning( 'Keine Kalender ausgewählt - Abbruch' );
+			Repro_CT_Suite_Logger::log( 'Keine Kalender ausgewählt - Abbruch', 'warning' );
 			return;
 		}
 		
@@ -227,11 +226,11 @@ class Repro_CT_Suite_Cron {
 			
 			$sync_service = new Repro_CT_Suite_Sync_Service( $client, $events_repo, $calendars_repo );
 			
-			$logger->info( 'Starte Synchronisation...' );
+			Repro_CT_Suite_Logger::log( 'Starte Synchronisation...', 'info' );
 			$result = $sync_service->sync_events();
 			
 			if ( is_wp_error( $result ) ) {
-				$logger->error( 'Sync fehlgeschlagen: ' . $result->get_error_message() );
+				Repro_CT_Suite_Logger::log( 'Sync fehlgeschlagen: ' . $result->get_error_message(), 'error' );
 				return;
 			}
 			
@@ -245,7 +244,7 @@ class Repro_CT_Suite_Cron {
 				'skipped' => $result['events_skipped'] ?? 0,
 			);
 			
-			$logger->info( sprintf(
+			Repro_CT_Suite_Logger::log( sprintf(
 				'Sync erfolgreich: %d Kalender, %d Events, %d Termine gefunden | %d neu, %d aktualisiert, %d übersprungen',
 				$stats['calendars'],
 				$stats['events'],
@@ -253,13 +252,13 @@ class Repro_CT_Suite_Cron {
 				$stats['inserted'],
 				$stats['updated'],
 				$stats['skipped']
-			) );
+			), 'success' );
 			
 			// Zeitstempel speichern
 			update_option( 'repro_ct_suite_last_auto_sync', time() );
 			
 		} catch ( Exception $e ) {
-			$logger->error( 'Sync-Fehler: ' . $e->getMessage() );
+			Repro_CT_Suite_Logger::log( 'Sync-Fehler: ' . $e->getMessage(), 'error' );
 		}
 	}
 
