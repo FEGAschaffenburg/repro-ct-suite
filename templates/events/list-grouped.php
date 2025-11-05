@@ -56,21 +56,19 @@ foreach ( $events as $event ) {
 									</span>
 								<?php endif; ?>
 								
-								<?php if ( in_array( 'title', $show_fields ) ) : ?>
-									<strong class="rcts-event-title">
-										<?php echo esc_html( $event->name ); ?>
-									</strong>
-								<?php endif; ?>
-							</div>
-							
-							<div class="rcts-event-meta">
-								<?php if ( in_array( 'location', $show_fields ) && ! empty( $event->location ) ) : ?>
-									<span class="rcts-event-location">
-										📍 <?php echo esc_html( $event->location ); ?>
-									</span>
-								<?php endif; ?>
-								
-								<?php if ( in_array( 'calendar', $show_fields ) && ! empty( $event->calendar_name ) ) : ?>
+							<?php if ( in_array( 'title', $show_fields ) ) : ?>
+								<strong class="rcts-event-title">
+									<?php echo esc_html( $event->title ); ?>
+								</strong>
+							<?php endif; ?>
+						</div>
+						
+						<div class="rcts-event-meta">
+							<?php if ( in_array( 'location', $show_fields ) && ! empty( $event->location_name ) ) : ?>
+								<span class="rcts-event-location">
+									📍 <?php echo esc_html( $event->location_name ); ?>
+								</span>
+							<?php endif; ?>								<?php if ( in_array( 'calendar', $show_fields ) && ! empty( $event->calendar_name ) ) : ?>
 									<span class="rcts-event-calendar" style="<?php echo ! empty( $event->calendar_color ) ? 'color: ' . esc_attr( $event->calendar_color ) : ''; ?>">
 										● <?php echo esc_html( $event->calendar_name ); ?>
 									</span>

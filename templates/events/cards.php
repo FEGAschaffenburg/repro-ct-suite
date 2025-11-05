@@ -48,7 +48,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<div class="rcts-card-title-wrap">
 							<?php if ( in_array( 'title', $show_fields ) ) : ?>
 								<h3 class="rcts-card-title">
-									<?php echo esc_html( $event->name ); ?>
+									<?php echo esc_html( $event->title ); ?>
 								</h3>
 							<?php endif; ?>
 							
@@ -63,15 +63,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</div>
 					</div>
 					
-					<div class="rcts-card-body">
-						<?php if ( in_array( 'location', $show_fields ) && ! empty( $event->location ) ) : ?>
-							<div class="rcts-card-location">
-								<span class="dashicons dashicons-location"></span>
-								<?php echo esc_html( $event->location ); ?>
-							</div>
-						<?php endif; ?>
-						
-						<?php if ( in_array( 'description', $show_fields ) && ! empty( $event->description ) ) : ?>
+				<div class="rcts-card-body">
+					<?php if ( in_array( 'location', $show_fields ) && ! empty( $event->location_name ) ) : ?>
+						<div class="rcts-card-location">
+							<span class="dashicons dashicons-location"></span>
+							<?php echo esc_html( $event->location_name ); ?>
+						</div>
+					<?php endif; ?>						<?php if ( in_array( 'description', $show_fields ) && ! empty( $event->description ) ) : ?>
 							<div class="rcts-card-description">
 								<?php 
 								// Beschreibung auf 150 Zeichen kürzen

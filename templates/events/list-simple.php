@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					
 					<?php if ( in_array( 'title', $show_fields ) ) : ?>
 						<strong class="rcts-event-title">
-							<?php echo esc_html( $event->name ); ?>
+							<?php echo esc_html( $event->title ); ?>
 						</strong>
 					<?php endif; ?>
 					
@@ -55,11 +55,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</span>
 						<?php endif; ?>
 						
-						<?php if ( in_array( 'location', $show_fields ) && ! empty( $event->location ) ) : ?>
-							<span class="rcts-event-location">
-								📍 <?php echo esc_html( $event->location ); ?>
-							</span>
-						<?php endif; ?>
+					<?php if ( in_array( 'location', $show_fields ) && ! empty( $event->location_name ) ) : ?>
+						<span class="rcts-event-location">
+							📍 <?php echo esc_html( $event->location_name ); ?>
+						</span>
+					<?php endif; ?>
 					</div>
 					
 					<?php if ( in_array( 'description', $show_fields ) && ! empty( $event->description ) ) : ?>
