@@ -76,6 +76,7 @@ if ( is_admin() ) {
 		if ( isset( $_GET['force-check'] ) ) {
 			delete_transient( 'repro_ct_suite_github_release_cache' );
 			delete_site_transient( 'update_plugins' );
+			wp_clean_plugins_cache();
 		}
 		
 		new Repro_CT_Suite_Updater(
@@ -86,15 +87,14 @@ if ( is_admin() ) {
 		);
 	});
 	
-	// Moderates Cache-Clearing nur für Plugin-Updates  
+	// AGGRESSIVE Cache-Clearing für Plugin-Updates bei Admin-Load
 	add_action( 'init', function() {
-		// Nur Cache für unser Plugin clearen, nicht bei jedem Admin-Load
 		if ( is_admin() && current_user_can( 'update_plugins' ) ) {
-			// Gelegentlich Update-Cache leeren (nicht bei jedem Request)
-			if ( ! get_transient( 'repro_ct_suite_last_check' ) ) {
-				delete_transient( 'repro_ct_suite_release_info' );
-				set_transient( 'repro_ct_suite_last_check', true, 300 ); // 5 Minuten
-			}
+			// Bei jedem Admin-Besuch alle Update-Caches löschen
+			delete_transient( 'repro_ct_suite_release_info' );
+			delete_transient( 'repro_ct_suite_github_release_cache' );
+			delete_site_transient( 'update_plugins' );
+			wp_clean_plugins_cache();
 		}
 	} );
 }
