@@ -37,11 +37,21 @@ class Repro_CT_Suite_Public {
 	 * Register the stylesheets for the public-facing side of the site.
 	 */
 	public function enqueue_styles() {
+		// Basis Public CSS
 		wp_enqueue_style(
 			$this->plugin_name,
 			plugin_dir_url( __FILE__ ) . 'css/repro-ct-suite-public.css',
 			array(),
 			null,
+			'all'
+		);
+		
+		// Frontend Events CSS
+		wp_enqueue_style(
+			$this->plugin_name . '-frontend',
+			plugin_dir_url( __FILE__ ) . 'css/repro-ct-suite-frontend.css',
+			array(),
+			REPRO_CT_SUITE_VERSION,
 			'all'
 		);
 	}

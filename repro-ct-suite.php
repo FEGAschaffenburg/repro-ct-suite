@@ -183,6 +183,12 @@ add_filter(
 function run_repro_ct_suite() {
 	$plugin = new Repro_CT_Suite();
 	$plugin->run();
+	
+	// Shortcodes initialisieren
+	if ( ! is_admin() ) {
+		require_once REPRO_CT_SUITE_PATH . 'includes/class-repro-ct-suite-shortcodes.php';
+		new Repro_CT_Suite_Shortcodes();
+	}
 }
 run_repro_ct_suite();
 
