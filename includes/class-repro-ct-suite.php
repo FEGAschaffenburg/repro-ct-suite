@@ -55,10 +55,14 @@ class Repro_CT_Suite {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-migrations.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-cron.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-repro-ct-suite-admin.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-repro-ct-suite-public.php';
 
 		$this->loader = new Repro_CT_Suite_Loader();
+		
+		// Cron initialisieren
+		Repro_CT_Suite_Cron::init();
 	}
 
 	/**

@@ -306,6 +306,16 @@ class Repro_CT_Suite_Admin {
 			array( $this, 'display_events_page' )
 		);
 
+		// Submenu: Einstellungen
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Einstellungen', 'repro-ct-suite' ),
+			__( 'Einstellungen', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-settings',
+			array( $this, 'display_settings_page' )
+		);
+
 		// Submenu: Update-Info (immer sichtbar)
 		add_submenu_page(
 			'repro-ct-suite',
@@ -346,6 +356,13 @@ class Repro_CT_Suite_Admin {
 	 */
 	public function display_events_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
+	}
+
+	/**
+	 * Display the settings page.
+	 */
+	public function display_settings_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-settings.php';
 	}
 
 	/**
