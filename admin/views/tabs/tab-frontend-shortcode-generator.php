@@ -24,6 +24,37 @@ $calendars = $wpdb->get_results( "SELECT id, calendar_id, name, color FROM {$cal
 				<?php esc_html_e( 'Erstellen Sie einen individualisierten Shortcode für die Anzeige Ihrer Termine.', 'repro-ct-suite' ); ?>
 			</p>
 
+			<!-- Preset Manager -->
+			<div class="preset-manager">
+				<div class="preset-controls">
+					<div class="preset-load">
+						<label for="preset-select">
+							<?php esc_html_e( 'Gespeicherte Presets', 'repro-ct-suite' ); ?>
+						</label>
+						<div class="preset-select-wrapper">
+							<select id="preset-select" class="regular-text">
+								<option value=""><?php esc_html_e( '-- Neues Preset --', 'repro-ct-suite' ); ?></option>
+							</select>
+							<button type="button" id="load-preset-btn" class="button" disabled>
+								<span class="dashicons dashicons-download"></span>
+								<?php esc_html_e( 'Laden', 'repro-ct-suite' ); ?>
+							</button>
+							<button type="button" id="delete-preset-btn" class="button button-link-delete" disabled>
+								<span class="dashicons dashicons-trash"></span>
+							</button>
+						</div>
+					</div>
+					<div class="preset-save">
+						<button type="button" id="save-preset-btn" class="button">
+							<span class="dashicons dashicons-saved"></span>
+							<?php esc_html_e( 'Als Preset speichern', 'repro-ct-suite' ); ?>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<hr style="margin: 20px 0;">
+
 			<form id="shortcode-generator-form" class="generator-form">
 				
 				<!-- Ansicht -->
@@ -172,6 +203,57 @@ $calendars = $wpdb->get_results( "SELECT id, calendar_id, name, color FROM {$cal
 </div>
 
 <style>
+.preset-manager {
+	background: #f9f9f9;
+	padding: 15px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-bottom: 20px;
+}
+
+.preset-controls {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	gap: 15px;
+}
+
+.preset-load label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 600;
+}
+
+.preset-select-wrapper {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.preset-select-wrapper select {
+	flex: 1;
+}
+
+.preset-select-wrapper button {
+	white-space: nowrap;
+}
+
+#delete-preset-btn {
+	color: #a00;
+}
+
+#delete-preset-btn:hover {
+	color: #dc3232;
+}
+
+.preset-save {
+	display: flex;
+	align-items: flex-end;
+}
+
+.preset-save button {
+	width: 100%;
+}
+
 .generator-columns {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -385,5 +467,182 @@ jQuery(document).ready(function($) {
 
 	// Initial generieren
 	generateShortcode();
+
+	// ========================================
+	// PRESET MANAGEMENT
+	// ========================================
+
+	var presets = [];
+	var currentPresetId = null;
+
+	// Presets laden
+	function loadPresets() {
+		$.post(ajaxurl, {
+			action: 'repro_ct_suite_get_presets',
+			nonce: '<?php echo wp_create_nonce( 'repro_ct_suite_presets' ); ?>'
+		}, function(response) {
+			if (response.success) {
+				presets = response.data.presets;
+				updatePresetDropdown();
+			}
+		});
+	}
+
+	// Preset-Dropdown aktualisieren
+	function updatePresetDropdown() {
+		var $select = $('#preset-select');
+		$select.find('option:not(:first)').remove();
+		
+		presets.forEach(function(preset) {
+			$select.append(
+				$('<option></option>')
+					.val(preset.id)
+					.text(preset.name)
+			);
+		});
+	}
+
+	// Preset-Select onChange
+	$('#preset-select').on('change', function() {
+		var presetId = $(this).val();
+		var hasPreset = presetId !== '';
+		
+		$('#load-preset-btn').prop('disabled', !hasPreset);
+		$('#delete-preset-btn').prop('disabled', !hasPreset);
+		
+		currentPresetId = hasPreset ? parseInt(presetId) : null;
+	});
+
+	// Preset laden
+	$('#load-preset-btn').on('click', function() {
+		if (!currentPresetId) return;
+
+		$.post(ajaxurl, {
+			action: 'repro_ct_suite_load_preset',
+			preset_id: currentPresetId,
+			nonce: '<?php echo wp_create_nonce( 'repro_ct_suite_presets' ); ?>'
+		}, function(response) {
+			if (response.success) {
+				var preset = response.data.preset;
+				fillFormWithPreset(preset);
+				alert('<?php esc_html_e( 'Preset geladen!', 'repro-ct-suite' ); ?>');
+			} else {
+				alert('<?php esc_html_e( 'Fehler beim Laden:', 'repro-ct-suite' ); ?> ' + response.data.message);
+			}
+		});
+	});
+
+	// Formular mit Preset-Daten füllen
+	function fillFormWithPreset(preset) {
+		// View
+		$('#view').val(preset.view || 'cards');
+		
+		// Limit
+		$('#limit').val(preset.limit_count || 10);
+		
+		// Calendar IDs
+		$('#calendar_ids').val([]);
+		if (preset.calendar_ids) {
+			var ids = preset.calendar_ids.split(',');
+			$('#calendar_ids').val(ids);
+		}
+		
+		// Date range
+		$('#from_days').val(preset.from_days || 0);
+		$('#to_days').val(preset.to_days || 90);
+		
+		// Show past
+		$('#show_past').prop('checked', preset.show_past == 1);
+		
+		// Order
+		$('#order').val(preset.order_dir || 'ASC');
+		
+		// Show fields
+		$('#show_fields input[type="checkbox"]').prop('checked', false);
+		if (preset.show_fields) {
+			var fields = preset.show_fields.split(',');
+			fields.forEach(function(field) {
+				$('#show_fields input[value="' + field + '"]').prop('checked', true);
+			});
+		}
+		
+		// Shortcode neu generieren
+		generateShortcode();
+	}
+
+	// Preset speichern
+	$('#save-preset-btn').on('click', function() {
+		var name = prompt('<?php esc_html_e( 'Name für das Preset:', 'repro-ct-suite' ); ?>');
+		
+		if (!name || name.trim() === '') {
+			alert('<?php esc_html_e( 'Bitte geben Sie einen Namen ein.', 'repro-ct-suite' ); ?>');
+			return;
+		}
+
+		var presetData = getFormData();
+		presetData.name = name.trim();
+
+		$.post(ajaxurl, {
+			action: 'repro_ct_suite_save_preset',
+			preset: presetData,
+			nonce: '<?php echo wp_create_nonce( 'repro_ct_suite_presets' ); ?>'
+		}, function(response) {
+			if (response.success) {
+				alert('<?php esc_html_e( 'Preset gespeichert!', 'repro-ct-suite' ); ?>');
+				loadPresets();
+			} else {
+				alert('<?php esc_html_e( 'Fehler:', 'repro-ct-suite' ); ?> ' + response.data.message);
+			}
+		});
+	});
+
+	// Preset löschen
+	$('#delete-preset-btn').on('click', function() {
+		if (!currentPresetId) return;
+
+		if (!confirm('<?php esc_html_e( 'Preset wirklich löschen?', 'repro-ct-suite' ); ?>')) {
+			return;
+		}
+
+		$.post(ajaxurl, {
+			action: 'repro_ct_suite_delete_preset',
+			preset_id: currentPresetId,
+			nonce: '<?php echo wp_create_nonce( 'repro_ct_suite_presets' ); ?>'
+		}, function(response) {
+			if (response.success) {
+				alert('<?php esc_html_e( 'Preset gelöscht!', 'repro-ct-suite' ); ?>');
+				$('#preset-select').val('');
+				$('#load-preset-btn').prop('disabled', true);
+				$('#delete-preset-btn').prop('disabled', true);
+				currentPresetId = null;
+				loadPresets();
+			} else {
+				alert('<?php esc_html_e( 'Fehler:', 'repro-ct-suite' ); ?> ' + response.data.message);
+			}
+		});
+	});
+
+	// Formular-Daten sammeln
+	function getFormData() {
+		var selectedCalendars = $('#calendar_ids').val() || [];
+		var selectedFields = [];
+		$('#show_fields input[type="checkbox"]:checked').each(function() {
+			selectedFields.push($(this).val());
+		});
+
+		return {
+			view: $('#view').val(),
+			limit_count: parseInt($('#limit').val()) || 10,
+			calendar_ids: selectedCalendars.join(','),
+			from_days: parseInt($('#from_days').val()) || 0,
+			to_days: parseInt($('#to_days').val()) || 90,
+			show_past: $('#show_past').is(':checked') ? 1 : 0,
+			order_dir: $('#order').val(),
+			show_fields: selectedFields.join(',')
+		};
+	}
+
+	// Presets initial laden
+	loadPresets();
 });
 </script>

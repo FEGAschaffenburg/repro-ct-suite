@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Migrations {
 
-	const DB_VERSION = '8';
+	const DB_VERSION = '9';
 	const OPTION_KEY = 'repro_ct_suite_db_version';
 
 	/**
@@ -32,6 +32,7 @@ class Repro_CT_Suite_Migrations {
 			$events_table       = $wpdb->prefix . 'rcts_events';
 			$services_table     = $wpdb->prefix . 'rcts_event_services';
 			$schedule_table     = $wpdb->prefix . 'rcts_schedule';
+			$presets_table      = $wpdb->prefix . 'rcts_shortcode_presets';
 
 			// Prüfe Datenbankverbindung
 			if ( empty( $wpdb->dbh ) ) {
@@ -129,6 +130,26 @@ class Repro_CT_Suite_Migrations {
 
 		dbDelta( $sql_schedule );
 
+		// Shortcode Presets (für gespeicherte Shortcode-Konfigurationen)
+		$sql_presets = "CREATE TABLE {$presets_table} (
+			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			name VARCHAR(255) NOT NULL,
+			view VARCHAR(50) NULL,
+			limit_count INT(11) NULL,
+			calendar_ids TEXT NULL,
+			from_days INT(11) NULL,
+			to_days INT(11) NULL,
+			show_past TINYINT(1) NULL,
+			order_dir VARCHAR(10) NULL,
+			show_fields TEXT NULL,
+			created_at DATETIME NOT NULL,
+			updated_at DATETIME NOT NULL,
+			PRIMARY KEY  (id),
+			KEY name (name)
+		) {$charset_collate};";
+
+		dbDelta( $sql_presets );
+
 		// Versionsabhängige Daten-Migrationen
 		$current = get_option( self::OPTION_KEY, '0' );
 		
@@ -150,6 +171,11 @@ class Repro_CT_Suite_Migrations {
 		// Migration von Version 7 auf 8: external_id umbenennen zu event_id / calendar_id
 		if ( version_compare( $current, '8', '<' ) ) {
 			self::migrate_rename_external_id_v8();
+		}
+		
+		// Migration von Version 8 auf 9: Standard-Presets erstellen
+		if ( version_compare( $current, '9', '<' ) ) {
+			self::migrate_create_default_presets_v9();
 		}
 
 		// Platzhalter für zukünftige Migrationen (z.B. Backfill der Schedule-Tabelle)
@@ -481,6 +507,109 @@ class Repro_CT_Suite_Migrations {
 		}
 		
 		error_log( 'Repro CT-Suite: Migration V8 abgeschlossen' );
+	}
+
+	/**
+	 * Migration V9: Standard-Presets für Shortcode Generator erstellen
+	 * 
+	 * Fügt vordefinierte Shortcode-Presets hinzu für häufige Anwendungsfälle.
+	 */
+	private static function migrate_create_default_presets_v9() {
+		global $wpdb;
+		
+		$presets_table = $wpdb->prefix . 'rcts_shortcode_presets';
+		
+		error_log( 'Repro CT-Suite: Starte Migration V9 - Standard-Presets erstellen' );
+		
+		// Prüfe ob Tabelle leer ist
+		$count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$presets_table}" );
+		
+		if ( $count > 0 ) {
+			error_log( 'Migration V9: Presets bereits vorhanden - überspringe Erstellung' );
+			return;
+		}
+		
+		$current_time = current_time( 'mysql' );
+		
+		// Standard-Presets definieren
+		$default_presets = array(
+			array(
+				'name'         => 'Nächste 10 Events',
+				'view'         => 'list-simple',
+				'limit_count'  => 10,
+				'calendar_ids' => null,
+				'from_days'    => 0,
+				'to_days'      => 90,
+				'show_past'    => 0,
+				'order_dir'    => 'ASC',
+				'show_fields'  => 'title,date,time,location',
+				'created_at'   => $current_time,
+				'updated_at'   => $current_time,
+			),
+			array(
+				'name'         => 'Diese Woche',
+				'view'         => 'list-grouped',
+				'limit_count'  => 50,
+				'calendar_ids' => null,
+				'from_days'    => 0,
+				'to_days'      => 7,
+				'show_past'    => 0,
+				'order_dir'    => 'ASC',
+				'show_fields'  => 'title,date,time,location,description',
+				'created_at'   => $current_time,
+				'updated_at'   => $current_time,
+			),
+			array(
+				'name'         => 'Monatsübersicht',
+				'view'         => 'cards',
+				'limit_count'  => 30,
+				'calendar_ids' => null,
+				'from_days'    => 0,
+				'to_days'      => 30,
+				'show_past'    => 0,
+				'order_dir'    => 'ASC',
+				'show_fields'  => 'title,date,time,location',
+				'created_at'   => $current_time,
+				'updated_at'   => $current_time,
+			),
+			array(
+				'name'         => 'Letzte Veranstaltungen',
+				'view'         => 'list-simple',
+				'limit_count'  => 5,
+				'calendar_ids' => null,
+				'from_days'    => -30,
+				'to_days'      => 0,
+				'show_past'    => 1,
+				'order_dir'    => 'DESC',
+				'show_fields'  => 'title,date,calendar',
+				'created_at'   => $current_time,
+				'updated_at'   => $current_time,
+			),
+			array(
+				'name'         => 'Alle Events (Kacheln)',
+				'view'         => 'cards',
+				'limit_count'  => 100,
+				'calendar_ids' => null,
+				'from_days'    => 0,
+				'to_days'      => 365,
+				'show_past'    => 0,
+				'order_dir'    => 'ASC',
+				'show_fields'  => 'title,date,time,location,description,calendar',
+				'created_at'   => $current_time,
+				'updated_at'   => $current_time,
+			),
+		);
+		
+		// Presets einfügen
+		$inserted = 0;
+		foreach ( $default_presets as $preset ) {
+			$result = $wpdb->insert( $presets_table, $preset );
+			if ( $result ) {
+				$inserted++;
+			}
+		}
+		
+		error_log( "Migration V9: {$inserted} Standard-Presets erstellt" );
 	}
 
 	/**

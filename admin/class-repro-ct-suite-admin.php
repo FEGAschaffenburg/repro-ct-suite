@@ -60,6 +60,13 @@ class Repro_CT_Suite_Admin {
 		add_action( 'wp_ajax_repro_ct_suite_update_event', array( $this, 'ajax_update_event' ) );
 		add_action( 'wp_ajax_repro_ct_suite_dismiss_v6_notice', array( $this, 'ajax_dismiss_v6_notice' ) );
 		add_action( 'wp_ajax_repro_ct_suite_preview_shortcode', array( $this, 'ajax_preview_shortcode' ) );
+		
+		// Preset AJAX Handlers
+		add_action( 'wp_ajax_repro_ct_suite_get_presets', array( $this, 'ajax_get_presets' ) );
+		add_action( 'wp_ajax_repro_ct_suite_save_preset', array( $this, 'ajax_save_preset' ) );
+		add_action( 'wp_ajax_repro_ct_suite_update_preset', array( $this, 'ajax_update_preset' ) );
+		add_action( 'wp_ajax_repro_ct_suite_delete_preset', array( $this, 'ajax_delete_preset' ) );
+		add_action( 'wp_ajax_repro_ct_suite_load_preset', array( $this, 'ajax_load_preset' ) );
 	}
 
 	/**
@@ -1727,6 +1734,195 @@ class Repro_CT_Suite_Admin {
 			'html' => $html
 		) );
 	}
+
+	/**
+	 * AJAX Handler: Alle Presets abrufen
+	 */
+	public function ajax_get_presets() {
+		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-shortcode-presets-repository.php';
+		$repository = new Repro_CT_Suite_Shortcode_Presets_Repository();
+
+		$presets = $repository->get_all();
+
+		wp_send_json_success( array(
+			'presets' => $presets
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Preset speichern
+	 */
+	public function ajax_save_preset() {
+		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$preset_data = isset( $_POST['preset'] ) ? $_POST['preset'] : array();
+
+		if ( empty( $preset_data['name'] ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Preset-Name ist erforderlich.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-shortcode-presets-repository.php';
+		$repository = new Repro_CT_Suite_Shortcode_Presets_Repository();
+
+		// Prüfe ob Name bereits existiert
+		if ( $repository->name_exists( $preset_data['name'] ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ein Preset mit diesem Namen existiert bereits.', 'repro-ct-suite' )
+			) );
+		}
+
+		$preset_id = $repository->save( $preset_data );
+
+		if ( $preset_id === false ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Speichern des Presets.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'message'   => __( 'Preset erfolgreich gespeichert.', 'repro-ct-suite' ),
+			'preset_id' => $preset_id
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Preset aktualisieren
+	 */
+	public function ajax_update_preset() {
+		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$preset_id = isset( $_POST['preset_id'] ) ? intval( $_POST['preset_id'] ) : 0;
+		$preset_data = isset( $_POST['preset'] ) ? $_POST['preset'] : array();
+
+		if ( ! $preset_id ) {
+			wp_send_json_error( array(
+				'message' => __( 'Preset-ID fehlt.', 'repro-ct-suite' )
+			) );
+		}
+
+		if ( empty( $preset_data['name'] ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Preset-Name ist erforderlich.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-shortcode-presets-repository.php';
+		$repository = new Repro_CT_Suite_Shortcode_Presets_Repository();
+
+		// Prüfe ob Name bereits existiert (außer bei diesem Preset)
+		if ( $repository->name_exists( $preset_data['name'], $preset_id ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Ein anderes Preset mit diesem Namen existiert bereits.', 'repro-ct-suite' )
+			) );
+		}
+
+		$success = $repository->update( $preset_id, $preset_data );
+
+		if ( ! $success ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Aktualisieren des Presets.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'message' => __( 'Preset erfolgreich aktualisiert.', 'repro-ct-suite' )
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Preset löschen
+	 */
+	public function ajax_delete_preset() {
+		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$preset_id = isset( $_POST['preset_id'] ) ? intval( $_POST['preset_id'] ) : 0;
+
+		if ( ! $preset_id ) {
+			wp_send_json_error( array(
+				'message' => __( 'Preset-ID fehlt.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-shortcode-presets-repository.php';
+		$repository = new Repro_CT_Suite_Shortcode_Presets_Repository();
+
+		$success = $repository->delete( $preset_id );
+
+		if ( ! $success ) {
+			wp_send_json_error( array(
+				'message' => __( 'Fehler beim Löschen des Presets.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'message' => __( 'Preset erfolgreich gelöscht.', 'repro-ct-suite' )
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Preset laden
+	 */
+	public function ajax_load_preset() {
+		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$preset_id = isset( $_POST['preset_id'] ) ? intval( $_POST['preset_id'] ) : 0;
+
+		if ( ! $preset_id ) {
+			wp_send_json_error( array(
+				'message' => __( 'Preset-ID fehlt.', 'repro-ct-suite' )
+			) );
+		}
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-shortcode-presets-repository.php';
+		$repository = new Repro_CT_Suite_Shortcode_Presets_Repository();
+
+		$preset = $repository->get_by_id( $preset_id );
+
+		if ( ! $preset ) {
+			wp_send_json_error( array(
+				'message' => __( 'Preset nicht gefunden.', 'repro-ct-suite' )
+			) );
+		}
+
+		wp_send_json_success( array(
+			'preset' => $preset
+		) );
+	}
 }
+
 
 
