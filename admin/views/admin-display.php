@@ -65,6 +65,12 @@ $auto_sync_enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
 					<?php esc_html_e( 'Update', 'repro-ct-suite' ); ?>
 				</a>
 			</li>
+			<li>
+				<a href="#debug" class="<?php echo $active_tab === 'debug' ? 'active' : ''; ?>">
+					<span class="dashicons dashicons-admin-tools"></span>
+					<?php esc_html_e( 'Debug', 'repro-ct-suite' ); ?>
+				</a>
+			</li>
 		</ul>
 	</div>
 
@@ -88,6 +94,11 @@ $auto_sync_enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
 	<!-- Tab: Update -->
 	<div id="update" class="repro-ct-suite-tab-content <?php echo $active_tab === 'update' ? 'active' : ''; ?>">
 		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-update.php'; ?>
+	</div>
+
+	<!-- Tab: Debug -->
+	<div id="debug" class="repro-ct-suite-tab-content <?php echo $active_tab === 'debug' ? 'active' : ''; ?>">
+		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-debug.php'; ?>
 	</div>
 
 </div>

@@ -526,8 +526,16 @@
 }
 
 /* ==========================================================================
-   Grid System
+   Grid & Layout System
    ========================================================================== */
+
+/**
+ * Box Container für zentrierte Inhalte (max-width)
+ */
+.repro-ct-suite-box {
+	max-width: 1200px;
+	margin: 0 auto;
+}
 
 /**
  * Flexibles Grid für responsive Layouts
@@ -544,6 +552,15 @@
 
 .repro-ct-suite-grid-3 {
 	grid-template-columns: repeat(3, 1fr);
+}
+
+/**
+ * Box-Container für begrenzte Breite (max 900px)
+ * Verwendet für Update-Tab und ähnliche Bereiche
+ */
+.repro-ct-suite-box {
+	max-width: 900px;
+	margin: 0 auto;
 }
 
 /**
