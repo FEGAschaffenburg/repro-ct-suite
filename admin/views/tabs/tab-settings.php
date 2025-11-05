@@ -91,9 +91,23 @@ if ( $test_result !== false ) {
 					</td>
 				</tr>
 			</table>
+			<p>
+				<button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-primary">
+					<span class="dashicons dashicons-yes"></span>
+					<?php esc_html_e( 'Zugangsdaten speichern', 'repro-ct-suite' ); ?>
+				</button>
+				<?php if ( ! empty( $tenant ) || ! empty( $username ) || ! empty( $enc_pw ) ) : ?>
+					<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-danger" id="reset-login-credentials" style="margin-left: 10px;">
+						<span class="dashicons dashicons-trash"></span>
+						<?php esc_html_e( 'Zugangsdaten löschen', 'repro-ct-suite' ); ?>
+					</button>
+				<?php endif; ?>
+			</p>
+
+			<hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
 
 			<!-- Sync-Zeitraum -->
-			<h4 style="margin-top: 30px;"><?php esc_html_e( 'Sync-Zeitraum', 'repro-ct-suite' ); ?></h4>
+			<h4><?php esc_html_e( 'Sync-Zeitraum', 'repro-ct-suite' ); ?></h4>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row">
@@ -118,9 +132,17 @@ if ( $test_result !== false ) {
 					</td>
 				</tr>
 			</table>
+			<p>
+				<button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-secondary">
+					<span class="dashicons dashicons-yes"></span>
+					<?php esc_html_e( 'Zeitraum speichern', 'repro-ct-suite' ); ?>
+				</button>
+			</p>
+
+			<hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
 
 			<!-- Erweiterte Einstellungen -->
-			<h4 style="margin-top: 30px;"><?php esc_html_e( 'Erweitert', 'repro-ct-suite' ); ?></h4>
+			<h4><?php esc_html_e( 'Erweitert', 'repro-ct-suite' ); ?></h4>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><?php esc_html_e( 'Logging: Syslog aktivieren', 'repro-ct-suite' ); ?></th>
@@ -130,20 +152,13 @@ if ( $test_result !== false ) {
 					</td>
 				</tr>
 			</table>
-
-			<!-- Speichern-Button -->
-			<p style="margin-top: 20px;">
-				<button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-primary">
+			<p>
+				<button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-secondary">
 					<span class="dashicons dashicons-yes"></span>
-					<?php esc_html_e( 'Einstellungen speichern', 'repro-ct-suite' ); ?>
+					<?php esc_html_e( 'Erweiterte Einstellungen speichern', 'repro-ct-suite' ); ?>
 				</button>
-				<?php if ( ! empty( $tenant ) || ! empty( $username ) || ! empty( $enc_pw ) ) : ?>
-					<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-danger" id="reset-login-credentials" style="margin-left: 10px;">
-						<span class="dashicons dashicons-trash"></span>
-						<?php esc_html_e( 'Zugangsdaten löschen', 'repro-ct-suite' ); ?>
-					</button>
-				<?php endif; ?>
 			</p>
+
 		</form>
 
 		<script>
