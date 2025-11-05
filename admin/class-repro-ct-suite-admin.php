@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -336,6 +336,8 @@ class Repro_CT_Suite_Admin {
 			return;
 		}
 
+		Repro_CT_Suite_Logger::log( 'info', '🔌 Login-Test gestartet' );
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-crypto.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-ct-client.php';
 
@@ -344,15 +346,27 @@ class Repro_CT_Suite_Admin {
 		$test_password_enc = get_option( 'repro_ct_suite_ct_password', '' );
 		$test_password     = Repro_CT_Suite_Crypto::decrypt( $test_password_enc );
 
+		Repro_CT_Suite_Logger::log( 'debug', sprintf( 'Zugangsdaten geladen - Tenant: %s, Username: %s', $test_tenant, $test_username ) );
+
 		if ( empty( $test_tenant ) || empty( $test_username ) || empty( $test_password ) ) {
+			Repro_CT_Suite_Logger::log( 'error', '❌ Login-Test fehlgeschlagen: Zugangsdaten unvollständig' );
 			set_transient( 'repro_ct_suite_test_result', new WP_Error( 'missing_credentials', __( 'Bitte alle Felder ausfüllen.', 'repro-ct-suite' ) ), 30 );
 		} else {
 			$client = new Repro_CT_Suite_CT_Client( $test_tenant, $test_username, $test_password );
+			Repro_CT_Suite_Logger::log( 'debug', 'CT-Client erstellt, starte Login-Versuch' );
+			
 			$login  = $client->login();
 			if ( is_wp_error( $login ) ) {
+				Repro_CT_Suite_Logger::log( 'error', sprintf( '❌ Login fehlgeschlagen: %s', $login->get_error_message() ) );
 				set_transient( 'repro_ct_suite_test_result', $login, 30 );
 			} else {
+				Repro_CT_Suite_Logger::log( 'success', '✅ Login erfolgreich, rufe whoami() ab' );
 				$whoami = $client->whoami();
+				if ( is_wp_error( $whoami ) ) {
+					Repro_CT_Suite_Logger::log( 'error', sprintf( '❌ whoami() fehlgeschlagen: %s', $whoami->get_error_message() ) );
+				} else {
+					Repro_CT_Suite_Logger::log( 'success', sprintf( '✅ Login-Test erfolgreich - User: %s', $whoami['userName'] ?? 'unbekannt' ) );
+				}
 				set_transient( 'repro_ct_suite_test_result', is_wp_error( $whoami ) ? $whoami : true, 30 );
 			}
 		}
