@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.7.3
+Stable tag: 0.7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,14 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.7.4 =
+* FEATURE: WordPress-Zeitformat-Unterstützung in Templates
+* Zeiten zeigen "Uhr" bei 24h-Format (z.B. "14:30 Uhr")
+* Zeiten zeigen AM/PM bei 12h-Format (z.B. "2:30 PM")
+* Automatische Erkennung über WordPress Einstellung (Settings → General → Time Format)
+* Betrifft alle 3 Templates: list-simple, list-grouped, cards
+* Verwendet time_formatted statt hartkodiertem H:i Format
 
 = 0.7.3 =
 * KRITISCHER FIX: Template-Fehler "Undefined property: $event->name" behoben

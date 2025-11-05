@@ -46,17 +46,15 @@ foreach ( $events as $event ) {
 					<?php foreach ( $group['events'] as $event ) : ?>
 						<li class="rcts-event-item" data-event-id="<?php echo esc_attr( $event->id ); ?>">
 							
-							<div class="rcts-event-time-title">
-								<?php if ( in_array( 'time', $show_fields ) || in_array( 'datetime', $show_fields ) ) : ?>
-									<span class="rcts-event-time">
-										<?php echo esc_html( $event->start_time ); ?>
-										<?php if ( ! empty( $event->end_time ) ) : ?>
-											- <?php echo esc_html( $event->end_time ); ?>
-										<?php endif; ?>
-									</span>
-								<?php endif; ?>
-								
-							<?php if ( in_array( 'title', $show_fields ) ) : ?>
+						<div class="rcts-event-time-title">
+							<?php if ( in_array( 'time', $show_fields ) || in_array( 'datetime', $show_fields ) ) : ?>
+								<span class="rcts-event-time">
+									<?php echo esc_html( $event->time_formatted ); ?>
+									<?php if ( ! empty( $event->end_time_formatted ) ) : ?>
+										- <?php echo esc_html( $event->end_time_formatted ); ?>
+									<?php endif; ?>
+								</span>
+							<?php endif; ?>							<?php if ( in_array( 'title', $show_fields ) ) : ?>
 								<strong class="rcts-event-title">
 									<?php echo esc_html( $event->title ); ?>
 								</strong>

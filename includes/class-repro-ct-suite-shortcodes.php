@@ -142,7 +142,20 @@ class Repro_CT_Suite_Shortcodes {
 			$event->start_time = wp_date( 'H:i', strtotime( $event->start_datetime ) );
 			$event->end_time   = $event->end_datetime ? wp_date( 'H:i', strtotime( $event->end_datetime ) ) : '';
 			$event->date_formatted = wp_date( get_option( 'date_format' ), strtotime( $event->start_datetime ) );
-			$event->time_formatted = wp_date( get_option( 'time_format' ), strtotime( $event->start_datetime ) );
+			
+			// Zeit-Formatierung mit WordPress-Einstellungen
+			$time_format = get_option( 'time_format' );
+			$event->time_formatted = wp_date( $time_format, strtotime( $event->start_datetime ) );
+			$event->end_time_formatted = $event->end_datetime ? wp_date( $time_format, strtotime( $event->end_datetime ) ) : '';
+			
+			// "Uhr" bei 24h-Format hinzufügen, AM/PM bei 12h-Format ist bereits im Format
+			$is_24h_format = ( strpos( $time_format, 'a' ) === false && strpos( $time_format, 'A' ) === false );
+			if ( $is_24h_format ) {
+				$event->time_formatted .= ' Uhr';
+				if ( $event->end_time_formatted ) {
+					$event->end_time_formatted .= ' Uhr';
+				}
+			}
 		}
 
 		return $events;

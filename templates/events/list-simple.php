@@ -46,16 +46,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</span>
 						<?php endif; ?>
 						
-						<?php if ( in_array( 'time', $show_fields ) || in_array( 'datetime', $show_fields ) ) : ?>
-							<span class="rcts-event-time">
-								🕐 <?php echo esc_html( $event->start_time ); ?>
-								<?php if ( ! empty( $event->end_time ) ) : ?>
-									- <?php echo esc_html( $event->end_time ); ?>
-								<?php endif; ?>
-							</span>
-						<?php endif; ?>
-						
-					<?php if ( in_array( 'location', $show_fields ) && ! empty( $event->location_name ) ) : ?>
+					<?php if ( in_array( 'time', $show_fields ) || in_array( 'datetime', $show_fields ) ) : ?>
+						<span class="rcts-event-time">
+							🕐 <?php echo esc_html( $event->time_formatted ); ?>
+							<?php if ( ! empty( $event->end_time_formatted ) ) : ?>
+								- <?php echo esc_html( $event->end_time_formatted ); ?>
+							<?php endif; ?>
+						</span>
+					<?php endif; ?>					<?php if ( in_array( 'location', $show_fields ) && ! empty( $event->location_name ) ) : ?>
 						<span class="rcts-event-location">
 							📍 <?php echo esc_html( $event->location_name ); ?>
 						</span>

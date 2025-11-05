@@ -52,14 +52,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 								</h3>
 							<?php endif; ?>
 							
-							<?php if ( in_array( 'time', $show_fields ) || in_array( 'datetime', $show_fields ) ) : ?>
-								<div class="rcts-card-time">
-									🕐 <?php echo esc_html( $event->start_time ); ?>
-									<?php if ( ! empty( $event->end_time ) ) : ?>
-										- <?php echo esc_html( $event->end_time ); ?>
-									<?php endif; ?>
-								</div>
-							<?php endif; ?>
+						<?php if ( in_array( 'time', $show_fields ) || in_array( 'datetime', $show_fields ) ) : ?>
+							<div class="rcts-card-time">
+								🕐 <?php echo esc_html( $event->time_formatted ); ?>
+								<?php if ( ! empty( $event->end_time_formatted ) ) : ?>
+									- <?php echo esc_html( $event->end_time_formatted ); ?>
+								<?php endif; ?>
+							</div>
+						<?php endif; ?>
 						</div>
 					</div>
 					
