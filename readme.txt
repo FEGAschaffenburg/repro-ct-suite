@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.6.1.0
+Stable tag: 0.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,16 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.7.0 =
+* MAJOR FEATURE: Frontend Events-Anzeige mit Shortcode [rcts_events]
+* Template-System: 3 Ansichten (list, list-grouped, cards)
+* Template-Loader mit Theme-Override Support (themes/repro-ct-suite/)
+* Responsive Frontend CSS (Grid-Layout, Mobile-optimiert)
+* Flexible Filter: calendar_ids, from_days, to_days, limit, order
+* Konfigurierbare Felder: show_fields="title,date,time,location,description,calendar"
+* Shortcode-Beispiele: [rcts_events view="cards" limit="12"]
+* Phase 1 von 7 des Frontend-Entwicklungsplans abgeschlossen
 
 = 0.6.1.0 =
 * FEATURE: WordPress-Zeitzone für alle Datum/Uhrzeit-Anzeigen
