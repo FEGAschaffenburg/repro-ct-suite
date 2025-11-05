@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.7.0
+Stable tag: 0.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.7.1 =
+* KRITISCHER FIX: Automatischer Sync (Cron-Job) funktional
+* Cron-Job lädt jetzt korrekt ausgewählte Kalender-IDs aus der Datenbank
+* Sync-Zeitraum: 7 Tage Vergangenheit bis 90 Tage Zukunft
+* Behebt Fehler: "Keine Kalender für den Import ausgewählt"
 
 = 0.7.0 =
 * MAJOR FEATURE: Frontend Events-Anzeige mit Shortcode [rcts_events]

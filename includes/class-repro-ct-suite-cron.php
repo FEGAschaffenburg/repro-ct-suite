@@ -226,8 +226,24 @@ class Repro_CT_Suite_Cron {
 			
 			$sync_service = new Repro_CT_Suite_Sync_Service( $client, $events_repo, $calendars_repo );
 			
-			Repro_CT_Suite_Logger::log( 'Starte Synchronisation...', 'info' );
-			$result = $sync_service->sync_events();
+			// Ausgewählte Kalender-IDs aus der Datenbank laden
+			$selected_calendars = $wpdb->get_results( 
+				"SELECT calendar_id FROM {$calendars_table} WHERE is_selected = 1", 
+				ARRAY_A 
+			);
+			$calendar_ids = array_column( $selected_calendars, 'calendar_id' );
+			
+			Repro_CT_Suite_Logger::log( 'Starte Synchronisation mit Kalendern: ' . implode( ', ', $calendar_ids ), 'info' );
+			
+			// Zeitraum: Vergangenheit (7 Tage) bis Zukunft (90 Tage)
+			$from = gmdate( 'Y-m-d', current_time( 'timestamp' ) - 7 * DAY_IN_SECONDS );
+			$to   = gmdate( 'Y-m-d', current_time( 'timestamp' ) + 90 * DAY_IN_SECONDS );
+			
+			$result = $sync_service->sync_events( array(
+				'calendar_ids' => $calendar_ids,
+				'from'         => $from,
+				'to'           => $to,
+			) );
 			
 			if ( is_wp_error( $result ) ) {
 				Repro_CT_Suite_Logger::log( 'Sync fehlgeschlagen: ' . $result->get_error_message(), 'error' );
