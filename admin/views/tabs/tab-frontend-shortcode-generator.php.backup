@@ -16,46 +16,49 @@ $calendars = $wpdb->get_results( "SELECT id, calendar_id, name, color FROM {$cal
 ?>
 
 <div class="shortcode-generator-wrapper">
-	<div class="generator-columns">
-		<!-- Linke Spalte: Konfiguration -->
-		<div class="generator-config">
-			<h2><?php esc_html_e( 'Shortcode Generator', 'repro-ct-suite' ); ?></h2>
-			<p class="description">
-				<?php esc_html_e( 'Erstellen Sie einen individualisierten Shortcode für die Anzeige Ihrer Termine.', 'repro-ct-suite' ); ?>
-			</p>
+	<!-- Preset-Liste (Standard-Ansicht) -->
+	<div id="preset-list-view" class="preset-list-container">
+		<div class="preset-list-header">
+			<h2><?php esc_html_e( 'Gespeicherte Shortcode-Presets', 'repro-ct-suite' ); ?></h2>
+			<button type="button" id="create-new-preset-btn" class="button button-primary">
+				<span class="dashicons dashicons-plus-alt"></span>
+				<?php esc_html_e( 'Neues Preset erstellen', 'repro-ct-suite' ); ?>
+			</button>
+		</div>
 
-			<!-- Preset Manager -->
-			<div class="preset-manager">
-				<div class="preset-controls">
-					<div class="preset-load">
-						<label for="preset-select">
-							<?php esc_html_e( 'Gespeicherte Presets', 'repro-ct-suite' ); ?>
-						</label>
-						<div class="preset-select-wrapper">
-							<select id="preset-select" class="regular-text">
-								<option value=""><?php esc_html_e( '-- Neues Preset --', 'repro-ct-suite' ); ?></option>
-							</select>
-							<button type="button" id="load-preset-btn" class="button" disabled>
-								<span class="dashicons dashicons-download"></span>
-								<?php esc_html_e( 'Laden', 'repro-ct-suite' ); ?>
-							</button>
-							<button type="button" id="delete-preset-btn" class="button button-link-delete" disabled>
-								<span class="dashicons dashicons-trash"></span>
-							</button>
-						</div>
-					</div>
-					<div class="preset-save">
-						<button type="button" id="save-preset-btn" class="button">
-							<span class="dashicons dashicons-saved"></span>
-							<?php esc_html_e( 'Als Preset speichern', 'repro-ct-suite' ); ?>
-						</button>
-					</div>
-				</div>
-			</div>
+		<table class="wp-list-table widefat fixed striped preset-table">
+			<thead>
+				<tr>
+					<th class="column-name"><?php esc_html_e( 'Name', 'repro-ct-suite' ); ?></th>
+					<th class="column-view"><?php esc_html_e( 'Ansicht', 'repro-ct-suite' ); ?></th>
+					<th class="column-limit"><?php esc_html_e( 'Anzahl', 'repro-ct-suite' ); ?></th>
+					<th class="column-timerange"><?php esc_html_e( 'Zeitraum', 'repro-ct-suite' ); ?></th>
+					<th class="column-calendars"><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
+					<th class="column-actions"><?php esc_html_e( 'Aktionen', 'repro-ct-suite' ); ?></th>
+				</tr>
+			</thead>
+			<tbody id="preset-table-body">
+				<tr class="no-presets">
+					<td colspan="6" style="text-align: center; padding: 40px;">
+						<span class="dashicons dashicons-info" style="font-size: 24px; color: #999;"></span>
+						<p><?php esc_html_e( 'Presets werden geladen...', 'repro-ct-suite' ); ?></p>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
-			<hr style="margin: 20px 0;">
+	<!-- Preset-Editor (versteckt, wird bei Neu/Bearbeiten angezeigt) -->
+	<div id="preset-editor-view" class="preset-editor-container" style="display: none;">
+		<div class="preset-editor-header">
+			<h2 id="preset-editor-title"><?php esc_html_e( 'Neues Preset erstellen', 'repro-ct-suite' ); ?></h2>
+			<button type="button" id="close-editor-btn" class="button">
+				<span class="dashicons dashicons-arrow-left-alt"></span>
+				<?php esc_html_e( 'Zurück zur Liste', 'repro-ct-suite' ); ?>
+			</button>
+		</div>
 
-			<form id="shortcode-generator-form" class="generator-form">
+		<form id="shortcode-generator-form" class="generator-form">
 				
 				<!-- Ansicht -->
 				<div class="form-group">
@@ -157,30 +160,33 @@ $calendars = $wpdb->get_results( "SELECT id, calendar_id, name, color FROM {$cal
 					</div>
 				</div>
 
-				<hr style="margin: 20px 0;">
-
-				<!-- Preset-Shortcode Option -->
+				<!-- Preset-Name (nur im Editor-Modus) -->
 				<div class="form-group">
-					<label>
-						<input type="checkbox" id="use-preset-shortcode" name="use_preset_shortcode">
-						<?php esc_html_e( 'Preset-Shortcode verwenden', 'repro-ct-suite' ); ?>
+					<label for="preset-name">
+						<?php esc_html_e( 'Preset-Name', 'repro-ct-suite' ); ?>
+						<span class="required">*</span>
 					</label>
+					<input type="text" id="preset-name" name="preset-name" class="regular-text" required>
 					<p class="description">
-						<?php esc_html_e( 'Generiert einen kurzen Shortcode mit Preset-Name statt aller Parameter (nur wenn gespeichert als Preset)', 'repro-ct-suite' ); ?>
-					</p>
-					<p class="description" id="preset-shortcode-hint" style="display: none; color: #d63638;">
-						<?php esc_html_e( 'Bitte speichern Sie die Konfiguration zuerst als Preset.', 'repro-ct-suite' ); ?>
+						<?php esc_html_e( 'Ein eindeutiger Name für dieses Preset (z.B. "Nächste 10 Events")', 'repro-ct-suite' ); ?>
 					</p>
 				</div>
 
-				<button type="button" id="generate-shortcode" class="button button-primary button-large">
-					<?php esc_html_e( 'Shortcode generieren', 'repro-ct-suite' ); ?>
-				</button>
+				<!-- Editor-Aktionen -->
+				<div class="preset-editor-actions">
+					<button type="button" id="save-preset-btn" class="button button-primary button-large">
+						<span class="dashicons dashicons-saved"></span>
+						<span id="save-preset-text"><?php esc_html_e( 'Preset speichern', 'repro-ct-suite' ); ?></span>
+					</button>
+					<button type="button" id="cancel-preset-btn" class="button button-large">
+						<?php esc_html_e( 'Abbrechen', 'repro-ct-suite' ); ?>
+					</button>
+				</div>
 			</form>
 		</div>
 
-		<!-- Rechte Spalte: Generierter Shortcode + Vorschau -->
-		<div class="generator-output">
+		<!-- Vorschau-Bereich (rechts im Editor) -->
+		<div class="generator-output" id="preset-preview-panel">
 			<h3><?php esc_html_e( 'Generierter Shortcode', 'repro-ct-suite' ); ?></h3>
 			<div class="shortcode-output-box">
 				<code id="generated-shortcode">[rcts_events view="cards" limit="10"]</code>
@@ -219,77 +225,118 @@ $calendars = $wpdb->get_results( "SELECT id, calendar_id, name, color FROM {$cal
 </div>
 
 <style>
-.preset-manager {
-	background: #f9f9f9;
-	padding: 15px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	margin-bottom: 20px;
-}
-
-.preset-controls {
-	display: grid;
-	grid-template-columns: 2fr 1fr;
-	gap: 15px;
-}
-
-.preset-load label {
-	display: block;
-	margin-bottom: 8px;
-	font-weight: 600;
-}
-
-.preset-select-wrapper {
-	display: flex;
-	gap: 10px;
-	align-items: center;
-}
-
-.preset-select-wrapper select {
-	flex: 1;
-}
-
-.preset-select-wrapper button {
-	white-space: nowrap;
-}
-
-#delete-preset-btn {
-	color: #a00;
-}
-
-#delete-preset-btn:hover {
-	color: #dc3232;
-}
-
-.preset-save {
-	display: flex;
-	align-items: flex-end;
-}
-
-.preset-save button {
-	width: 100%;
-}
-
-.generator-columns {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 30px;
-	margin-top: 20px;
-}
-
-.generator-config,
-.generator-output {
+/* ===================================
+   PRESET-LISTE (Tabellen-Ansicht)
+   =================================== */
+.preset-list-container {
 	background: #fff;
 	padding: 20px;
 	border: 1px solid #ddd;
 	border-radius: 4px;
 }
 
-.form-group {
+.preset-list-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 2px solid #0073aa;
+}
+
+.preset-list-header h2 {
+	margin: 0;
+	font-size: 1.5em;
+}
+
+.preset-table {
+	margin-top: 15px;
+}
+
+.preset-table .column-name {
+	width: 25%;
+}
+
+.preset-table .column-view {
+	width: 15%;
+}
+
+.preset-table .column-limit {
+	width: 10%;
+	text-align: center;
+}
+
+.preset-table .column-timerange {
+	width: 15%;
+}
+
+.preset-table .column-calendars {
+	width: 15%;
+}
+
+.preset-table .column-actions {
+	width: 20%;
+	text-align: right;
+}
+
+.preset-table tbody td {
+	vertical-align: middle;
+}
+
+.preset-actions {
+	display: flex;
+	gap: 5px;
+	justify-content: flex-end;
+}
+
+.preset-actions .button {
+	padding: 4px 8px;
+	min-height: 30px;
+}
+
+/* ===================================
+   PRESET-EDITOR (Formular-Ansicht)
+   =================================== */
+.preset-editor-container {
+	background: #fff;
+	padding: 20px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.preset-editor-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 2px solid #0073aa;
+}
+
+.preset-editor-header h2 {
+	margin: 0;
+	font-size: 1.5em;
+}
+
+.preset-editor-actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 30px;
+	padding-top: 20px;
+	border-top: 1px solid #ddd;
+}
+
+.required {
+	color: #d63638;
+	font-weight: bold;
+}
+
+/* Formular-Styles */
+.generator-form .form-group {
 	margin-bottom: 20px;
 }
 
-.form-group label {
+.generator-form label {
 	display: block;
 	margin-bottom: 8px;
 	font-weight: 600;
@@ -387,28 +434,9 @@ jQuery(document).ready(function($) {
 		generateShortcode();
 	});
 
-	// Globale Variable für aktuellen Preset-Namen
-	var currentPresetName = null;
-
 	function generateShortcode() {
 		var shortcode = '[rcts_events';
 		var attributes = [];
-
-		// Prüfen ob Preset-Shortcode gewünscht
-		var usePresetShortcode = $('#use-preset-shortcode').is(':checked');
-
-		if (usePresetShortcode && currentPresetName) {
-			// Kurzer Preset-Shortcode
-			shortcode = '[rcts_events preset="' + currentPresetName + '"]';
-			$('#generated-shortcode').text(shortcode);
-			loadPreview(shortcode);
-			return;
-		} else if (usePresetShortcode && !currentPresetName) {
-			// Warnung anzeigen
-			$('#preset-shortcode-hint').show();
-		} else {
-			$('#preset-shortcode-hint').hide();
-		}
 
 		// View
 		var view = $('#view').val();
@@ -559,7 +587,6 @@ jQuery(document).ready(function($) {
 		}, function(response) {
 			if (response.success) {
 				var preset = response.data.preset;
-				currentPresetName = preset.name; // Preset-Namen speichern
 				fillFormWithPreset(preset);
 				alert('<?php esc_html_e( 'Preset geladen!', 'repro-ct-suite' ); ?>');
 			} else {
@@ -624,10 +651,8 @@ jQuery(document).ready(function($) {
 			nonce: '<?php echo wp_create_nonce( 'repro_ct_suite_presets' ); ?>'
 		}, function(response) {
 			if (response.success) {
-				currentPresetName = name.trim(); // Preset-Namen speichern
 				alert('<?php esc_html_e( 'Preset gespeichert!', 'repro-ct-suite' ); ?>');
 				loadPresets();
-				generateShortcode(); // Shortcode neu generieren
 			} else {
 				alert('<?php esc_html_e( 'Fehler:', 'repro-ct-suite' ); ?> ' + response.data.message);
 			}

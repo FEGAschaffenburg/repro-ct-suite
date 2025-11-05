@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.8.1
+Stable tag: 0.8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,15 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.8.2 =
+* FEATURE: Preset-Shortcode - Verwendung von [rcts_events preset="Name"] statt langer Parameter
+* Shortcode-Handler: `preset` Parameter lädt gespeicherte Konfiguration
+* UI: Checkbox "Preset-Shortcode verwenden" im Generator
+* Preset-Werte dienen als Defaults, Parameter-Override möglich
+* Beispiel: [rcts_events preset="Nächste 10 Events" limit="20"]
+* Fehlerbehandlung: Zeigt Warnung wenn Preset nicht gefunden
+* currentPresetName wird beim Speichern/Laden gesetzt
 
 = 0.8.1 =
 * FEATURE: Shortcode-Presets - Speichern Sie Ihre Lieblings-Konfigurationen

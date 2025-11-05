@@ -52,21 +52,37 @@ class Repro_CT_Suite_Shortcodes {
 	 * @return string HTML Output
 	 */
 	public function render_events( $atts ) {
-		// Standard-Attribute
-		$atts = shortcode_atts(
-			array(
-				'view'         => 'list',           // list, list-grouped, cards
-				'limit'        => 10,               // Anzahl Events
-				'calendar_ids' => '',               // Komma-getrennte IDs
-				'from_days'    => 0,                // Relative Tage (negativ = Vergangenheit)
-				'to_days'      => 30,               // Relative Tage (positiv = Zukunft)
-				'order'        => 'asc',            // asc, desc
-				'show_past'    => 'false',          // true, false
-				'show_fields'  => 'title,date,time,location', // Angezeigte Felder
-			),
-			$atts,
-			'rcts_events'
+		// Preset-Parameter auswerten
+		$preset_atts = array();
+		if ( ! empty( $atts['preset'] ) ) {
+			$preset_atts = $this->load_preset_by_name( $atts['preset'] );
+			if ( empty( $preset_atts ) ) {
+				return '<p class="rcts-error">' . sprintf(
+					__( 'Preset "%s" nicht gefunden.', 'repro-ct-suite' ),
+					esc_html( $atts['preset'] )
+				) . '</p>';
+			}
+		}
+
+		// Standard-Attribute (mit Preset-Override)
+		$default_atts = array(
+			'view'         => 'list',           // list, list-grouped, cards
+			'limit'        => 10,               // Anzahl Events
+			'calendar_ids' => '',               // Komma-getrennte IDs
+			'from_days'    => 0,                // Relative Tage (negativ = Vergangenheit)
+			'to_days'      => 30,               // Relative Tage (positiv = Zukunft)
+			'order'        => 'asc',            // asc, desc
+			'show_past'    => 'false',          // true, false
+			'show_fields'  => 'title,date,time,location', // Angezeigte Felder
 		);
+
+		// Preset-Werte als Defaults verwenden
+		if ( ! empty( $preset_atts ) ) {
+			$default_atts = array_merge( $default_atts, $preset_atts );
+		}
+
+		// Shortcode-Attribute haben höchste Priorität (Override)
+		$atts = shortcode_atts( $default_atts, $atts, 'rcts_events' );
 
 		// Events abrufen
 		$events = $this->get_events( $atts );
@@ -188,4 +204,62 @@ class Repro_CT_Suite_Shortcodes {
 
 		return isset( $templates[ $view ] ) ? $templates[ $view ] : $templates['list'];
 	}
+
+	/**
+	 * Preset nach Name laden
+	 *
+	 * @param string $preset_name Name des Presets
+	 * @return array|null Preset-Attribute oder null
+	 */
+	private function load_preset_by_name( $preset_name ) {
+		global $wpdb;
+
+		// Preset Repository laden
+		require_once plugin_dir_path( __FILE__ ) . 'class-repro-ct-suite-shortcode-presets-repository.php';
+		$repository = new Repro_CT_Suite_Shortcode_Presets_Repository();
+
+		$preset = $repository->get_by_name( $preset_name );
+
+		if ( ! $preset ) {
+			return null;
+		}
+
+		// Preset-Daten in Shortcode-Attribute umwandeln
+		$atts = array();
+
+		if ( ! empty( $preset['view'] ) ) {
+			$atts['view'] = $preset['view'];
+		}
+
+		if ( ! empty( $preset['limit_count'] ) ) {
+			$atts['limit'] = $preset['limit_count'];
+		}
+
+		if ( ! empty( $preset['calendar_ids'] ) ) {
+			$atts['calendar_ids'] = $preset['calendar_ids'];
+		}
+
+		if ( isset( $preset['from_days'] ) ) {
+			$atts['from_days'] = $preset['from_days'];
+		}
+
+		if ( isset( $preset['to_days'] ) ) {
+			$atts['to_days'] = $preset['to_days'];
+		}
+
+		if ( isset( $preset['show_past'] ) ) {
+			$atts['show_past'] = $preset['show_past'] ? 'true' : 'false';
+		}
+
+		if ( ! empty( $preset['order_dir'] ) ) {
+			$atts['order'] = strtolower( $preset['order_dir'] );
+		}
+
+		if ( ! empty( $preset['show_fields'] ) ) {
+			$atts['show_fields'] = $preset['show_fields'];
+		}
+
+		return $atts;
+	}
 }
+
