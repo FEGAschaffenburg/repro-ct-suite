@@ -145,19 +145,20 @@ $total_pages = ceil( $total / $limit );
             <table class="widefat fixed striped" style="margin: 0;">
                 <thead>
                     <tr>
-                        <th style="width:12%;"><?php esc_html_e( 'Anfang', 'repro-ct-suite' ); ?></th>
+                        <th style="width:10%;"><?php esc_html_e( 'Datum', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'Von', 'repro-ct-suite' ); ?></th>
+                        <th style="width:8%;"><?php esc_html_e( 'Bis', 'repro-ct-suite' ); ?></th>
                         <th style="width:8%;"><?php esc_html_e( 'Typ', 'repro-ct-suite' ); ?></th>
                         <th style="width:8%;"><?php esc_html_e( 'ID', 'repro-ct-suite' ); ?></th>
-                        <th style="width:20%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
-                        <th style="width:20%;"><?php esc_html_e( 'Beschreibung', 'repro-ct-suite' ); ?></th>
+                        <th style="width:22%;"><?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?></th>
+                        <th style="width:22%;"><?php esc_html_e( 'Beschreibung', 'repro-ct-suite' ); ?></th>
                         <th style="width:12%;"><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
-                        <th style="width:12%;"><?php esc_html_e( 'Ende', 'repro-ct-suite' ); ?></th>
-                        <th style="width:8%;"><?php esc_html_e( 'Aktionen', 'repro-ct-suite' ); ?></th>
+                        <th style="width:6%;"><?php esc_html_e( 'Aktionen', 'repro-ct-suite' ); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php if ( empty( $items ) ) : ?>
-                    <tr><td colspan="8" style="text-align:center; padding:30px;">
+                    <tr><td colspan="9" style="text-align:center; padding:30px;">
                         <?php esc_html_e( 'Keine Termine gefunden. Führen Sie die Synchronisation aus, um Termine zu importieren.', 'repro-ct-suite' ); ?>
                     </td></tr>
                 <?php else : foreach ( $items as $item ) : 
@@ -208,8 +209,17 @@ $total_pages = ceil( $total / $limit );
                     ?>
                     <tr>
                         <td>
-                            <strong><?php echo esc_html( $start_dt->format( get_option('date_format') ) ); ?></strong><br>
-                            <small><?php echo esc_html( $start_dt->format( 'H:i' ) ); ?> Uhr</small>
+                            <strong><?php echo esc_html( $start_dt->format( 'd.m.Y' ) ); ?></strong>
+                        </td>
+                        <td>
+                            <strong><?php echo esc_html( $start_dt->format( 'H:i' ) ); ?></strong> Uhr
+                        </td>
+                        <td>
+                            <?php if ( $end_dt ) : ?>
+                                <strong><?php echo esc_html( $end_dt->format( 'H:i' ) ); ?></strong> Uhr
+                            <?php else : ?>
+                                <span style="color: #999;">—</span>
+                            <?php endif; ?>
                         </td>
                         <td>
                             <span class="repro-ct-suite-badge <?php echo esc_attr( $type_class ); ?>" title="<?php echo esc_attr( $tooltip ); ?>">
@@ -235,14 +245,6 @@ $total_pages = ceil( $total / $limit );
                                 <?php echo esc_html( $calendar->name ); ?>
                             <?php else : ?>
                                 <span style="color:#999;">—</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <?php if ( $end_dt ) : ?>
-                                <strong><?php echo esc_html( $end_dt->format( get_option('date_format') ) ); ?></strong><br>
-                                <small><?php echo esc_html( $end_dt->format( 'H:i' ) ); ?> Uhr</small>
-                            <?php else : ?>
-                                —
                             <?php endif; ?>
                         </td>
                         <td>
