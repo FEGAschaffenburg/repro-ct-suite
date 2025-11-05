@@ -87,9 +87,9 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$calendars_table
 				<?php if ( $next_scheduled ) : ?>
 					<p class="description">
 						<strong><?php esc_html_e( 'Nächster Sync:', 'repro-ct-suite' ); ?></strong><br>
-						<?php echo esc_html( date_i18n( 'd.m.Y H:i', $next_scheduled ) ); ?>
+						<?php echo esc_html( wp_date( 'd.m.Y H:i', $next_scheduled ) ); ?>
 						<span style="color: #666;">
-							(<?php echo esc_html( human_time_diff( time(), $next_scheduled ) ); ?>)
+							(<?php echo esc_html( human_time_diff( current_time( 'timestamp' ), $next_scheduled ) ); ?>)
 						</span>
 					</p>
 				<?php endif; ?>
@@ -161,9 +161,9 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$calendars_table
 					</td>
 					<td>
 						<?php if ( $next_scheduled ) : ?>
-							<strong><?php echo esc_html( date_i18n( 'd.m.Y H:i:s', $next_scheduled ) ); ?></strong>
+							<strong><?php echo esc_html( wp_date( 'd.m.Y H:i:s', $next_scheduled ) ); ?></strong>
 							<span style="color: #666;">
-								(<?php printf( esc_html__( 'in %s', 'repro-ct-suite' ), human_time_diff( time(), $next_scheduled ) ); ?>)
+								(<?php printf( esc_html__( 'in %s', 'repro-ct-suite' ), human_time_diff( current_time( 'timestamp' ), $next_scheduled ) ); ?>)
 							</span>
 						<?php else : ?>
 							<span style="color: #dc3232;">
@@ -178,9 +178,9 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$calendars_table
 					</td>
 					<td>
 						<?php if ( $last_sync ) : ?>
-							<?php echo esc_html( date_i18n( 'd.m.Y H:i:s', $last_sync ) ); ?>
+							<?php echo esc_html( wp_date( 'd.m.Y H:i:s', $last_sync ) ); ?>
 							<span style="color: #666;">
-								(<?php echo esc_html( human_time_diff( $last_sync, time() ) ); ?> <?php esc_html_e( 'her', 'repro-ct-suite' ); ?>)
+								(<?php echo esc_html( human_time_diff( $last_sync, current_time( 'timestamp' ) ) ); ?> <?php esc_html_e( 'her', 'repro-ct-suite' ); ?>)
 							</span>
 						<?php else : ?>
 							<span style="color: #999;">

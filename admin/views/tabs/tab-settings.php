@@ -544,14 +544,14 @@ $last_sync = get_option( 'repro_ct_suite_last_auto_sync', 0 );
 						<td>
 							<?php if ( $next_scheduled ) : ?>
 								<strong><?php esc_html_e( 'Nächster Sync:', 'repro-ct-suite' ); ?></strong>
-								<?php echo esc_html( date_i18n( 'd.m.Y H:i', $next_scheduled ) ); ?>
-								(<?php echo esc_html( human_time_diff( time(), $next_scheduled ) ); ?>)
+								<?php echo esc_html( wp_date( 'd.m.Y H:i', $next_scheduled ) ); ?>
+								(<?php echo esc_html( human_time_diff( current_time( 'timestamp' ), $next_scheduled ) ); ?>)
 								<br>
 							<?php endif; ?>
 							<?php if ( $last_sync ) : ?>
 								<strong><?php esc_html_e( 'Letzter Sync:', 'repro-ct-suite' ); ?></strong>
-								<?php echo esc_html( date_i18n( 'd.m.Y H:i', $last_sync ) ); ?>
-								(<?php echo esc_html( human_time_diff( $last_sync, time() ) ); ?> <?php esc_html_e( 'her', 'repro-ct-suite' ); ?>)
+								<?php echo esc_html( wp_date( 'd.m.Y H:i', $last_sync ) ); ?>
+								(<?php echo esc_html( human_time_diff( $last_sync, current_time( 'timestamp' ) ) ); ?> <?php esc_html_e( 'her', 'repro-ct-suite' ); ?>)
 							<?php endif; ?>
 						</td>
 					</tr>
