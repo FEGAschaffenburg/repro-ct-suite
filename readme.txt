@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.7.4
+Stable tag: 0.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,17 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.8.0 =
+* MAJOR FEATURE: Admin-Seite "Anzeige im Frontend" (Phase 3 des Frontend-Plans)
+* Shortcode Generator mit Live-Vorschau und Copy-Button
+* Visueller Konfigurator für alle Shortcode-Attribute
+* Template-Varianten Übersicht mit Dokumentation
+* Styling-Referenz mit CSS-Klassen und Beispielen
+* Interaktive Live-Vorschau verschiedener Konfigurationen
+* 4 Tabs: Shortcode Generator, Template-Varianten, Styling, Vorschau
+* AJAX-basierte Vorschau ohne Seiten-Reload
+* Theme-Override Anleitung mit verfügbaren Variablen
 
 = 0.7.4 =
 * FEATURE: WordPress-Zeitformat-Unterstützung in Templates

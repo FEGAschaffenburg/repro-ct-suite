@@ -59,6 +59,7 @@ class Repro_CT_Suite_Admin {
 		add_action( 'wp_ajax_repro_ct_suite_delete_event', array( $this, 'ajax_delete_event' ) );
 		add_action( 'wp_ajax_repro_ct_suite_update_event', array( $this, 'ajax_update_event' ) );
 		add_action( 'wp_ajax_repro_ct_suite_dismiss_v6_notice', array( $this, 'ajax_dismiss_v6_notice' ) );
+		add_action( 'wp_ajax_repro_ct_suite_preview_shortcode', array( $this, 'ajax_preview_shortcode' ) );
 	}
 
 	/**
@@ -308,6 +309,16 @@ class Repro_CT_Suite_Admin {
 			'repro-ct-suite-events',
 			array( $this, 'display_events_page' )
 		);
+
+		// Submenu: Anzeige im Frontend
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Anzeige im Frontend', 'repro-ct-suite' ),
+			__( 'Anzeige im Frontend', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-frontend',
+			array( $this, 'display_frontend_page' )
+		);
 	}
 
 	/**
@@ -322,6 +333,13 @@ class Repro_CT_Suite_Admin {
 	 */
 	public function display_events_page() {
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
+	}
+
+	/**
+	 * Display the frontend (Anzeige im Frontend) page.
+	 */
+	public function display_frontend_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'views/admin-frontend.php';
 	}
 
 	/**
@@ -1677,5 +1695,38 @@ class Repro_CT_Suite_Admin {
 			'message' => __( 'Notice ausgeblendet.', 'repro-ct-suite' )
 		) );
 	}
+
+	/**
+	 * AJAX Handler: Shortcode Vorschau
+	 */
+	public function ajax_preview_shortcode() {
+		check_ajax_referer( 'repro_ct_suite_preview', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		$shortcode = isset( $_POST['shortcode'] ) ? stripslashes( $_POST['shortcode'] ) : '';
+
+		if ( empty( $shortcode ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Kein Shortcode angegeben.', 'repro-ct-suite' )
+			) );
+		}
+
+		// Shortcode ausführen
+		$html = do_shortcode( $shortcode );
+
+		if ( empty( $html ) ) {
+			$html = '<p class="no-events">' . __( 'Keine Termine gefunden.', 'repro-ct-suite' ) . '</p>';
+		}
+
+		wp_send_json_success( array(
+			'html' => $html
+		) );
+	}
 }
+
 
