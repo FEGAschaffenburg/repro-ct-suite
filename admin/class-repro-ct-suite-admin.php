@@ -299,17 +299,15 @@ class Repro_CT_Suite_Admin {
 			array( $this, 'display_admin_page' )
 		);
 
-		// Submenu: Termine (nur wenn Cron nicht aktiv)
-		if ( ! $auto_sync_enabled ) {
-			add_submenu_page(
-				'repro-ct-suite',
-				__( 'Termine', 'repro-ct-suite' ),
-				__( 'Termine', 'repro-ct-suite' ),
-				'manage_options',
-				'repro-ct-suite-events',
-				array( $this, 'display_events_page' )
-			);
-		}
+		// Submenu: Termine (immer anzeigen)
+		add_submenu_page(
+			'repro-ct-suite',
+			__( 'Termine', 'repro-ct-suite' ),
+			__( 'Termine', 'repro-ct-suite' ),
+			'manage_options',
+			'repro-ct-suite-events',
+			array( $this, 'display_events_page' )
+		);
 	}
 
 	/**

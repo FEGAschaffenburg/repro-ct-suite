@@ -31,10 +31,11 @@ if ( $release_info && ! is_wp_error( $release_info ) ) {
 	<?php esc_html_e( 'Plugin-Versionen und Update-Status.', 'repro-ct-suite' ); ?>
 </p>
 
-<div class="repro-ct-suite-grid repro-ct-suite-grid-2" style="margin-top: 20px;">
-	
-	<!-- Installierte Version -->
-	<div class="repro-ct-suite-card">
+<div class="repro-ct-suite-box" style="margin-top: 20px;">
+	<div class="repro-ct-suite-grid repro-ct-suite-grid-2">
+		
+		<!-- Installierte Version -->
+		<div class="repro-ct-suite-card">
 		<div class="repro-ct-suite-card-header">
 			<span class="dashicons dashicons-admin-plugins"></span>
 			<h3><?php esc_html_e( 'Installiert', 'repro-ct-suite' ); ?></h3>
@@ -79,10 +80,12 @@ if ( $release_info && ! is_wp_error( $release_info ) ) {
 			</a>
 		</div>
 	</div>
+	</div>
 </div>
 
 <?php if ( $release_info && ! is_wp_error( $release_info ) && isset( $release_info->body ) ) : ?>
-<div class="repro-ct-suite-card" style="margin-top: 20px;">
+<div class="repro-ct-suite-box" style="margin-top: 20px;">
+	<div class="repro-ct-suite-card">
 	<div class="repro-ct-suite-card-header">
 		<span class="dashicons dashicons-info"></span>
 		<h3><?php esc_html_e( 'Release-Notes', 'repro-ct-suite' ); ?></h3>
@@ -98,6 +101,7 @@ if ( $release_info && ! is_wp_error( $release_info ) ) {
 			<span class="dashicons dashicons-external"></span>
 			<?php esc_html_e( 'Auf GitHub ansehen', 'repro-ct-suite' ); ?>
 		</a>
+	</div>
 	</div>
 </div>
 <?php endif; ?>
