@@ -73,6 +73,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 == Changelog ==
 
+= 0.6.0.8 =
+* KRITISCHER FIX: UTF-8 BOM aus 5 PHP-Dateien entfernt (JSON parse error behoben)
+* Login-Test: Vollständige Logging-Unterstützung hinzugefügt
+* Debug: Detaillierte Ausgaben für Login-Ablauf (Credentials, CT-Client, Login, whoami)
+* Verbesserte Fehlerdiagnose bei Verbindungsproblemen
+
 = 0.4.0.9 =
 * UPDATE-DETECTION: Aggressive Update-Prüfung mit Admin-Benachrichtigung
 * Zeigt aktuelle Plugin-Version im WordPress Admin an
