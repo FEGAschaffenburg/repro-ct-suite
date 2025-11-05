@@ -25,16 +25,8 @@ class Repro_CT_Suite_Logger {
 	 * @param string $level   Log-Level: 'info', 'error', 'warning', 'success'
 	 */
 	public static function log( $message, $level = 'info' ) {
-		// Stelle sicher, dass error_log funktioniert
+		// Log-Datei: WordPress debug.log
 		$log_file = WP_CONTENT_DIR . '/debug.log';
-		
-		// Temporär error_log aktivieren falls nicht aktiv
-		if ( ! @ini_get( 'log_errors' ) ) {
-			@ini_set( 'log_errors', '1' );
-		}
-		if ( ! @ini_get( 'error_log' ) ) {
-			@ini_set( 'error_log', $log_file );
-		}
 		
 		// Prefix mit Icons für bessere Lesbarkeit
 		$prefix = '[REPRO CT-SUITE] ';
@@ -60,44 +52,44 @@ class Repro_CT_Suite_Logger {
 		$milliseconds = sprintf( '%03d', ( $microtime - floor( $microtime ) ) * 1000 );
 		$timestamp = $datetime->format( 'Y-m-d H:i:s' ) . '.' . $milliseconds;
 		
-	// Log-Eintrag schreiben ins WordPress debug.log (wp-content/debug.log)
-	$entry = '[' . $timestamp . '] ' . $prefix . $message;
+		// Log-Eintrag formatieren
+		$entry = '[' . $timestamp . '] ' . $prefix . $message . PHP_EOL;
 
-	// In das WordPress debug.log schreiben
-	error_log( $entry );
+		// Direkt in die Datei schreiben (funktioniert immer, unabhängig von WP_DEBUG)
+		@file_put_contents( $log_file, $entry, FILE_APPEND | LOCK_EX );
 
-	// Optional: auch in den System-Logger (syslog) schreiben, falls aktiviert
-	// Aktivierung über Option 'repro_ct_suite_syslog' (bool) oder Konstante REPRO_CT_SUITE_SYSLOG
-	$use_syslog = false;
-	if ( defined( 'REPRO_CT_SUITE_SYSLOG' ) ) {
-		$use_syslog = (bool) REPRO_CT_SUITE_SYSLOG;
-	} else {
-		$use_syslog = (bool) get_option( 'repro_ct_suite_syslog', false );
-	}
-	if ( $use_syslog ) {
-		// map level to syslog priority
-		switch ( $level ) {
-			case 'error':
-				$prio = LOG_ERR;
-				break;
-			case 'warning':
-				$prio = LOG_WARNING;
-				break;
-			case 'success':
-				$prio = LOG_INFO;
-				break;
-			case 'info':
-			default:
-				$prio = LOG_INFO;
+		// Optional: auch in den System-Logger (syslog) schreiben, falls aktiviert
+		// Aktivierung über Option 'repro_ct_suite_syslog' (bool) oder Konstante REPRO_CT_SUITE_SYSLOG
+		$use_syslog = false;
+		if ( defined( 'REPRO_CT_SUITE_SYSLOG' ) ) {
+			$use_syslog = (bool) REPRO_CT_SUITE_SYSLOG;
+		} else {
+			$use_syslog = (bool) get_option( 'repro_ct_suite_syslog', false );
 		}
+		if ( $use_syslog ) {
+			// map level to syslog priority
+			switch ( $level ) {
+				case 'error':
+					$prio = LOG_ERR;
+					break;
+				case 'warning':
+					$prio = LOG_WARNING;
+					break;
+				case 'success':
+					$prio = LOG_INFO;
+					break;
+				case 'info':
+				default:
+					$prio = LOG_INFO;
+			}
 
-		// openlog/syslog are safe to call multiple times; include plugin name
-		if ( function_exists( 'openlog' ) && function_exists( 'syslog' ) ) {
-			@openlog( 'repro-ct-suite', LOG_PID, LOG_USER );
-			@syslog( $prio, trim( strip_tags( $prefix . $message ) ) );
-			@closelog();
+			// openlog/syslog are safe to call multiple times; include plugin name
+			if ( function_exists( 'openlog' ) && function_exists( 'syslog' ) ) {
+				@openlog( 'repro-ct-suite', LOG_PID, LOG_USER );
+				@syslog( $prio, trim( strip_tags( $prefix . $message ) ) );
+				@closelog();
+			}
 		}
-	}
 	}
 
 	/**
