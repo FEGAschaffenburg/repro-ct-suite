@@ -589,6 +589,36 @@ class Repro_CT_Suite_Admin {
 			)
 		);
 
+		// Sync-Zeitraum: Termine von (Tage in der Vergangenheit, negativ)
+		register_setting(
+			'repro_ct_suite',
+			'repro_ct_suite_sync_from_days',
+			array(
+				'type'              => 'integer',
+				'description'       => __( 'Anzahl der Tage in der Vergangenheit für Event-Synchronisation (negativ)', 'repro-ct-suite' ),
+				'sanitize_callback' => function ( $value ) {
+					$value = intval( $value );
+					return max( -365, min( 0, $value ) );
+				},
+				'default'           => -7,
+			)
+		);
+
+		// Sync-Zeitraum: Termine bis (Tage in der Zukunft, positiv)
+		register_setting(
+			'repro_ct_suite',
+			'repro_ct_suite_sync_to_days',
+			array(
+				'type'              => 'integer',
+				'description'       => __( 'Anzahl der Tage in der Zukunft für Event-Synchronisation (positiv)', 'repro-ct-suite' ),
+				'sanitize_callback' => function ( $value ) {
+					$value = intval( $value );
+					return max( 0, min( 730, $value ) );
+				},
+				'default'           => 365,
+			)
+		);
+
 	}
 
 	/**

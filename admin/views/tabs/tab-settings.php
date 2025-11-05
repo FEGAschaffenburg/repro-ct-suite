@@ -104,6 +104,42 @@ if ( $test_result !== false ) {
 
 		<form method="post" action="options.php" style="margin-top: 20px;">
 			<?php settings_fields( 'repro_ct_suite' ); ?>
+			<h4><?php esc_html_e( 'Sync-Zeitraum', 'repro-ct-suite' ); ?></h4>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row">
+						<label for="repro_ct_suite_sync_from_days"><?php esc_html_e( 'Termine von (Tage)', 'repro-ct-suite' ); ?></label>
+					</th>
+					<td>
+						<input type="number" id="repro_ct_suite_sync_from_days" name="repro_ct_suite_sync_from_days" value="<?php echo esc_attr( get_option( 'repro_ct_suite_sync_from_days', -7 ) ); ?>" class="small-text" />
+						<p class="description">
+							<?php esc_html_e( 'Negative Zahl = Tage in der Vergangenheit (z.B. -7 = 7 Tage zurück). Standard: -7', 'repro-ct-suite' ); ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="repro_ct_suite_sync_to_days"><?php esc_html_e( 'Termine bis (Tage)', 'repro-ct-suite' ); ?></label>
+					</th>
+					<td>
+						<input type="number" id="repro_ct_suite_sync_to_days" name="repro_ct_suite_sync_to_days" value="<?php echo esc_attr( get_option( 'repro_ct_suite_sync_to_days', 365 ) ); ?>" class="small-text" />
+						<p class="description">
+							<?php esc_html_e( 'Positive Zahl = Tage in der Zukunft (z.B. 365 = 1 Jahr voraus). Standard: 365', 'repro-ct-suite' ); ?>
+						</p>
+					</td>
+				</tr>
+			</table>
+			<p>
+				<button type="submit" class="repro-ct-suite-btn repro-ct-suite-btn-secondary">
+					<span class="dashicons dashicons-yes"></span>
+					<?php esc_html_e( 'Zeitraum speichern', 'repro-ct-suite' ); ?>
+				</button>
+			</p>
+		</form>
+
+		<form method="post" action="options.php" style="margin-top: 20px;">
+			<?php settings_fields( 'repro_ct_suite' ); ?>
+			<h4><?php esc_html_e( 'Erweitert', 'repro-ct-suite' ); ?></h4>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><?php esc_html_e( 'Logging: Syslog aktivieren', 'repro-ct-suite' ); ?></th>
