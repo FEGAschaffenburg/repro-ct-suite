@@ -60,12 +60,11 @@ class Repro_CT_Suite_Logger {
 		$milliseconds = sprintf( '%03d', ( $microtime - floor( $microtime ) ) * 1000 );
 		$timestamp = $datetime->format( 'Y-m-d H:i:s' ) . '.' . $milliseconds;
 		
-	// Log-Eintrag schreiben: primär über PHP error_log (WP debug.log),
-	// zusätzlich als Fallback in eine plugin-spezifische Datei.
-	$entry = '[' . $timestamp . '] ' . $prefix . $message . PHP_EOL;
+	// Log-Eintrag schreiben ins WordPress debug.log (wp-content/debug.log)
+	$entry = '[' . $timestamp . '] ' . $prefix . $message;
 
-	// Versuche, in das globale WP debug.log zu schreiben (über error_log)
-	@error_log( $entry );
+	// In das WordPress debug.log schreiben
+	error_log( $entry );
 
 	// Optional: auch in den System-Logger (syslog) schreiben, falls aktiviert
 	// Aktivierung über Option 'repro_ct_suite_syslog' (bool) oder Konstante REPRO_CT_SUITE_SYSLOG
@@ -99,10 +98,6 @@ class Repro_CT_Suite_Logger {
 			@closelog();
 		}
 	}
-
-	// Fallback / zusätzliches Log in plugin-eigene Datei
-	$plugin_log = WP_CONTENT_DIR . '/repro-ct-suite-debug.log';
-	@file_put_contents( $plugin_log, $entry, FILE_APPEND | LOCK_EX );
 	}
 
 	/**

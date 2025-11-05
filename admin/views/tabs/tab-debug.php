@@ -16,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <?php
-// Zeigt den Inhalt der plugin-eigenen Debug-Log-Datei an (repro-ct-suite-debug.log)
-$log_file = WP_CONTENT_DIR . '/repro-ct-suite-debug.log';
+// Zeigt den Inhalt der WordPress Debug-Log-Datei an (wp-content/debug.log)
+$log_file = WP_CONTENT_DIR . '/debug.log';
 $log_exists = file_exists( $log_file );
 $log_size = $log_exists ? filesize( $log_file ) : 0;
 $log_lines = 0;
@@ -78,11 +78,24 @@ if ( $log_exists && $log_size > 0 ) {
 
 			<div style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; max-height: 400px; overflow-y: auto;" id="repro-ct-suite-log-viewer">
 				<?php
-				// Letzten 100 Zeilen des Logs anzeigen
+				// Letzten 100 Zeilen des Logs anzeigen, aber nur Zeilen vom Plugin
 				$log_content = file( $log_file );
-				$log_content = array_slice( $log_content, -100 );
-
+				$log_content = array_reverse( $log_content ); // Neueste zuerst
+				
+				$plugin_lines = array();
 				foreach ( $log_content as $line ) {
+					// Nur Zeilen vom Plugin anzeigen
+					if ( strpos( $line, '[REPRO CT-SUITE]' ) !== false ) {
+						$plugin_lines[] = $line;
+						if ( count( $plugin_lines ) >= 100 ) {
+							break;
+						}
+					}
+				}
+				
+				$plugin_lines = array_reverse( $plugin_lines ); // Wieder chronologisch
+
+				foreach ( $plugin_lines as $line ) {
 					$line = esc_html( $line );
 
 					// Einfaches Syntax-Highlighting nach Level
@@ -100,7 +113,7 @@ if ( $log_exists && $log_size > 0 ) {
 			</div>
 
 			<p class="description" style="margin-top: 10px;">
-				<?php esc_html_e( 'Zeigt die letzten 100 Log-Einträge. Voller Log-Pfad:', 'repro-ct-suite' ); ?>
+				<?php esc_html_e( 'Zeigt die letzten 100 Plugin-Einträge aus dem WordPress Debug-Log. Voller Log-Pfad:', 'repro-ct-suite' ); ?>
 				<code><?php echo esc_html( $log_file ); ?></code>
 			</p>
 		<?php else : ?>
