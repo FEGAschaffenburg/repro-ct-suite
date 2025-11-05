@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.6.0.8
+Stable tag: 0.6.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.6.0.9 =
+* KRITISCHER FIX: Aggressive Update-Cache Clearing für wp-admin/plugins.php
+* WordPress Plugin-Seite zeigt Updates jetzt korrekt an
+* Cache-Clearing bei jedem Admin-Besuch (update_plugins, plugins_cache)
+* Behebt Problem dass Updates nur im Plugin-Tab erkennbar waren
 
 = 0.6.0.8 =
 * KRITISCHER FIX: UTF-8 BOM aus 5 PHP-Dateien entfernt (JSON parse error behoben)
