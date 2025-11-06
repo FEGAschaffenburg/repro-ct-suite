@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.8.2
+Stable tag: 0.8.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,14 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.8.3 =
+* KRITISCHER FIX: Kalender-Zuordnung zu Events korrigiert
+* SQL JOIN verwendet jetzt korrekte Spalte: c.calendar_id statt c.id
+* Behebt Problem: Kalender-Namen und -Farben wurden nicht angezeigt
+* Betrifft Frontend-Shortcode [rcts_events]
+* Grund: wp_rcts_calendars hat id (BIGINT, auto-increment) UND calendar_id (VARCHAR, ChurchTools-ID)
+* Events speichern calendar_id als VARCHAR, daher muss JOIN auf VARCHAR-Spalten erfolgen
 
 = 0.8.2 =
 * FEATURE: Preset-Shortcode - Verwendung von [rcts_events preset="Name"] statt langer Parameter

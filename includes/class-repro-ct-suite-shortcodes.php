@@ -125,8 +125,8 @@ class Repro_CT_Suite_Shortcodes {
 
 		// Kalender-Filter
 		if ( ! empty( $atts['calendar_ids'] ) ) {
-			$calendar_ids = array_map( 'intval', explode( ',', $atts['calendar_ids'] ) );
-			$placeholders = implode( ',', array_fill( 0, count( $calendar_ids ), '%d' ) );
+			$calendar_ids = array_map( 'sanitize_text_field', explode( ',', $atts['calendar_ids'] ) );
+			$placeholders = implode( ',', array_fill( 0, count( $calendar_ids ), '%s' ) );
 			$where[] = $wpdb->prepare( "e.calendar_id IN ($placeholders)", $calendar_ids );
 		}
 
@@ -144,7 +144,7 @@ class Repro_CT_Suite_Shortcodes {
 		$sql = "
 			SELECT e.*, c.name as calendar_name, c.color as calendar_color
 			FROM {$events_table} e
-			LEFT JOIN {$wpdb->prefix}rcts_calendars c ON e.calendar_id = c.id
+			LEFT JOIN {$wpdb->prefix}rcts_calendars c ON e.calendar_id = c.calendar_id
 			WHERE {$where_clause}
 			ORDER BY e.start_datetime {$order_by}
 			LIMIT {$limit}
