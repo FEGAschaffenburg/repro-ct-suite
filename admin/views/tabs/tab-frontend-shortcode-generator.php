@@ -1,6 +1,8 @@
 <?php
 /**
- * Frontend Tab: Shortcode Generator
+ * Frontend Tab: Shortcode Manager
+ * 
+ * Moderne UI für Shortcode-Verwaltung mit Liste, Popup-Editor und Live-Vorschau
  *
  * @package Repro_CT_Suite
  */
@@ -15,90 +17,310 @@ $calendars_table = $wpdb->prefix . 'rcts_calendars';
 $calendars = $wpdb->get_results( "SELECT id, calendar_id, name, color FROM {$calendars_table} WHERE is_selected = 1 ORDER BY name ASC" );
 ?>
 
-<div class="shortcode-generator-wrapper">
-	<div class="generator-columns">
-		<!-- Linke Spalte: Konfiguration -->
-		<div class="generator-config">
-			<h2><?php esc_html_e( 'Shortcode Generator', 'repro-ct-suite' ); ?></h2>
-			<p class="description">
-				<?php esc_html_e( 'Erstellen Sie einen individualisierten Shortcode für die Anzeige Ihrer Termine.', 'repro-ct-suite' ); ?>
-			</p>
+<div class="shortcode-manager-wrapper">
+	
+	<!-- Header mit Action-Buttons -->
+	<div class="shortcode-manager-header">
+		<div class="header-content">
+			<div class="header-left">
+				<h2>
+					<span class="dashicons dashicons-shortcode"></span>
+					<?php esc_html_e( 'Shortcode Manager', 'repro-ct-suite' ); ?>
+				</h2>
+				<p class="description">
+					<?php esc_html_e( 'Verwalten Sie Ihre gespeicherten Shortcode-Konfigurationen.', 'repro-ct-suite' ); ?>
+				</p>
+			</div>
+			<div class="header-right">
+				<button type="button" id="create-shortcode-btn" class="button button-primary button-large">
+					<span class="dashicons dashicons-plus-alt"></span>
+					<?php esc_html_e( 'Neuer Shortcode', 'repro-ct-suite' ); ?>
+				</button>
+			</div>
+		</div>
+	</div>
 
-			<!-- Preset Manager -->
-			<div class="preset-manager">
-				<div class="preset-controls">
-					<div class="preset-load">
-						<label for="preset-select">
-							<?php esc_html_e( 'Gespeicherte Presets', 'repro-ct-suite' ); ?>
-						</label>
-						<div class="preset-select-wrapper">
-							<select id="preset-select" class="regular-text">
-								<option value=""><?php esc_html_e( '-- Neues Preset --', 'repro-ct-suite' ); ?></option>
-							</select>
-							<button type="button" id="load-preset-btn" class="button" disabled>
-								<span class="dashicons dashicons-download"></span>
-								<?php esc_html_e( 'Laden', 'repro-ct-suite' ); ?>
-							</button>
-							<button type="button" id="delete-preset-btn" class="button button-link-delete" disabled>
-								<span class="dashicons dashicons-trash"></span>
-							</button>
+	<!-- Shortcode-Liste -->
+	<div class="shortcode-list-container">
+		<div class="list-header">
+			<div class="search-controls">
+				<input type="text" id="shortcode-search" placeholder="<?php esc_attr_e( 'Shortcodes durchsuchen...', 'repro-ct-suite' ); ?>" class="regular-text">
+				<button type="button" id="refresh-list-btn" class="button">
+					<span class="dashicons dashicons-update"></span>
+				</button>
+			</div>
+			<div class="view-controls">
+				<button type="button" class="view-toggle active" data-view="grid">
+					<span class="dashicons dashicons-grid-view"></span>
+				</button>
+				<button type="button" class="view-toggle" data-view="list">
+					<span class="dashicons dashicons-list-view"></span>
+				</button>
+			</div>
+		</div>
+
+		<!-- Loading State -->
+		<div id="shortcode-list-loading" class="loading-state">
+			<div class="spinner is-active"></div>
+			<p><?php esc_html_e( 'Lade Shortcodes...', 'repro-ct-suite' ); ?></p>
+		</div>
+
+		<!-- Empty State -->
+		<div id="shortcode-list-empty" class="empty-state" style="display: none;">
+			<div class="empty-icon">
+				<span class="dashicons dashicons-shortcode"></span>
+			</div>
+			<h3><?php esc_html_e( 'Noch keine Shortcodes erstellt', 'repro-ct-suite' ); ?></h3>
+			<p><?php esc_html_e( 'Erstellen Sie Ihren ersten Shortcode, um loszulegen.', 'repro-ct-suite' ); ?></p>
+			<button type="button" class="button button-primary" onclick="document.getElementById('create-shortcode-btn').click()">
+				<span class="dashicons dashicons-plus-alt"></span>
+				<?php esc_html_e( 'Jetzt erstellen', 'repro-ct-suite' ); ?>
+			</button>
+		</div>
+
+		<!-- Shortcode Grid/List -->
+		<div id="shortcode-list" class="shortcode-grid" style="display: none;">
+			<!-- Dynamisch gefüllt via JavaScript -->
+		</div>
+	</div>
+</div>
+
+<!-- Shortcode Editor Modal -->
+<div id="shortcode-editor-modal" class="modal-overlay" style="display: none;">
+	<div class="modal-container">
+		<div class="modal-header">
+			<h3 id="modal-title">
+				<span class="dashicons dashicons-shortcode"></span>
+				<span id="modal-title-text"><?php esc_html_e( 'Shortcode bearbeiten', 'repro-ct-suite' ); ?></span>
+			</h3>
+			<button type="button" class="modal-close" id="close-modal-btn">
+				<span class="dashicons dashicons-no-alt"></span>
+			</button>
+		</div>
+		
+		<div class="modal-body">
+			<div class="modal-columns">
+				<!-- Linke Spalte: Konfiguration -->
+				<div class="modal-config">
+					<form id="shortcode-editor-form">
+						<input type="hidden" id="edit-preset-id" value="">
+						
+						<!-- Basis-Informationen -->
+						<div class="form-section">
+							<h4><?php esc_html_e( 'Basis-Informationen', 'repro-ct-suite' ); ?></h4>
+							
+							<div class="form-group">
+								<label for="edit-name">
+									<?php esc_html_e( 'Name', 'repro-ct-suite' ); ?>
+									<span class="required">*</span>
+								</label>
+								<input type="text" id="edit-name" name="name" class="regular-text" required 
+									placeholder="<?php esc_attr_e( 'z.B. Gottesdienste, Nächste Events...', 'repro-ct-suite' ); ?>">
+								<p class="description">
+									<?php esc_html_e( 'Ein beschreibender Name für diesen Shortcode.', 'repro-ct-suite' ); ?>
+								</p>
+							</div>
+						</div>
+
+						<!-- Ansicht -->
+						<div class="form-section">
+							<h4><?php esc_html_e( 'Darstellung', 'repro-ct-suite' ); ?></h4>
+							
+							<div class="form-group">
+								<label for="edit-view">
+									<?php esc_html_e( 'Ansicht', 'repro-ct-suite' ); ?>
+								</label>
+								<select id="edit-view" name="view" class="regular-text">
+									<option value="list"><?php esc_html_e( 'Liste (einfach)', 'repro-ct-suite' ); ?></option>
+									<option value="list-grouped"><?php esc_html_e( 'Liste (nach Datum gruppiert)', 'repro-ct-suite' ); ?></option>
+									<option value="cards"><?php esc_html_e( 'Kacheln (Grid)', 'repro-ct-suite' ); ?></option>
+								</select>
+							</div>
+
+							<div class="form-group">
+								<label for="edit-limit">
+									<?php esc_html_e( 'Anzahl Termine', 'repro-ct-suite' ); ?>
+								</label>
+								<input type="number" id="edit-limit" name="limit_count" value="10" min="1" max="100" class="small-text">
+								<p class="description">
+									<?php esc_html_e( 'Maximale Anzahl anzuzeigender Termine (1-100)', 'repro-ct-suite' ); ?>
+								</p>
+							</div>
+						</div>
+
+						<!-- Kalender-Auswahl -->
+						<div class="form-section">
+							<h4><?php esc_html_e( 'Kalender-Filter', 'repro-ct-suite' ); ?></h4>
+							
+							<div class="form-group">
+								<label><?php esc_html_e( 'Kalender auswählen', 'repro-ct-suite' ); ?></label>
+								<div class="calendar-checkboxes">
+									<label class="calendar-option all-calendars">
+										<input type="checkbox" id="edit-all-calendars" checked>
+										<span class="checkmark"></span>
+										<strong><?php esc_html_e( 'Alle Kalender', 'repro-ct-suite' ); ?></strong>
+									</label>
+									<?php foreach ( $calendars as $calendar ) : ?>
+										<label class="calendar-option" data-calendar-id="<?php echo esc_attr( $calendar->calendar_id ); ?>">
+											<input type="checkbox" class="calendar-checkbox" value="<?php echo esc_attr( $calendar->calendar_id ); ?>">
+											<span class="checkmark" style="background-color: <?php echo esc_attr( $calendar->color ); ?>"></span>
+											<?php echo esc_html( $calendar->name ); ?>
+										</label>
+									<?php endforeach; ?>
+								</div>
+							</div>
+						</div>
+
+						<!-- Zeitraum -->
+						<div class="form-section">
+							<h4><?php esc_html_e( 'Zeitraum', 'repro-ct-suite' ); ?></h4>
+							
+							<div class="form-row">
+								<div class="form-group">
+									<label for="edit-from-days">
+										<?php esc_html_e( 'Von (Tage)', 'repro-ct-suite' ); ?>
+									</label>
+									<input type="number" id="edit-from-days" name="from_days" value="-7" class="small-text">
+									<p class="description">
+										<?php esc_html_e( 'Tage von heute (negativ = Vergangenheit)', 'repro-ct-suite' ); ?>
+									</p>
+								</div>
+								<div class="form-group">
+									<label for="edit-to-days">
+										<?php esc_html_e( 'Bis (Tage)', 'repro-ct-suite' ); ?>
+									</label>
+									<input type="number" id="edit-to-days" name="to_days" value="90" class="small-text">
+									<p class="description">
+										<?php esc_html_e( 'Tage von heute', 'repro-ct-suite' ); ?>
+									</p>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label>
+									<input type="checkbox" id="edit-show-past" name="show_past">
+									<?php esc_html_e( 'Vergangene Termine anzeigen', 'repro-ct-suite' ); ?>
+								</label>
+							</div>
+						</div>
+
+						<!-- Sortierung -->
+						<div class="form-section">
+							<h4><?php esc_html_e( 'Sortierung', 'repro-ct-suite' ); ?></h4>
+							
+							<div class="form-group">
+								<label for="edit-order-dir">
+									<?php esc_html_e( 'Reihenfolge', 'repro-ct-suite' ); ?>
+								</label>
+								<select id="edit-order-dir" name="order_dir" class="regular-text">
+									<option value="asc"><?php esc_html_e( 'Aufsteigend (älteste zuerst)', 'repro-ct-suite' ); ?></option>
+									<option value="desc"><?php esc_html_e( 'Absteigend (neueste zuerst)', 'repro-ct-suite' ); ?></option>
+								</select>
+							</div>
+						</div>
+
+						<!-- Angezeigte Felder -->
+						<div class="form-section">
+							<h4><?php esc_html_e( 'Angezeigte Felder', 'repro-ct-suite' ); ?></h4>
+							
+							<div class="field-checkboxes">
+								<label class="field-option">
+									<input type="checkbox" value="title" checked disabled>
+									<span class="checkmark"></span>
+									<?php esc_html_e( 'Titel', 'repro-ct-suite' ); ?>
+									<em>(<?php esc_html_e( 'immer angezeigt', 'repro-ct-suite' ); ?>)</em>
+								</label>
+								<label class="field-option">
+									<input type="checkbox" class="field-checkbox" value="date" checked>
+									<span class="checkmark"></span>
+									<?php esc_html_e( 'Datum', 'repro-ct-suite' ); ?>
+								</label>
+								<label class="field-option">
+									<input type="checkbox" class="field-checkbox" value="time" checked>
+									<span class="checkmark"></span>
+									<?php esc_html_e( 'Uhrzeit', 'repro-ct-suite' ); ?>
+								</label>
+								<label class="field-option">
+									<input type="checkbox" class="field-checkbox" value="location">
+									<span class="checkmark"></span>
+									<?php esc_html_e( 'Ort', 'repro-ct-suite' ); ?>
+								</label>
+								<label class="field-option">
+									<input type="checkbox" class="field-checkbox" value="description">
+									<span class="checkmark"></span>
+									<?php esc_html_e( 'Beschreibung', 'repro-ct-suite' ); ?>
+								</label>
+								<label class="field-option">
+									<input type="checkbox" class="field-checkbox" value="calendar" checked>
+									<span class="checkmark"></span>
+									<?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?>
+								</label>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<!-- Rechte Spalte: Vorschau -->
+				<div class="modal-preview">
+					<div class="preview-header">
+						<h4>
+							<span class="dashicons dashicons-visibility"></span>
+							<?php esc_html_e( 'Live-Vorschau', 'repro-ct-suite' ); ?>
+						</h4>
+						<button type="button" id="refresh-preview-btn" class="button button-small">
+							<span class="dashicons dashicons-update"></span>
+						</button>
+					</div>
+					
+					<div class="preview-container">
+						<div id="preview-loading" class="preview-loading">
+							<div class="spinner is-active"></div>
+							<p><?php esc_html_e( 'Vorschau wird geladen...', 'repro-ct-suite' ); ?></p>
+						</div>
+						<div id="preview-content" class="preview-content">
+							<!-- Dynamisch gefüllt via AJAX -->
 						</div>
 					</div>
-					<div class="preset-save">
-						<button type="button" id="save-preset-btn" class="button">
-							<span class="dashicons dashicons-saved"></span>
-							<?php esc_html_e( 'Als Preset speichern', 'repro-ct-suite' ); ?>
-						</button>
+
+					<div class="shortcode-output">
+						<h4><?php esc_html_e( 'Generierter Shortcode', 'repro-ct-suite' ); ?></h4>
+						<div class="shortcode-display">
+							<input type="text" id="generated-shortcode" class="code" readonly>
+							<button type="button" id="copy-shortcode-btn" class="button button-small">
+								<span class="dashicons dashicons-admin-page"></span>
+								<?php esc_html_e( 'Kopieren', 'repro-ct-suite' ); ?>
+							</button>
+						</div>
+						<p class="description">
+							<?php esc_html_e( 'Kopieren Sie diesen Shortcode in Ihre Seiten oder Beiträge.', 'repro-ct-suite' ); ?>
+						</p>
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<hr style="margin: 20px 0;">
+		<div class="modal-footer">
+			<div class="footer-left">
+				<button type="button" id="delete-current-shortcode-btn" class="button button-link-delete" style="display: none;">
+					<span class="dashicons dashicons-trash"></span>
+					<?php esc_html_e( 'Löschen', 'repro-ct-suite' ); ?>
+				</button>
+			</div>
+			<div class="footer-right">
+				<button type="button" id="cancel-edit-btn" class="button">
+					<?php esc_html_e( 'Abbrechen', 'repro-ct-suite' ); ?>
+				</button>
+				<button type="button" id="save-shortcode-btn" class="button button-primary">
+					<span class="dashicons dashicons-saved"></span>
+					<span id="save-btn-text"><?php esc_html_e( 'Speichern', 'repro-ct-suite' ); ?></span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
 
-			<form id="shortcode-generator-form" class="generator-form">
-				
-				<!-- Ansicht -->
-				<div class="form-group">
-					<label for="view">
-						<?php esc_html_e( 'Ansicht', 'repro-ct-suite' ); ?>
-						<span class="dashicons dashicons-info-outline" title="<?php esc_attr_e( 'Wählen Sie die Darstellungsart der Termine', 'repro-ct-suite' ); ?>"></span>
-					</label>
-					<select id="view" name="view" class="regular-text">
-						<option value="list"><?php esc_html_e( 'Liste (einfach)', 'repro-ct-suite' ); ?></option>
-						<option value="list-grouped"><?php esc_html_e( 'Liste (nach Datum gruppiert)', 'repro-ct-suite' ); ?></option>
-						<option value="cards" selected><?php esc_html_e( 'Kacheln (Grid)', 'repro-ct-suite' ); ?></option>
-					</select>
-					<p class="description">
-						<?php esc_html_e( 'Die Darstellungsart beeinflusst das Layout der Termine.', 'repro-ct-suite' ); ?>
-					</p>
-				</div>
-
-				<!-- Anzahl -->
-				<div class="form-group">
-					<label for="limit">
-						<?php esc_html_e( 'Anzahl Termine', 'repro-ct-suite' ); ?>
-					</label>
-					<input type="number" id="limit" name="limit" value="10" min="1" max="100" class="small-text">
-					<p class="description">
-						<?php esc_html_e( 'Maximale Anzahl anzuzeigender Termine (1-100)', 'repro-ct-suite' ); ?>
-					</p>
-				</div>
-
-				<!-- Kalender-Auswahl -->
-				<div class="form-group">
-					<label for="calendar_ids">
-						<?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?>
-					</label>
-					<select id="calendar_ids" name="calendar_ids[]" multiple class="regular-text" style="height: 120px;">
-						<option value="" selected><?php esc_html_e( 'Alle Kalender', 'repro-ct-suite' ); ?></option>
-						<?php foreach ( $calendars as $calendar ) : ?>
-							<option value="<?php echo esc_attr( $calendar->calendar_id ); ?>" 
-								style="color: <?php echo esc_attr( $calendar->color ); ?>">
-								<?php echo esc_html( $calendar->name ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description">
+<!-- Toast Notifications -->
+<div id="toast-container" class="toast-container"></div>
 						<?php esc_html_e( 'Mehrfachauswahl mit Strg/Cmd + Klick. Leer = alle Kalender.', 'repro-ct-suite' ); ?>
 					</p>
 				</div>

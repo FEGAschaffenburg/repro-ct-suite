@@ -232,6 +232,18 @@ class Repro_CT_Suite_Admin {
 			null,
 			'all'
 		);
+
+		// Shortcode Manager Styles (nur auf Frontend-Seite)
+		$screen = get_current_screen();
+		if ( $screen && strpos( $screen->id, 'repro-ct-suite-frontend' ) !== false ) {
+			wp_enqueue_style(
+				$this->plugin_name . '-shortcode-manager',
+				plugin_dir_url( __FILE__ ) . 'css/shortcode-manager.css',
+				array(),
+				$this->version,
+				'all'
+			);
+		}
 	}
 
 	/**
@@ -246,8 +258,29 @@ class Repro_CT_Suite_Admin {
 			false
 		);
 
-		// Debug-Seite JavaScript
+		// Shortcode Manager JavaScript (nur auf Frontend-Seite)
 		$screen = get_current_screen();
+		if ( $screen && strpos( $screen->id, 'repro-ct-suite-frontend' ) !== false ) {
+			wp_enqueue_script(
+				$this->plugin_name . '-shortcode-manager',
+				plugin_dir_url( __FILE__ ) . 'js/shortcode-manager.js',
+				array( 'jquery' ),
+				$this->version,
+				true
+			);
+
+			// AJAX-Daten für Shortcode Manager
+			wp_localize_script(
+				$this->plugin_name . '-shortcode-manager',
+				'repro_ct_suite_ajax',
+				array(
+					'ajax_url' => admin_url( 'admin-ajax.php' ),
+					'nonce'    => wp_create_nonce( 'repro_ct_suite_presets' ),
+				)
+			);
+		}
+
+		// Debug-Seite JavaScript
 		// Enqueue debug JS either on the dedicated debug page OR on the main plugin page when the Logs tab is active
 		$enqueue_debug = false;
 		if ( $screen && strpos( $screen->id, 'repro-ct-suite-debug' ) !== false ) {
