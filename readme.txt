@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.8.4
+Stable tag: 0.8.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 3. Events-Anzeige im Frontend
 
 == Changelog ==
+
+= 0.8.5 =
+* BUGFIX: Admin-Übersicht zeigt jetzt korrekte Kalendernamen
+* Admin-Seite "Termine" (page=repro-ct-suite-events) verwendet jetzt get_by_calendar_id() statt get_by_id()
+* Behebt Problem: Kalendernamen wurden in der Admin-Tabelle nicht angezeigt
+* Betrifft nur Admin-Bereich, Frontend war bereits mit v0.8.3 korrekt
 
 = 0.8.4 =
 * FEATURE: Automatische Update-Benachrichtigungen von GitHub

@@ -125,9 +125,23 @@ class Repro_CT_Suite_Shortcodes {
 
 		// Kalender-Filter
 		if ( ! empty( $atts['calendar_ids'] ) ) {
-			$calendar_ids = array_map( 'sanitize_text_field', explode( ',', $atts['calendar_ids'] ) );
-			$placeholders = implode( ',', array_fill( 0, count( $calendar_ids ), '%s' ) );
-			$where[] = $wpdb->prepare( "e.calendar_id IN ($placeholders)", $calendar_ids );
+			// Konvertiere WordPress-IDs zu ChurchTools calendar_ids
+			$wp_ids = array_map( 'intval', explode( ',', $atts['calendar_ids'] ) );
+			
+			// Hole die ChurchTools calendar_ids aus der Kalendar-Tabelle
+			$placeholders_in = implode( ',', array_fill( 0, count( $wp_ids ), '%d' ) );
+			$ct_calendar_ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT calendar_id FROM {$wpdb->prefix}rcts_calendars WHERE id IN ($placeholders_in)",
+					$wp_ids
+				)
+			);
+			
+			// Wenn ChurchTools-IDs gefunden wurden, filtere danach
+			if ( ! empty( $ct_calendar_ids ) ) {
+				$placeholders = implode( ',', array_fill( 0, count( $ct_calendar_ids ), '%s' ) );
+				$where[] = $wpdb->prepare( "e.calendar_id IN ($placeholders)", $ct_calendar_ids );
+			}
 		}
 
 		// Vergangene Events filtern

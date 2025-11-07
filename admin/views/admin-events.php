@@ -200,8 +200,8 @@ $total_pages = ceil( $total / $limit );
                     // Beschreibung kürzen
                     $description_preview = ! empty( $item->description ) ? wp_trim_words( strip_tags( $item->description ), 10, '...' ) : '—';
                     
-                    // Kalender holen
-                    $calendar = $calendars_repo->get_by_id( $item->calendar_id );
+                    // Kalender holen über calendar_id (ChurchTools-ID verwenden)
+                    $calendar = $calendars_repo->get_by_calendar_id( $item->calendar_id );
                     
                     // Type badge - Termin (Appointment) = Grün, Event = Blau
                     $type_class = $is_appointment ? 'repro-ct-suite-badge-success' : 'repro-ct-suite-badge-info';
