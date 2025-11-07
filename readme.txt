@@ -4,7 +4,7 @@ Tags: churchtools, calendar, events, appointments, sync
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 0.8.3
+Stable tag: 0.8.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,13 +73,24 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 == Changelog ==
 
+= 0.8.4 =
+* FEATURE: Automatische Update-Benachrichtigungen von GitHub
+* WordPress erkennt jetzt automatisch neue Releases
+* 1-Klick-Update direkt aus dem WordPress-Admin
+* Update-Prüfung alle 5 Minuten (mit Cache)
+* Unterstützt öffentliche und private GitHub-Repositories
+* Keine zusätzlichen Plugins erforderlich
+* Optimiertes Cache-Management (keine übermäßigen API-Anfragen)
+
 = 0.8.3 =
-* KRITISCHER FIX: Kalender-Zuordnung zu Events korrigiert
-* SQL JOIN verwendet jetzt korrekte Spalte: c.calendar_id statt c.id
+* KRITISCHER FIX: Kalender-Zuordnung zu Events korrigiert (2 Bugs behoben)
+* Bug 1: SQL JOIN verwendet jetzt korrekte Spalte: c.calendar_id statt c.id
+* Bug 2: Kalender-Filter behandelt calendar_ids jetzt als VARCHAR statt Integer
 * Behebt Problem: Kalender-Namen und -Farben wurden nicht angezeigt
+* Behebt Problem: Shortcode-Parameter calendar_ids="1,2,3" funktionierte nicht
 * Betrifft Frontend-Shortcode [rcts_events]
 * Grund: wp_rcts_calendars hat id (BIGINT, auto-increment) UND calendar_id (VARCHAR, ChurchTools-ID)
-* Events speichern calendar_id als VARCHAR, daher muss JOIN auf VARCHAR-Spalten erfolgen
+* Events speichern calendar_id als VARCHAR, daher müssen JOIN und Filter VARCHAR-basiert sein
 
 = 0.8.2 =
 * FEATURE: Preset-Shortcode - Verwendung von [rcts_events preset="Name"] statt langer Parameter

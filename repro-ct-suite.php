@@ -3,7 +3,7 @@
  * Plugin Name:       Repro CT-Suite
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
  * Description:       ChurchTools-Integration für WordPress. Synchronisiert Termine und Events aus ChurchTools.
- * Version:           0.8.3
+ * Version:           0.8.4
  * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            FEGAschaffenburg
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Version mit 4 Zahlen: Major.Minor.Patch.Build
  * Build-Nummer erhöhen bei minimalen Änderungen
  */
-define( 'REPRO_CT_SUITE_VERSION', '0.8.3' );
+define( 'REPRO_CT_SUITE_VERSION', '0.8.4' );
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 define( 'REPRO_CT_SUITE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'REPRO_CT_SUITE_URL', plugin_dir_url( __FILE__ ) );
@@ -63,18 +63,12 @@ require_once REPRO_CT_SUITE_PATH . 'includes/class-repro-ct-suite-updater.php';
 
 /**
  * Initialize the updater
- * 
- * Hinweis: Für private Repositories kann ein GitHub Token als vierter Parameter
- * übergeben werden. Für öffentliche Repositories ist dies nicht erforderlich.
  */
 if ( is_admin() ) {
-	// GitHub Updater in späterem Hook laden um "Headers already sent" zu vermeiden
 	add_action( 'admin_init', function() {
-		$github_token = ''; // Leer lassen für öffentliche Repositories
-		
-		// Update-Cache löschen um neue Version zu erkennen
-		if ( isset( $_GET['force-check'] ) ) {
-			delete_transient( 'repro_ct_suite_github_release_cache' );
+		// Force-Check Parameter für manuelles Update-Prüfung
+		if ( isset( $_GET['force-check'] ) && current_user_can( 'update_plugins' ) ) {
+			delete_transient( 'repro_ct_suite_release_info' );
 			delete_site_transient( 'update_plugins' );
 			wp_clean_plugins_cache();
 		}
@@ -83,20 +77,9 @@ if ( is_admin() ) {
 			__FILE__,
 			'FEGAschaffenburg',
 			'repro-ct-suite',
-			$github_token
+			'' // Leer für öffentliche Repositories
 		);
 	});
-	
-	// AGGRESSIVE Cache-Clearing für Plugin-Updates bei Admin-Load
-	add_action( 'init', function() {
-		if ( is_admin() && current_user_can( 'update_plugins' ) ) {
-			// Bei jedem Admin-Besuch alle Update-Caches löschen
-			delete_transient( 'repro_ct_suite_release_info' );
-			delete_transient( 'repro_ct_suite_github_release_cache' );
-			delete_site_transient( 'update_plugins' );
-			wp_clean_plugins_cache();
-		}
-	} );
 }
 
 /**
