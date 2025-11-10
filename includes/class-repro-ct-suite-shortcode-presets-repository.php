@@ -76,12 +76,19 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 
 		$insert_data = array(
 			'name'         => sanitize_text_field( $data['name'] ?? '' ),
-			'view'         => sanitize_text_field( $data['view'] ?? 'list-simple' ),
+			'view'         => sanitize_text_field( $data['view'] ?? 'list-simple' ),
+			'shortcode_tag' => sanitize_text_field( $data['shortcode_tag'] ?? '' ),
+			'display_mode' => sanitize_text_field( $data['display_mode'] ?? $data['view'] ?? 'list-simple' ),
 			'limit_count'  => isset( $data['limit_count'] ) ? intval( $data['limit_count'] ) : null,
 			'calendar_ids' => isset( $data['calendar_ids'] ) ? sanitize_text_field( $data['calendar_ids'] ) : null,
 			'from_days'    => isset( $data['from_days'] ) ? intval( $data['from_days'] ) : null,
 			'to_days'      => isset( $data['to_days'] ) ? intval( $data['to_days'] ) : null,
-			'show_past'    => isset( $data['show_past'] ) ? (int) $data['show_past'] : 0,
+			'days_ahead'        => isset( $data['days_ahead'] ) ? intval( $data['days_ahead'] ) : null,
+			'show_past'         => isset( $data['show_past'] ) ? (int) $data['show_past'] : 0,
+			'show_time'         => isset( $data['show_time'] ) ? (int) $data['show_time'] : 1,
+			'show_location'     => isset( $data['show_location'] ) ? (int) $data['show_location'] : 1,
+			'show_description'  => isset( $data['show_description'] ) ? (int) $data['show_description'] : 1,
+			'show_organizer'    => isset( $data['show_organizer'] ) ? (int) $data['show_organizer'] : 0,
 			'order_dir'    => isset( $data['order_dir'] ) ? sanitize_text_field( $data['order_dir'] ) : 'ASC',
 			'show_fields'  => isset( $data['show_fields'] ) ? sanitize_text_field( $data['show_fields'] ) : null,
 			'created_at'   => $current_time,
@@ -115,7 +122,7 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 		);
 
 		// Nur vorhandene Felder aktualisieren
-		$allowed_fields = array( 'name', 'view', 'limit_count', 'calendar_ids', 'from_days', 'to_days', 'show_past', 'order_dir', 'show_fields' );
+		$allowed_fields = array( 'name', 'shortcode_tag', 'view', 'display_mode', 'limit_count', 'calendar_ids', 'from_days', 'to_days', 'days_ahead', 'show_past', 'show_time', 'show_location', 'show_description', 'show_organizer', 'order_dir', 'show_fields' );
 		
 		foreach ( $allowed_fields as $field ) {
 			if ( isset( $data[ $field ] ) ) {
