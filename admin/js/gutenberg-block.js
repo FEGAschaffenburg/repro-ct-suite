@@ -1,19 +1,28 @@
 /**
  * Gutenberg Block für Repro CT Suite Events
- * Ermöglicht die Auswahl verschiedener Event-Ansichten im Block-Editor
+ * Ermöglicht die Auswahl gespeicherter Shortcodes oder manuelle Konfiguration
  */
 
-(function (blocks, element, blockEditor, components) {
+(function (blocks, element, blockEditor, components, data) {
 	const el = element.createElement;
 	const { registerBlockType } = blocks;
 	const { InspectorControls, useBlockProps } = blockEditor;
-	const { PanelBody, SelectControl, TextControl, ToggleControl, RangeControl } = components;
+	const { PanelBody, SelectControl, TextControl, ToggleControl, RangeControl, Button, Notice } = components;
+	const { useState, useEffect } = element;
 
 	registerBlockType('repro-ct-suite/events', {
 		title: 'ChurchTools Termine',
 		icon: 'calendar-alt',
 		category: 'widgets',
 		attributes: {
+			mode: {
+				type: 'string',
+				default: 'manual' // 'manual' oder 'preset'
+			},
+			presetId: {
+				type: 'number',
+				default: 0
+			},
 			view: {
 				type: 'string',
 				default: 'list'
@@ -46,25 +55,65 @@
 
 		edit: function (props) {
 			const { attributes, setAttributes } = props;
-			const blockProps = useBlockProps();
+			const blockProps = useBlockProps({
+				className: 'rcts-gutenberg-block-wrapper'
+			});
+			
+			const [presets, setPresets] = useState([]);
+			const [loading, setLoading] = useState(true);
+
+			// Lade gespeicherte Shortcodes
+			useEffect(() => {
+				if (window.shortcodeManager && window.shortcodeManager.ajaxUrl) {
+					fetch(window.shortcodeManager.ajaxUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+						},
+						body: new URLSearchParams({
+							action: 'sm_get_all_presets',
+							nonce: window.shortcodeManager.nonce
+						})
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success && data.data) {
+							const presetOptions = data.data.map(preset => ({
+								label: preset.name,
+								value: preset.id
+							}));
+							presetOptions.unshift({ label: '-- Manuell konfigurieren --', value: 0 });
+							setPresets(presetOptions);
+						}
+						setLoading(false);
+					})
+					.catch(() => {
+						setLoading(false);
+					});
+				} else {
+					setLoading(false);
+				}
+			}, []);
 
 			const viewOptions = [
-				{ label: '📋 Kompakte Liste', value: 'compact' },
-				{ label: '📄 Einfache Liste', value: 'list' },
-				{ label: '📊 Mittlere Liste', value: 'medium' },
-				{ label: '📅 Timeline (gruppiert)', value: 'list-grouped' },
-				{ label: '🎴 Karten-Grid', value: 'cards' },
-				{ label: '📌 Sidebar Widget', value: 'sidebar' }
+				{ label: '📌 Kompakt', value: 'compact' },
+				{ label: '� Liste', value: 'list' },
+				{ label: '� Medium', value: 'medium' },
+				{ label: '� Timeline', value: 'list-grouped' },
+				{ label: '🎴 Karten', value: 'cards' },
+				{ label: '� Sidebar', value: 'sidebar' }
 			];
 
 			const viewDescriptions = {
-				compact: 'Ultra kompakt: Datum, Zeit, Titel in einer Zeile',
-				list: 'Modern: Große Datums-Box mit Details',
-				medium: 'Ausgewogen: Datum, Zeit, Titel, Ort',
-				'list-grouped': 'Timeline: Nach Datum gruppiert mit Zeitlinie',
-				cards: 'Grid: Karten-Layout mit Hover-Effekten',
-				sidebar: 'Widget: Optimiert für schmale Bereiche'
+				compact: 'Ultra kompakt: Eine Zeile pro Termin',
+				list: 'Standard: Große Datums-Box mit Details',
+				medium: 'Ausgewogen: Zweispaltig mit Icon',
+				'list-grouped': 'Timeline: Nach Datum gruppiert',
+				cards: 'Grid: Karten-Layout responsive',
+				sidebar: 'Widget: Für schmale Bereiche'
 			};
+
+			const isManualMode = attributes.mode === 'manual' || attributes.presetId === 0;
 
 			return el(
 				'div',
@@ -75,75 +124,110 @@
 						null,
 						el(
 							PanelBody,
-							{ title: 'Ansicht & Layout', initialOpen: true },
+							{ title: 'Shortcode-Quelle', initialOpen: true },
 							[
-								el(SelectControl, {
-									label: 'Ansicht wählen',
-									value: attributes.view,
-									options: viewOptions,
-									onChange: (value) => setAttributes({ view: value }),
-									help: viewDescriptions[attributes.view]
-								}),
-								el(RangeControl, {
-									label: 'Anzahl Termine',
-									value: attributes.limit,
-									onChange: (value) => setAttributes({ limit: value }),
-									min: 1,
-									max: 50
-								})
+								loading ? el(Notice, {
+									status: 'info',
+									isDismissible: false
+								}, 'Lade gespeicherte Shortcodes...') : null,
+								
+								presets.length > 1 ? el(SelectControl, {
+									label: 'Gespeicherten Shortcode verwenden',
+									value: attributes.presetId,
+									options: presets,
+									onChange: (value) => {
+										const numValue = parseInt(value);
+										setAttributes({ 
+											presetId: numValue,
+											mode: numValue === 0 ? 'manual' : 'preset'
+										});
+									},
+									help: 'Wähle einen gespeicherten Shortcode oder konfiguriere manuell'
+								}) : el(Notice, {
+									status: 'warning',
+									isDismissible: false
+								}, 'Keine gespeicherten Shortcodes gefunden. Gehe zu ChurchTools Suite → Shortcodes um einen zu erstellen.')
 							]
 						),
-						el(
-							PanelBody,
-							{ title: 'Filter-Einstellungen', initialOpen: false },
-							[
+						
+						isManualMode ? [
+							el(
+								PanelBody,
+								{ title: 'Ansicht & Layout', initialOpen: true },
+								[
+									el(SelectControl, {
+										label: 'Template wählen',
+										value: attributes.view,
+										options: viewOptions,
+										onChange: (value) => setAttributes({ view: value }),
+										help: viewDescriptions[attributes.view]
+									}),
+									el(RangeControl, {
+										label: 'Anzahl Termine',
+										value: attributes.limit,
+										onChange: (value) => setAttributes({ limit: value }),
+										min: 1,
+										max: 50
+									})
+								]
+							),
+							el(
+								PanelBody,
+								{ title: 'Filter-Einstellungen', initialOpen: false },
+								[
+									el(TextControl, {
+										label: 'Kalender-IDs',
+										value: attributes.calendarIds,
+										onChange: (value) => setAttributes({ calendarIds: value }),
+										help: 'Komma-getrennt, z.B. "1,2,3" (leer = alle)'
+									}),
+									el(RangeControl, {
+										label: 'Von (Tage ab heute)',
+										value: attributes.fromDays,
+										onChange: (value) => setAttributes({ fromDays: value }),
+										min: -365,
+										max: 365
+									}),
+									el(RangeControl, {
+										label: 'Bis (Tage ab heute)',
+										value: attributes.toDays,
+										onChange: (value) => setAttributes({ toDays: value }),
+										min: 0,
+										max: 365
+									}),
+									el(ToggleControl, {
+										label: 'Vergangene Termine anzeigen',
+										checked: attributes.showPast,
+										onChange: (value) => setAttributes({ showPast: value })
+									})
+								]
+							),
+							el(
+								PanelBody,
+								{ title: 'Anzuzeigende Felder', initialOpen: false },
 								el(TextControl, {
-									label: 'Kalender-IDs',
-									value: attributes.calendarIds,
-									onChange: (value) => setAttributes({ calendarIds: value }),
-									help: 'Komma-getrennt, z.B. "1,2,3" (leer = alle)'
-								}),
-								el(RangeControl, {
-									label: 'Von (Tage ab heute)',
-									value: attributes.fromDays,
-									onChange: (value) => setAttributes({ fromDays: value }),
-									min: -365,
-									max: 365
-								}),
-								el(RangeControl, {
-									label: 'Bis (Tage ab heute)',
-									value: attributes.toDays,
-									onChange: (value) => setAttributes({ toDays: value }),
-									min: 0,
-									max: 365
-								}),
-								el(ToggleControl, {
-									label: 'Vergangene Termine anzeigen',
-									checked: attributes.showPast,
-									onChange: (value) => setAttributes({ showPast: value })
+									label: 'Felder',
+									value: attributes.showFields,
+									onChange: (value) => setAttributes({ showFields: value }),
+									help: 'Komma-getrennt: date, time, location, description'
 								})
-							]
-						),
-						el(
-							PanelBody,
-							{ title: 'Anzuzeigende Felder', initialOpen: false },
-							el(TextControl, {
-								label: 'Felder',
-								value: attributes.showFields,
-								onChange: (value) => setAttributes({ showFields: value }),
-								help: 'Komma-getrennt: date, time, location, description'
-							})
-						)
+							)
+						] : null
 					),
 					el(
 						'div',
 						{
 							style: {
-								padding: '30px',
+								padding: '30px 20px',
 								background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
 								borderRadius: '12px',
 								color: '#ffffff',
-								textAlign: 'center'
+								textAlign: 'center',
+								minHeight: '200px',
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+								justifyContent: 'center'
 							}
 						},
 						[
@@ -156,24 +240,43 @@
 							el('h3', {
 								style: {
 									margin: '0 0 8px 0',
-									fontSize: '20px',
+									fontSize: 'clamp(18px, 3vw, 24px)',
 									fontWeight: '600'
 								}
 							}, 'ChurchTools Termine'),
+							!isManualMode && attributes.presetId > 0 ? el('div', {
+								style: {
+									background: 'rgba(255,255,255,0.2)',
+									padding: '8px 16px',
+									borderRadius: '6px',
+									margin: '8px 0',
+									fontSize: '14px'
+								}
+							}, `📌 Gespeicherter Shortcode ID: ${attributes.presetId}`) : null,
 							el('p', {
 								style: {
 									margin: '0',
 									opacity: '0.9',
-									fontSize: '14px'
+									fontSize: 'clamp(13px, 2.5vw, 15px)'
 								}
-							}, `Ansicht: ${viewOptions.find(opt => opt.value === attributes.view)?.label || 'Standard'}`),
-							el('p', {
+							}, isManualMode ? 
+								`Template: ${viewOptions.find(opt => opt.value === attributes.view)?.label || 'Standard'}` :
+								'Verwendet gespeicherten Shortcode'
+							),
+							isManualMode ? el('p', {
 								style: {
 									margin: '8px 0 0 0',
 									opacity: '0.8',
-									fontSize: '13px'
+									fontSize: 'clamp(12px, 2vw, 14px)'
 								}
-							}, `${attributes.limit} Termine · ${attributes.showPast ? 'inkl. vergangene' : 'nur zukünftige'}`)
+							}, `${attributes.limit} Termine · ${attributes.showPast ? 'inkl. vergangene' : 'nur zukünftige'}`) : null,
+							el('div', {
+								style: {
+									marginTop: '16px',
+									fontSize: '12px',
+									opacity: '0.7'
+								}
+							}, '🎨 Passt sich automatisch der Container-Breite an')
 						]
 					)
 				]
@@ -183,7 +286,13 @@
 		save: function (props) {
 			const { attributes } = props;
 			
-			// Shortcode-String erstellen
+			// Wenn Preset-Modus, nutze das gespeicherte Shortcode-Tag
+			if (attributes.mode === 'preset' && attributes.presetId > 0) {
+				// Wird vom Server über render_callback verarbeitet
+				return null;
+			}
+			
+			// Manuelle Konfiguration: Shortcode-String erstellen
 			let shortcode = '[repro_ct_suite_events';
 			shortcode += ` view="${attributes.view}"`;
 			shortcode += ` limit="${attributes.limit}"`;
@@ -210,7 +319,6 @@
 			
 			shortcode += ']';
 			
-			// Shortcode als HTML-Kommentar speichern, damit WordPress es verarbeitet
 			return el('div', null, shortcode);
 		}
 	});

@@ -15,6 +15,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     public function __construct() {
         // AJAX actions for logged-in users - Namen korrigiert
         add_action('wp_ajax_sm_get_presets', array($this, 'get_presets'));
+        add_action('wp_ajax_sm_get_all_presets', array($this, 'get_all_presets')); // Für Gutenberg Block
         add_action('wp_ajax_sm_save_preset', array($this, 'save_preset'));
         add_action('wp_ajax_sm_update_preset', array($this, 'update_preset'));
         add_action('wp_ajax_sm_delete_preset', array($this, 'delete_preset'));
@@ -22,6 +23,34 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
         
         // Zusätzliche AJAX-Handler für Kalender-Daten
         add_action('wp_ajax_sm_get_calendars', array($this, 'get_calendars'));
+    }
+    
+    /**
+     * Get all presets for Gutenberg Block (public access for editor)
+     */
+    public function get_all_presets() {
+        // Security check
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'sm_ajax_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        if (!current_user_can('edit_posts')) {
+            wp_send_json_error(array('message' => 'Insufficient permissions'));
+            return;
+        }
+        
+        try {
+            // Repository laden
+            require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-repro-ct-suite-shortcode-presets-repository.php';
+            $repo = new Repro_CT_Suite_Shortcode_Presets_Repository();
+            
+            $presets = $repo->get_all();
+            
+            wp_send_json_success($presets);
+        } catch (Exception $e) {
+            wp_send_json_error(array('message' => $e->getMessage()));
+        }
     }
     
     /**

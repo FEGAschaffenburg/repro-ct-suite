@@ -78,6 +78,9 @@
             $(document).on('click', '.sm-btn-delete, .delete-preset', (e) => this.deletePreset(e));
             $(document).on('click', '.sm-btn-copy, .sm-copy-shortcode, .copy-shortcode', (e) => this.copyShortcode(e));
 
+            // Preview-Buttons für Standard-Shortcodes
+            $(document).on('click', '.preview-shortcode', (e) => this.openPreview(e));
+
             // Kalender-Auswahl
             this.elements.calendarMode.on('change', () => this.toggleCalendarSelection());
             $(document).on('click', '.sm-calendar-item', (e) => this.toggleCalendarItem(e));
@@ -175,12 +178,13 @@
         }
 
         /**
-         * Modal-Hintergrund Klick behandeln
+         * Modal-Hintergrund Klick behandeln (DEAKTIVIERT - Modal soll nicht bei Außen-Klick schließen)
          */
         handleModalClick(e) {
-            if (e.target === e.currentTarget) {
-                this.closeModal();
-            }
+            // Kommentiert aus, damit Modal nicht versehentlich geschlossen wird
+            // if (e.target === e.currentTarget) {
+            //     this.closeModal();
+            // }
         }
 
         /**
@@ -270,11 +274,15 @@
                 if (response.success) {
                     this.closeModal();
                     
-                    if (!isDraft) {
-                        this.showShortcodeResult(response.data.shortcode);
+                    // Erfolgs-Toast mit Shortcode anzeigen (statt separatem Modal)
+                    if (!isDraft && response.data.shortcode) {
+                        this.showToast('Shortcode erfolgreich erstellt: ' + response.data.shortcode, 'success');
+                        // Shortcode in Zwischenablage kopieren
+                        this.copyToClipboard(response.data.shortcode);
+                    } else {
+                        this.showToast('Shortcode erfolgreich gespeichert!', 'success');
                     }
                     
-                    this.showToast('Preset erfolgreich gespeichert!', 'success');
                     this.refreshPresetsList();
                 } else {
                     this.showToast(response.data || 'Fehler beim Speichern', 'error');
@@ -447,6 +455,21 @@
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 this.showToast('Shortcode kopiert!', 'success');
+            }
+        }
+
+        /**
+         * Vorschau für Standard-Shortcode öffnen
+         */
+        openPreview(e) {
+            e.preventDefault();
+            const viewType = $(e.currentTarget).data('shortcode');
+            
+            // Rufe die globale Funktion auf (die im inline-Script definiert ist)
+            if (typeof window.openPreviewModal === 'function') {
+                window.openPreviewModal(viewType);
+            } else {
+                console.warn('openPreviewModal function not found');
             }
         }
 

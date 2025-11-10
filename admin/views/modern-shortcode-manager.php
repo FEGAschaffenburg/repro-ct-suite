@@ -119,7 +119,7 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
                         <span class="sm-shortcode-desc">Timeline-Ansicht • Nach Datum gruppiert mit Zeitlinie • Übersichtlich</span>
                     </div>
                     <div class="sm-shortcode-actions">
-                        <button type="button" class="sm-btn sm-btn-icon sm-btn-small preview-shortcode" data-shortcode="grouped" title="Vorschau anzeigen">
+                        <button type="button" class="sm-btn sm-btn-icon sm-btn-small preview-shortcode" data-shortcode="list-grouped" title="Vorschau anzeigen">
                             <span class="dashicons dashicons-visibility"></span>
                         </button>
                         <button type="button" class="sm-btn sm-btn-secondary sm-btn-small copy-shortcode" data-shortcode='[repro_ct_suite_events view="list-grouped" limit="20"]'>
@@ -492,35 +492,35 @@ window.shortcodeManager = {
 
 // Preview Modal Daten
 const previewData = {
-    'standard': {
-        title: 'Standard-Ansicht',
-        description: '<strong>Verwendung:</strong> [repro_ct_suite_events]<br><strong>Einstellungen:</strong> Alle Kalender, Standard-Sortierung<br><strong>Beschreibung:</strong> Zeigt alle kommenden Termine in einer übersichtlichen Liste an.',
-        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-standard.jpg'
+    'compact': {
+        title: '📋 Compact View',
+        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="compact" limit="10"]<br><strong>Beschreibung:</strong> Ultra kompakte Liste • Datum, Zeit, Titel in einer Zeile • Perfekt für Footer oder Sidebar<br><strong>Ideal für:</strong> Schmale Bereiche, schnelle Übersicht',
+        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-compact.png'
     },
     'list': {
-        title: 'Listen-Ansicht',
-        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="list"]<br><strong>Parameter:</strong> view="list"<br><strong>Beschreibung:</strong> Kompakte Listendarstellung mit Datum, Uhrzeit und Veranstaltungsname.',
-        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-list.jpg'
+        title: '📅 List View (Standard)',
+        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="list" limit="10"]<br><strong>Beschreibung:</strong> Moderne Liste • Große Datums-Box mit Details • Standard-Ansicht<br><strong>Ideal für:</strong> Hauptseiten, ausführliche Darstellung',
+        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-list.png'
     },
-    'grouped': {
-        title: 'Gruppierte Ansicht',
-        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="grouped"]<br><strong>Parameter:</strong> view="grouped"<br><strong>Beschreibung:</strong> Termine werden nach Datum gruppiert angezeigt. Ideal für eine übersichtliche Monatsansicht.',
-        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-grouped.jpg'
+    'medium': {
+        title: '⚖️ Medium View',
+        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="medium" limit="10"]<br><strong>Beschreibung:</strong> Ausgewogenes Layout • Kompakt aber informativ<br><strong>Ideal für:</strong> Mittlere Container-Breiten',
+        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-medium.png'
+    },
+    'list-grouped': {
+        title: '📍 Timeline View (Gruppiert)',
+        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="list-grouped" limit="20"]<br><strong>Beschreibung:</strong> Timeline-Design • Nach Datum gruppiert • Visuelle Marker<br><strong>Ideal für:</strong> Chronologische Übersichten',
+        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-timeline.png'
     },
     'cards': {
-        title: 'Karten-Layout',
-        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="cards"]<br><strong>Parameter:</strong> view="cards"<br><strong>Beschreibung:</strong> Visuell ansprechende Karten mit detaillierten Informationen zu jedem Termin.',
-        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-cards.jpg'
+        title: '🎴 Cards View (Grid)',
+        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="cards" limit="12"]<br><strong>Beschreibung:</strong> Karten-Layout • Moderne Grid-Ansicht • Große Datums-Badges<br><strong>Ideal für:</strong> Breite Layouts, visuelle Präsentation',
+        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-cards.png'
     },
-    'limit': {
-        title: 'Mit Limit-Parameter',
-        description: '<strong>Verwendung:</strong> [repro_ct_suite_events limit="5"]<br><strong>Parameter:</strong> limit="5" (oder andere Zahl)<br><strong>Beschreibung:</strong> Begrenzt die Anzahl der angezeigten Termine. Hier werden maximal 5 Termine angezeigt.',
-        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-limit.jpg'
-    },
-    'days': {
-        title: 'Mit Zeitfilter',
-        description: '<strong>Verwendung:</strong> [repro_ct_suite_events days="30"]<br><strong>Parameter:</strong> days="30" (oder andere Anzahl Tage)<br><strong>Beschreibung:</strong> Zeigt nur Termine innerhalb des angegebenen Zeitraums. Hier: Die nächsten 30 Tage.',
-        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-days.jpg'
+    'sidebar': {
+        title: '📌 Sidebar View (Widget)',
+        description: '<strong>Verwendung:</strong> [repro_ct_suite_events view="sidebar" limit="5"]<br><strong>Beschreibung:</strong> Widget-Design • Kompakte Karten • Kleine Datums-Boxen<br><strong>Ideal für:</strong> Seitenleisten, schmale Bereiche',
+        image: '<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ); ?>assets/images/preview-sidebar.png'
     }
 };
 
@@ -546,12 +546,12 @@ function openPreviewModal(shortcodeType) {
     
     // Speichere den Shortcode für den Kopier-Button
     const shortcodeMap = {
-        'standard': '[repro_ct_suite_events]',
-        'list': '[repro_ct_suite_events view="list"]',
-        'grouped': '[repro_ct_suite_events view="grouped"]',
-        'cards': '[repro_ct_suite_events view="cards"]',
-        'limit': '[repro_ct_suite_events limit="5"]',
-        'days': '[repro_ct_suite_events days="30"]'
+        'compact': '[repro_ct_suite_events view="compact" limit="10"]',
+        'list': '[repro_ct_suite_events view="list" limit="10"]',
+        'medium': '[repro_ct_suite_events view="medium" limit="10"]',
+        'list-grouped': '[repro_ct_suite_events view="list-grouped" limit="20"]',
+        'cards': '[repro_ct_suite_events view="cards" limit="12"]',
+        'sidebar': '[repro_ct_suite_events view="sidebar" limit="5"]'
     };
     
     document.getElementById('copy-from-preview').dataset.shortcode = shortcodeMap[shortcodeType];

@@ -1,12 +1,14 @@
 /**
  * Public-facing styles for the plugin.
- * Modern Event Calendar Design - inspiriert von The Events Calendar & Eventbrite
+ * Modern Event Calendar Design - Responsive mit Container Queries
  * @package Repro_CT_Suite
  */
 
 .repro-ct-suite-container {
 	max-width: 100%;
 	margin: 0 auto;
+	container-type: inline-size;
+	container-name: rcts-container;
 }
 
 /* ===========================
@@ -18,17 +20,19 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 60px 20px;
+	padding: clamp(40px, 8vw, 60px) 20px;
 	text-align: center;
 	background: #f9fafb;
 	border-radius: 12px;
 	color: #6b7280;
-	font-size: 16px;
+	font-size: clamp(14px, 2.5vw, 16px);
 }
 
 .rcts-no-events svg {
 	margin-bottom: 16px;
 	opacity: 0.4;
+	width: clamp(40px, 8vw, 48px);
+	height: clamp(40px, 8vw, 48px);
 }
 
 .rcts-no-events p {
@@ -37,19 +41,19 @@
 }
 
 /* ===========================
-   List Simple View - Modern List Design
+   List Simple View - Responsive
    =========================== */
 
 .rcts-events-list-modern {
-	max-width: 900px;
+	max-width: 100%;
 	margin: 0 auto;
 }
 
 .rcts-event-item {
 	display: flex;
-	gap: 20px;
-	padding: 24px;
-	margin-bottom: 16px;
+	gap: clamp(12px, 3vw, 20px);
+	padding: clamp(16px, 3vw, 24px);
+	margin-bottom: clamp(12px, 2vw, 16px);
 	background: #ffffff;
 	border: 1px solid #e5e7eb;
 	border-radius: 12px;
@@ -69,8 +73,8 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width: 70px;
-	height: 70px;
+	width: clamp(60px, 10vw, 70px);
+	height: clamp(60px, 10vw, 70px);
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	border-radius: 10px;
 	color: #ffffff;
@@ -79,7 +83,7 @@
 
 .rcts-event-month {
 	display: block;
-	font-size: 13px;
+	font-size: clamp(11px, 1.8vw, 13px);
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
@@ -88,7 +92,7 @@
 
 .rcts-event-day {
 	display: block;
-	font-size: 28px;
+	font-size: clamp(22px, 4vw, 28px);
 	font-weight: 700;
 	line-height: 1;
 	margin-top: 2px;
@@ -101,7 +105,7 @@
 
 .rcts-event-title {
 	margin: 0 0 12px 0;
-	font-size: 20px;
+	font-size: clamp(16px, 3vw, 20px);
 	font-weight: 600;
 	color: #111827;
 	line-height: 1.3;
@@ -110,7 +114,7 @@
 .rcts-event-details {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 16px;
+	gap: clamp(8px, 2vw, 16px);
 	margin-bottom: 12px;
 }
 
@@ -119,10 +123,10 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	padding: 6px 12px;
+	padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px);
 	background: #f3f4f6;
 	border-radius: 6px;
-	font-size: 14px;
+	font-size: clamp(12px, 2vw, 14px);
 	color: #374151;
 	font-weight: 500;
 }
@@ -131,10 +135,12 @@
 .rcts-event-location-badge svg {
 	flex-shrink: 0;
 	color: #667eea;
+	width: clamp(14px, 2.5vw, 16px);
+	height: clamp(14px, 2.5vw, 16px);
 }
 
 .rcts-event-excerpt {
-	font-size: 14px;
+	font-size: clamp(13px, 2vw, 14px);
 	line-height: 1.6;
 	color: #6b7280;
 }
@@ -152,7 +158,7 @@
 .rcts-events-timeline::before {
 	content: '';
 	position: absolute;
-	left: 40px;
+	left: clamp(32px, 6vw, 40px);
 	top: 60px;
 	bottom: 0;
 	width: 2px;
@@ -161,29 +167,29 @@
 }
 
 .rcts-timeline-date-group {
-	margin-bottom: 40px;
+	margin-bottom: clamp(24px, 5vw, 40px);
 	position: relative;
 }
 
 .rcts-timeline-date-header {
 	display: flex;
 	align-items: center;
-	gap: 20px;
-	margin-bottom: 24px;
+	gap: clamp(12px, 3vw, 20px);
+	margin-bottom: clamp(16px, 3vw, 24px);
 	position: relative;
 }
 
 .rcts-timeline-marker {
 	flex-shrink: 0;
-	width: 24px;
-	height: 24px;
+	width: clamp(20px, 4vw, 24px);
+	height: clamp(20px, 4vw, 24px);
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	border: 4px solid #ffffff;
+	border: clamp(3px, 0.6vw, 4px) solid #ffffff;
 	border-radius: 50%;
 	box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 	position: relative;
 	z-index: 2;
-	margin-left: 28px;
+	margin-left: clamp(22px, 4.5vw, 28px);
 }
 
 .rcts-timeline-date {
@@ -194,7 +200,7 @@
 }
 
 .rcts-timeline-weekday {
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	font-weight: 600;
 	color: #667eea;
 	text-transform: uppercase;
@@ -202,25 +208,25 @@
 }
 
 .rcts-timeline-daymonth {
-	font-size: 18px;
+	font-size: clamp(16px, 3vw, 18px);
 	font-weight: 700;
 	color: #111827;
 }
 
 .rcts-timeline-events {
-	margin-left: 92px;
+	margin-left: clamp(64px, 12vw, 92px);
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: clamp(12px, 2.5vw, 16px);
 }
 
 .rcts-timeline-event {
 	display: flex;
-	gap: 16px;
-	padding: 20px;
+	gap: clamp(12px, 2.5vw, 16px);
+	padding: clamp(16px, 3vw, 20px);
 	background: #ffffff;
 	border: 1px solid #e5e7eb;
-	border-radius: 10px;
+	border-radius: clamp(8px, 1.5vw, 10px);
 	transition: all 0.2s ease;
 }
 
@@ -233,20 +239,22 @@
 	flex-shrink: 0;
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	padding: 8px 12px;
+	gap: clamp(6px, 1.5vw, 8px);
+	padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 12px);
 	background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-	border-radius: 8px;
+	border-radius: clamp(6px, 1.2vw, 8px);
 	height: fit-content;
 }
 
 .rcts-timeline-time svg {
 	color: #667eea;
 	flex-shrink: 0;
+	width: clamp(14px, 2.5vw, 16px);
+	height: clamp(14px, 2.5vw, 16px);
 }
 
 .rcts-time-range {
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	font-weight: 600;
 	color: #374151;
 	white-space: nowrap;
@@ -259,7 +267,7 @@
 
 .rcts-timeline-event-title {
 	margin: 0 0 8px 0;
-	font-size: 18px;
+	font-size: clamp(16px, 3vw, 18px);
 	font-weight: 600;
 	color: #111827;
 	line-height: 1.3;
@@ -270,17 +278,19 @@
 	align-items: center;
 	gap: 6px;
 	margin-bottom: 8px;
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	color: #6b7280;
 }
 
 .rcts-timeline-location svg {
 	flex-shrink: 0;
 	color: #667eea;
+	width: clamp(14px, 2.5vw, 16px);
+	height: clamp(14px, 2.5vw, 16px);
 }
 
 .rcts-timeline-description {
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	line-height: 1.6;
 	color: #6b7280;
 	margin-top: 8px;
@@ -292,8 +302,8 @@
 
 .rcts-events-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-	gap: 24px;
+	grid-template-columns: repeat(auto-fill, minmax(clamp(260px, 40vw, 320px), 1fr));
+	gap: clamp(16px, 3vw, 24px);
 	margin: 0 auto;
 	max-width: 1200px;
 }
@@ -303,7 +313,7 @@
 	flex-direction: column;
 	background: #ffffff;
 	border: 1px solid #e5e7eb;
-	border-radius: 12px;
+	border-radius: clamp(10px, 1.8vw, 12px);
 	overflow: hidden;
 	transition: all 0.3s ease;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -318,7 +328,7 @@
 .rcts-card-date-badge {
 	position: relative;
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	padding: 20px;
+	padding: clamp(16px, 3vw, 20px);
 	color: #ffffff;
 	text-align: center;
 }
@@ -341,7 +351,7 @@
 }
 
 .rcts-badge-month {
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 1px;
@@ -349,14 +359,14 @@
 }
 
 .rcts-badge-day {
-	font-size: 36px;
+	font-size: clamp(30px, 5.5vw, 36px);
 	font-weight: 700;
 	line-height: 1;
 	margin: 4px 0;
 }
 
 .rcts-badge-weekday {
-	font-size: 13px;
+	font-size: clamp(11px, 2vw, 13px);
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
@@ -364,13 +374,13 @@
 }
 
 .rcts-card-body-modern {
-	padding: 24px;
+	padding: clamp(18px, 3.5vw, 24px);
 	flex: 1;
 }
 
 .rcts-card-title {
-	margin: 0 0 16px 0;
-	font-size: 19px;
+	margin: 0 0 clamp(12px, 2.5vw, 16px) 0;
+	font-size: clamp(16px, 3vw, 19px);
 	font-weight: 600;
 	color: #111827;
 	line-height: 1.3;
@@ -379,39 +389,41 @@
 .rcts-card-meta {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
-	margin-bottom: 16px;
+	gap: clamp(8px, 1.5vw, 10px);
+	margin-bottom: clamp(12px, 2.5vw, 16px);
 }
 
 .rcts-meta-item {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	font-size: 14px;
+	gap: clamp(6px, 1.5vw, 8px);
+	font-size: clamp(12px, 2.2vw, 14px);
 	color: #374151;
 }
 
 .rcts-meta-item svg {
 	flex-shrink: 0;
 	color: #667eea;
+	width: clamp(14px, 2.5vw, 16px);
+	height: clamp(14px, 2.5vw, 16px);
 }
 
 .rcts-card-description {
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	line-height: 1.6;
 	color: #6b7280;
 	border-top: 1px solid #e5e7eb;
-	padding-top: 16px;
+	padding-top: clamp(12px, 2.5vw, 16px);
 }
 
 .rcts-card-footer {
-	padding: 12px 24px;
+	padding: clamp(10px, 2vw, 12px) clamp(18px, 3.5vw, 24px);
 	background: #f9fafb;
 	border-top: 1px solid #e5e7eb;
 }
 
 .rcts-card-category {
-	font-size: 12px;
+	font-size: clamp(11px, 1.8vw, 12px);
 	font-weight: 600;
 	color: #667eea;
 	text-transform: uppercase;
@@ -480,35 +492,36 @@
 .rcts-compact-item {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	padding: 8px 12px;
+	gap: clamp(6px, 1.5vw, 8px);
+	padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 12px);
 	margin-bottom: 4px;
 	background: #ffffff;
 	border-left: 3px solid #667eea;
 	border-radius: 4px;
 	transition: all 0.2s ease;
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 }
 
 .rcts-compact-item:hover {
 	background: #f9fafb;
 	border-left-color: #764ba2;
-	padding-left: 16px;
+	padding-left: clamp(12px, 2.5vw, 16px);
 }
 
 .rcts-compact-date {
 	flex-shrink: 0;
 	font-weight: 700;
 	color: #667eea;
-	min-width: 45px;
+	min-width: clamp(40px, 7vw, 45px);
+	font-size: clamp(11px, 2vw, 14px);
 }
 
 .rcts-compact-time {
 	flex-shrink: 0;
 	font-weight: 600;
 	color: #6b7280;
-	font-size: 13px;
-	min-width: 80px;
+	font-size: clamp(11px, 2vw, 13px);
+	min-width: clamp(70px, 12vw, 80px);
 }
 
 .rcts-compact-title {
@@ -521,10 +534,10 @@
 }
 
 .rcts-no-events-compact {
-	padding: 20px;
+	padding: clamp(16px, 3vw, 20px);
 	text-align: center;
 	color: #6b7280;
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	font-style: italic;
 }
 
@@ -539,12 +552,12 @@
 
 .rcts-medium-item {
 	display: flex;
-	gap: 16px;
-	padding: 16px;
-	margin-bottom: 12px;
+	gap: clamp(12px, 2.5vw, 16px);
+	padding: clamp(12px, 2.5vw, 16px);
+	margin-bottom: clamp(10px, 2vw, 12px);
 	background: #ffffff;
 	border: 1px solid #e5e7eb;
-	border-radius: 8px;
+	border-radius: clamp(6px, 1.2vw, 8px);
 	transition: all 0.2s ease;
 }
 
@@ -559,15 +572,15 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width: 80px;
-	padding: 8px;
+	width: clamp(70px, 12vw, 80px);
+	padding: clamp(6px, 1.5vw, 8px);
 	background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
 	border-radius: 6px;
 	text-align: center;
 }
 
 .rcts-medium-weekday {
-	font-size: 11px;
+	font-size: clamp(10px, 1.8vw, 11px);
 	font-weight: 700;
 	color: #667eea;
 	text-transform: uppercase;
@@ -576,7 +589,7 @@
 }
 
 .rcts-medium-date {
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	font-weight: 600;
 	color: #374151;
 }
@@ -588,7 +601,7 @@
 
 .rcts-medium-title {
 	margin: 0 0 8px 0;
-	font-size: 17px;
+	font-size: clamp(15px, 2.8vw, 17px);
 	font-weight: 600;
 	color: #111827;
 	line-height: 1.3;
@@ -597,8 +610,8 @@
 .rcts-medium-meta {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 12px;
-	font-size: 13px;
+	gap: clamp(10px, 2vw, 12px);
+	font-size: clamp(11px, 2vw, 13px);
 }
 
 .rcts-medium-time,
@@ -613,10 +626,12 @@
 .rcts-medium-location svg {
 	flex-shrink: 0;
 	color: #667eea;
+	width: clamp(14px, 2.5vw, 16px);
+	height: clamp(14px, 2.5vw, 16px);
 }
 
 .rcts-no-events-medium {
-	padding: 30px;
+	padding: clamp(24px, 4vw, 30px);
 	text-align: center;
 	color: #6b7280;
 	font-style: italic;
@@ -632,12 +647,12 @@
 
 .rcts-sidebar-item {
 	display: flex;
-	gap: 12px;
-	padding: 12px;
-	margin-bottom: 8px;
+	gap: clamp(10px, 2vw, 12px);
+	padding: clamp(10px, 2vw, 12px);
+	margin-bottom: clamp(6px, 1.2vw, 8px);
 	background: #ffffff;
 	border: 1px solid #e5e7eb;
-	border-radius: 8px;
+	border-radius: clamp(6px, 1.2vw, 8px);
 	transition: all 0.2s ease;
 }
 
@@ -652,24 +667,24 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width: 50px;
-	height: 50px;
+	width: clamp(45px, 8vw, 50px);
+	height: clamp(45px, 8vw, 50px);
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	border-radius: 8px;
+	border-radius: clamp(6px, 1.2vw, 8px);
 	color: #ffffff;
 	text-align: center;
 }
 
 .rcts-sidebar-day {
 	display: block;
-	font-size: 20px;
+	font-size: clamp(18px, 3.5vw, 20px);
 	font-weight: 700;
 	line-height: 1;
 }
 
 .rcts-sidebar-month {
 	display: block;
-	font-size: 11px;
+	font-size: clamp(10px, 1.8vw, 11px);
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
@@ -683,7 +698,7 @@
 }
 
 .rcts-sidebar-title {
-	font-size: 14px;
+	font-size: clamp(12px, 2.2vw, 14px);
 	font-weight: 600;
 	color: #111827;
 	line-height: 1.3;
@@ -692,20 +707,21 @@
 	text-overflow: ellipsis;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
+	line-clamp: 2;
 	-webkit-box-orient: vertical;
 }
 
 .rcts-sidebar-time {
-	font-size: 12px;
+	font-size: clamp(11px, 1.8vw, 12px);
 	color: #6b7280;
 	font-weight: 500;
 }
 
 .rcts-no-events-sidebar {
-	padding: 20px;
+	padding: clamp(16px, 3vw, 20px);
 	text-align: center;
 	color: #6b7280;
-	font-size: 13px;
+	font-size: clamp(11px, 2vw, 13px);
 	font-style: italic;
 }
 
