@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Repro_CT_Suite_Migrations {
 
-	const DB_VERSION = '9';
+	const DB_VERSION = '10';
 	const OPTION_KEY = 'repro_ct_suite_db_version';
 
 	/**
