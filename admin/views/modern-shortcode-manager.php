@@ -174,24 +174,6 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
         </div>
         
         <div class="sm-collapsible-content" id="custom-presets">
-                        <span class="dashicons dashicons-clipboard"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Eigene Presets Section -->
-    <div class="sm-section">
-        <div class="sm-section-header sm-collapsible-header" data-target="custom-presets">
-            <h2>
-                <span class="sm-collapse-icon">▼</span>
-                ⭐ Eigene Presets
-            </h2>
-            <span class="sm-badge"><?php echo count($presets); ?> Presets</span>
-        </div>
-        
-        <div class="sm-collapsible-content" id="custom-presets">
         <?php if (empty($presets)): ?>
             <div class="sm-empty-state-small">
                 <p>Noch keine eigenen Presets erstellt.</p>
@@ -602,9 +584,12 @@ function showCopyFeedback(message) {
 document.addEventListener('DOMContentLoaded', function() {
     // Preview-Buttons
     document.querySelectorAll('.preview-shortcode').forEach(button => {
-        button.addEventListener('click', function() {
-            openPreviewModal(this.dataset.shortcode);
-        });
+        if (!button.hasAttribute('data-js-bound')) {
+            button.addEventListener('click', function() {
+                openPreviewModal(this.dataset.shortcode);
+            });
+            button.setAttribute('data-js-bound', 'true');
+        }
     });
     
     // Kopier-Button im Preview-Modal
