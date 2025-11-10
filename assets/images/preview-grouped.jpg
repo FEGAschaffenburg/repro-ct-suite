@@ -1,0 +1,22 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#f8fafc"/>
+  
+  <!-- Erste Datumsgruppe -->
+  <rect x="40" y="40" width="720" height="30" fill="#667eea" rx="6"/>
+  <text x="60" y="62" font-family="Arial" font-size="14" fill="white" font-weight="bold">Montag, 8. November 2025</text>
+  
+  <rect x="40" y="80" width="720" height="45" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="95" width="150" height="10" fill="#667eea" rx="5"/>
+  
+  <rect x="40" y="135" width="720" height="45" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="150" width="130" height="10" fill="#667eea" rx="5"/>
+  
+  <!-- Zweite Datumsgruppe -->
+  <rect x="40" y="195" width="720" height="30" fill="#667eea" rx="6"/>
+  <text x="60" y="217" font-family="Arial" font-size="14" fill="white" font-weight="bold">Dienstag, 9. November 2025</text>
+  
+  <rect x="40" y="235" width="720" height="45" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="250" width="140" height="10" fill="#667eea" rx="5"/>
+  
+  <text x="400" y="330" font-family="Arial" font-size="16" fill="#64748b" text-anchor="middle">Gruppierte Ansicht: Nach Datum sortiert</text>
+</svg>

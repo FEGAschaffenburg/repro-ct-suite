@@ -1,0 +1,29 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#f8fafc"/>
+  
+  <!-- Card 1 -->
+  <rect x="40" y="40" width="220" height="280" fill="white" stroke="#e2e8f0" stroke-width="2" rx="12"/>
+  <rect x="40" y="40" width="220" height="120" fill="#667eea" rx="12"/>
+  <rect x="60" y="175" width="150" height="12" fill="#667eea" rx="6"/>
+  <rect x="60" y="200" width="100" height="8" fill="#cbd5e1" rx="4"/>
+  <rect x="60" y="220" width="120" height="8" fill="#cbd5e1" rx="4"/>
+  <rect x="60" y="250" width="140" height="25" fill="#667eea" rx="6"/>
+  
+  <!-- Card 2 -->
+  <rect x="290" y="40" width="220" height="280" fill="white" stroke="#e2e8f0" stroke-width="2" rx="12"/>
+  <rect x="290" y="40" width="220" height="120" fill="#764ba2" rx="12"/>
+  <rect x="310" y="175" width="160" height="12" fill="#667eea" rx="6"/>
+  <rect x="310" y="200" width="110" height="8" fill="#cbd5e1" rx="4"/>
+  <rect x="310" y="220" width="130" height="8" fill="#cbd5e1" rx="4"/>
+  <rect x="310" y="250" width="140" height="25" fill="#667eea" rx="6"/>
+  
+  <!-- Card 3 -->
+  <rect x="540" y="40" width="220" height="280" fill="white" stroke="#e2e8f0" stroke-width="2" rx="12"/>
+  <rect x="540" y="40" width="220" height="120" fill="#667eea" rx="12"/>
+  <rect x="560" y="175" width="140" height="12" fill="#667eea" rx="6"/>
+  <rect x="560" y="200" width="120" height="8" fill="#cbd5e1" rx="4"/>
+  <rect x="560" y="220" width="110" height="8" fill="#cbd5e1" rx="4"/>
+  <rect x="560" y="250" width="140" height="25" fill="#667eea" rx="6"/>
+  
+  <text x="400" y="370" font-family="Arial" font-size="16" fill="#64748b" text-anchor="middle">Karten-Layout: Visuell ansprechend</text>
+</svg>

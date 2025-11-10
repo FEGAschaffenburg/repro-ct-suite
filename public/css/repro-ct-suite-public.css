@@ -1,0 +1,734 @@
+/**
+ * Public-facing styles for the plugin.
+ * Modern Event Calendar Design - inspiriert von The Events Calendar & Eventbrite
+ * @package Repro_CT_Suite
+ */
+
+.repro-ct-suite-container {
+	max-width: 100%;
+	margin: 0 auto;
+}
+
+/* ===========================
+   Gemeinsame Styles
+   =========================== */
+
+.rcts-no-events {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 60px 20px;
+	text-align: center;
+	background: #f9fafb;
+	border-radius: 12px;
+	color: #6b7280;
+	font-size: 16px;
+}
+
+.rcts-no-events svg {
+	margin-bottom: 16px;
+	opacity: 0.4;
+}
+
+.rcts-no-events p {
+	margin: 0;
+	font-weight: 500;
+}
+
+/* ===========================
+   List Simple View - Modern List Design
+   =========================== */
+
+.rcts-events-list-modern {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.rcts-event-item {
+	display: flex;
+	gap: 20px;
+	padding: 24px;
+	margin-bottom: 16px;
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	transition: all 0.3s ease;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.rcts-event-item:hover {
+	border-color: #667eea;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+	transform: translateY(-2px);
+}
+
+.rcts-event-date-box {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 70px;
+	height: 70px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border-radius: 10px;
+	color: #ffffff;
+	text-align: center;
+}
+
+.rcts-event-month {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	opacity: 0.9;
+}
+
+.rcts-event-day {
+	display: block;
+	font-size: 28px;
+	font-weight: 700;
+	line-height: 1;
+	margin-top: 2px;
+}
+
+.rcts-event-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.rcts-event-title {
+	margin: 0 0 12px 0;
+	font-size: 20px;
+	font-weight: 600;
+	color: #111827;
+	line-height: 1.3;
+}
+
+.rcts-event-details {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-bottom: 12px;
+}
+
+.rcts-event-time-badge,
+.rcts-event-location-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	background: #f3f4f6;
+	border-radius: 6px;
+	font-size: 14px;
+	color: #374151;
+	font-weight: 500;
+}
+
+.rcts-event-time-badge svg,
+.rcts-event-location-badge svg {
+	flex-shrink: 0;
+	color: #667eea;
+}
+
+.rcts-event-excerpt {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #6b7280;
+}
+
+/* ===========================
+   List Grouped View - Timeline Design
+   =========================== */
+
+.rcts-events-timeline {
+	max-width: 900px;
+	margin: 0 auto;
+	position: relative;
+}
+
+.rcts-events-timeline::before {
+	content: '';
+	position: absolute;
+	left: 40px;
+	top: 60px;
+	bottom: 0;
+	width: 2px;
+	background: linear-gradient(to bottom, #667eea, #764ba2);
+	opacity: 0.3;
+}
+
+.rcts-timeline-date-group {
+	margin-bottom: 40px;
+	position: relative;
+}
+
+.rcts-timeline-date-header {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	margin-bottom: 24px;
+	position: relative;
+}
+
+.rcts-timeline-marker {
+	flex-shrink: 0;
+	width: 24px;
+	height: 24px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border: 4px solid #ffffff;
+	border-radius: 50%;
+	box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+	position: relative;
+	z-index: 2;
+	margin-left: 28px;
+}
+
+.rcts-timeline-date {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.rcts-timeline-weekday {
+	font-size: 14px;
+	font-weight: 600;
+	color: #667eea;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.rcts-timeline-daymonth {
+	font-size: 18px;
+	font-weight: 700;
+	color: #111827;
+}
+
+.rcts-timeline-events {
+	margin-left: 92px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.rcts-timeline-event {
+	display: flex;
+	gap: 16px;
+	padding: 20px;
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 10px;
+	transition: all 0.2s ease;
+}
+
+.rcts-timeline-event:hover {
+	border-color: #667eea;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.rcts-timeline-time {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+	border-radius: 8px;
+	height: fit-content;
+}
+
+.rcts-timeline-time svg {
+	color: #667eea;
+	flex-shrink: 0;
+}
+
+.rcts-time-range {
+	font-size: 14px;
+	font-weight: 600;
+	color: #374151;
+	white-space: nowrap;
+}
+
+.rcts-timeline-event-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.rcts-timeline-event-title {
+	margin: 0 0 8px 0;
+	font-size: 18px;
+	font-weight: 600;
+	color: #111827;
+	line-height: 1.3;
+}
+
+.rcts-timeline-location {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 8px;
+	font-size: 14px;
+	color: #6b7280;
+}
+
+.rcts-timeline-location svg {
+	flex-shrink: 0;
+	color: #667eea;
+}
+
+.rcts-timeline-description {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #6b7280;
+	margin-top: 8px;
+}
+
+/* ===========================
+   Cards View - Grid Card Design
+   =========================== */
+
+.rcts-events-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 24px;
+	margin: 0 auto;
+	max-width: 1200px;
+}
+
+.rcts-event-card-modern {
+	display: flex;
+	flex-direction: column;
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	overflow: hidden;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.rcts-event-card-modern:hover {
+	border-color: #667eea;
+	box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+	transform: translateY(-4px);
+}
+
+.rcts-card-date-badge {
+	position: relative;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 20px;
+	color: #ffffff;
+	text-align: center;
+}
+
+.rcts-card-date-badge::after {
+	content: '';
+	position: absolute;
+	bottom: -10px;
+	left: 0;
+	right: 0;
+	height: 10px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 50%, 0 100%);
+}
+
+.rcts-badge-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.rcts-badge-month {
+	font-size: 14px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	opacity: 0.9;
+}
+
+.rcts-badge-day {
+	font-size: 36px;
+	font-weight: 700;
+	line-height: 1;
+	margin: 4px 0;
+}
+
+.rcts-badge-weekday {
+	font-size: 13px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	opacity: 0.9;
+}
+
+.rcts-card-body-modern {
+	padding: 24px;
+	flex: 1;
+}
+
+.rcts-card-title {
+	margin: 0 0 16px 0;
+	font-size: 19px;
+	font-weight: 600;
+	color: #111827;
+	line-height: 1.3;
+}
+
+.rcts-card-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-bottom: 16px;
+}
+
+.rcts-meta-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+	color: #374151;
+}
+
+.rcts-meta-item svg {
+	flex-shrink: 0;
+	color: #667eea;
+}
+
+.rcts-card-description {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #6b7280;
+	border-top: 1px solid #e5e7eb;
+	padding-top: 16px;
+}
+
+.rcts-card-footer {
+	padding: 12px 24px;
+	background: #f9fafb;
+	border-top: 1px solid #e5e7eb;
+}
+
+.rcts-card-category {
+	font-size: 12px;
+	font-weight: 600;
+	color: #667eea;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* ===========================
+   Responsive Design
+   =========================== */
+
+@media (max-width: 768px) {
+	.rcts-events-grid {
+		grid-template-columns: 1fr;
+	}
+	
+	.rcts-event-item {
+		flex-direction: column;
+	}
+	
+	.rcts-event-date-box {
+		width: 60px;
+		height: 60px;
+		align-self: flex-start;
+	}
+	
+	.rcts-event-month {
+		font-size: 11px;
+	}
+	
+	.rcts-event-day {
+		font-size: 24px;
+	}
+	
+	.rcts-events-timeline::before {
+		display: none;
+	}
+	
+	.rcts-timeline-marker {
+		margin-left: 0;
+	}
+	
+	.rcts-timeline-events {
+		margin-left: 0;
+	}
+	
+	.rcts-timeline-event {
+		flex-direction: column;
+	}
+	
+	.rcts-timeline-time {
+		width: fit-content;
+	}
+}
+
+/* ===========================
+   Compact View - Ultra kompakte Liste
+   =========================== */
+
+.rcts-events-compact {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	max-width: 600px;
+}
+
+.rcts-compact-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	margin-bottom: 4px;
+	background: #ffffff;
+	border-left: 3px solid #667eea;
+	border-radius: 4px;
+	transition: all 0.2s ease;
+	font-size: 14px;
+}
+
+.rcts-compact-item:hover {
+	background: #f9fafb;
+	border-left-color: #764ba2;
+	padding-left: 16px;
+}
+
+.rcts-compact-date {
+	flex-shrink: 0;
+	font-weight: 700;
+	color: #667eea;
+	min-width: 45px;
+}
+
+.rcts-compact-time {
+	flex-shrink: 0;
+	font-weight: 600;
+	color: #6b7280;
+	font-size: 13px;
+	min-width: 80px;
+}
+
+.rcts-compact-title {
+	flex: 1;
+	color: #111827;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.rcts-no-events-compact {
+	padding: 20px;
+	text-align: center;
+	color: #6b7280;
+	font-size: 14px;
+	font-style: italic;
+}
+
+/* ===========================
+   Medium View - Balanced Layout
+   =========================== */
+
+.rcts-events-medium {
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.rcts-medium-item {
+	display: flex;
+	gap: 16px;
+	padding: 16px;
+	margin-bottom: 12px;
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	transition: all 0.2s ease;
+}
+
+.rcts-medium-item:hover {
+	border-color: #667eea;
+	box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.rcts-medium-date-col {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 80px;
+	padding: 8px;
+	background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+	border-radius: 6px;
+	text-align: center;
+}
+
+.rcts-medium-weekday {
+	font-size: 11px;
+	font-weight: 700;
+	color: #667eea;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	margin-bottom: 4px;
+}
+
+.rcts-medium-date {
+	font-size: 14px;
+	font-weight: 600;
+	color: #374151;
+}
+
+.rcts-medium-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.rcts-medium-title {
+	margin: 0 0 8px 0;
+	font-size: 17px;
+	font-weight: 600;
+	color: #111827;
+	line-height: 1.3;
+}
+
+.rcts-medium-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	font-size: 13px;
+}
+
+.rcts-medium-time,
+.rcts-medium-location {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	color: #6b7280;
+}
+
+.rcts-medium-time svg,
+.rcts-medium-location svg {
+	flex-shrink: 0;
+	color: #667eea;
+}
+
+.rcts-no-events-medium {
+	padding: 30px;
+	text-align: center;
+	color: #6b7280;
+	font-style: italic;
+}
+
+/* ===========================
+   Sidebar View - Widget Style
+   =========================== */
+
+.rcts-events-sidebar {
+	max-width: 100%;
+}
+
+.rcts-sidebar-item {
+	display: flex;
+	gap: 12px;
+	padding: 12px;
+	margin-bottom: 8px;
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	transition: all 0.2s ease;
+}
+
+.rcts-sidebar-item:hover {
+	border-color: #667eea;
+	box-shadow: 0 2px 6px rgba(102, 126, 234, 0.1);
+}
+
+.rcts-sidebar-date {
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 50px;
+	height: 50px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	border-radius: 8px;
+	color: #ffffff;
+	text-align: center;
+}
+
+.rcts-sidebar-day {
+	display: block;
+	font-size: 20px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.rcts-sidebar-month {
+	display: block;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-top: 2px;
+	opacity: 0.9;
+}
+
+.rcts-sidebar-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.rcts-sidebar-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: #111827;
+	line-height: 1.3;
+	margin-bottom: 4px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+
+.rcts-sidebar-time {
+	font-size: 12px;
+	color: #6b7280;
+	font-weight: 500;
+}
+
+.rcts-no-events-sidebar {
+	padding: 20px;
+	text-align: center;
+	color: #6b7280;
+	font-size: 13px;
+	font-style: italic;
+}
+
+@media (max-width: 480px) {
+	.rcts-compact-item {
+		flex-wrap: wrap;
+	}
+	
+	.rcts-compact-time {
+		order: 3;
+		width: 100%;
+		margin-top: 4px;
+	}
+	
+	.rcts-medium-item {
+		flex-direction: column;
+	}
+	
+	.rcts-medium-date-col {
+		width: 100%;
+		flex-direction: row;
+		justify-content: flex-start;
+		gap: 8px;
+	}
+}
+

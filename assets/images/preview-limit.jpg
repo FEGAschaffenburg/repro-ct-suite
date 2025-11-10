@@ -1,0 +1,26 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#f8fafc"/>
+  
+  <rect x="40" y="40" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="55" width="150" height="12" fill="#667eea" rx="6"/>
+  <rect x="230" y="55" width="100" height="10" fill="#cbd5e1" rx="5"/>
+  
+  <rect x="40" y="105" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="120" width="140" height="12" fill="#667eea" rx="6"/>
+  <rect x="220" y="120" width="90" height="10" fill="#cbd5e1" rx="5"/>
+  
+  <rect x="40" y="170" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="185" width="130" height="12" fill="#667eea" rx="6"/>
+  <rect x="210" y="185" width="110" height="10" fill="#cbd5e1" rx="5"/>
+  
+  <rect x="40" y="235" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="250" width="120" height="12" fill="#667eea" rx="6"/>
+  <rect x="200" y="250" width="95" height="10" fill="#cbd5e1" rx="5"/>
+  
+  <rect x="40" y="300" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="315" width="135" height="12" fill="#667eea" rx="6"/>
+  <rect x="215" y="315" width="100" height="10" fill="#cbd5e1" rx="5"/>
+  
+  <rect x="600" y="355" width="150" height="30" fill="#fbbf24" rx="6"/>
+  <text x="675" y="377" font-family="Arial" font-size="14" fill="white" text-anchor="middle" font-weight="bold">Max. 5 Termine</text>
+</svg>

@@ -1,0 +1,32 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#f8fafc"/>
+  
+  <rect x="40" y="20" width="720" height="40" fill="#10b981" rx="8"/>
+  <text x="400" y="47" font-family="Arial" font-size="16" fill="white" text-anchor="middle" font-weight="bold">Termine der nächsten 30 Tage</text>
+  
+  <rect x="40" y="75" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="90" width="150" height="12" fill="#667eea" rx="6"/>
+  <rect x="230" y="90" width="80" height="10" fill="#cbd5e1" rx="5"/>
+  <rect x="700" y="85" width="40" height="20" fill="#10b981" rx="4"/>
+  <text x="720" y="100" font-family="Arial" font-size="10" fill="white" text-anchor="middle">+5d</text>
+  
+  <rect x="40" y="140" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="155" width="140" height="12" fill="#667eea" rx="6"/>
+  <rect x="220" y="155" width="90" height="10" fill="#cbd5e1" rx="5"/>
+  <rect x="700" y="150" width="40" height="20" fill="#10b981" rx="4"/>
+  <text x="720" y="165" font-family="Arial" font-size="10" fill="white" text-anchor="middle">+12d</text>
+  
+  <rect x="40" y="205" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="220" width="130" height="12" fill="#667eea" rx="6"/>
+  <rect x="210" y="220" width="110" height="10" fill="#cbd5e1" rx="5"/>
+  <rect x="700" y="215" width="40" height="20" fill="#10b981" rx="4"/>
+  <text x="720" y="230" font-family="Arial" font-size="10" fill="white" text-anchor="middle">+21d</text>
+  
+  <rect x="40" y="270" width="720" height="50" fill="white" stroke="#e2e8f0" stroke-width="2" rx="6"/>
+  <rect x="60" y="285" width="120" height="12" fill="#667eea" rx="6"/>
+  <rect x="200" y="285" width="95" height="10" fill="#cbd5e1" rx="5"/>
+  <rect x="700" y="280" width="40" height="20" fill="#fbbf24" rx="4"/>
+  <text x="720" y="295" font-family="Arial" font-size="10" fill="white" text-anchor="middle">+28d</text>
+  
+  <text x="400" y="370" font-family="Arial" font-size="14" fill="#64748b" text-anchor="middle">Nur Termine innerhalb von 30 Tagen</text>
+</svg>

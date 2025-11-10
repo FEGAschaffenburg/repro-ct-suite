@@ -1,0 +1,33 @@
+{
+  "name": "fegaaschaffenburg/repro-ct-suite",
+  "description": "Modernes WordPress-Plugin für Repro CT-Suite",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "FEGAschaffenburg",
+      "email": "fega@aschaffenburg.de"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "ReproCTS\\": "includes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ReproCTS\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "test-coverage": "phpunit --coverage-html coverage"
+  }
+}
+
