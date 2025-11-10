@@ -123,7 +123,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     }
     
     /**
-     * Save new preset
+     * Save new preset or update existing
      */
     public function save_preset() {
         // Security check
@@ -138,31 +138,37 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
         }
         
         try {
+            // Check if this is an update (preset_id provided)
+            $preset_id = !empty($_POST['preset_id']) ? intval($_POST['preset_id']) : null;
+            
             // Debug: Log all received data
             error_log('RCTS Debug: Received POST data: ' . print_r($_POST, true));
+            error_log('RCTS Debug: Preset ID: ' . ($preset_id ? $preset_id : 'NULL (new)'));
             
             // Input validieren
             $name = sanitize_text_field($_POST['name'] ?? '');
+            $calendar_mode = sanitize_text_field($_POST['calendar_mode'] ?? 'all');
             $calendar_ids = $_POST['calendar_ids'] ?? array();
-            $limit = intval($_POST['limit'] ?? 10);
-            $show_time = isset($_POST['show_time']) ? intval($_POST['show_time']) : 0;
-            $show_location = isset($_POST['show_location']) ? intval($_POST['show_location']) : 0;
-            $show_description = isset($_POST['show_description']) ? intval($_POST['show_description']) : 0;
+            $display_mode = sanitize_text_field($_POST['display_mode'] ?? 'list');
+            $events_limit = intval($_POST['events_limit'] ?? 10);
+            $days_ahead = intval($_POST['days_ahead'] ?? 30);
+            $show_descriptions = isset($_POST['show_descriptions']) ? 1 : 0;
+            $show_locations = isset($_POST['show_locations']) ? 1 : 0;
+            $show_time = isset($_POST['show_time']) ? 1 : 0;
+            $show_organizer = isset($_POST['show_organizer']) ? 1 : 0;
             
             // Debug: Log parsed data
-            error_log('RCTS Debug: Parsed data - Name: ' . $name . ', Calendar IDs: ' . print_r($calendar_ids, true) . ', Limit: ' . $limit);
+            error_log('RCTS Debug: Parsed data - Name: ' . $name . ', Mode: ' . $display_mode . ', Calendar IDs: ' . print_r($calendar_ids, true));
             
             if (empty($name)) {
-                wp_send_json_error(array('message' => 'Preset-Name ist erforderlich'));
+                wp_send_json_error(array('message' => 'Shortcode-Name ist erforderlich'));
                 return;
             }
             
-            // Kalender-IDs validieren (optional - kann auch leer sein für "alle Kalender")
+            // Kalender-IDs validieren
             if (!is_array($calendar_ids)) {
                 $calendar_ids = array();
             }
-            
-            // Calendar-IDs validieren
             $calendar_ids = array_map('intval', $calendar_ids);
             $calendar_ids = array_filter($calendar_ids, function($id) { return $id > 0; });
             
@@ -170,27 +176,52 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
             require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-repro-ct-suite-shortcode-presets-repository.php';
             $repo = new Repro_CT_Suite_Shortcode_Presets_Repository();
             
+            // Shortcode-Tag generieren
+            $shortcode_tag = 'ct_' . sanitize_title($name);
+            
             // Daten für Repository vorbereiten
             $preset_data = array(
                 'name' => $name,
-                'limit_count' => $limit,
-                'calendar_ids' => $calendar_ids,
+                'shortcode_tag' => $shortcode_tag,
+                'display_mode' => $display_mode,
+                'calendar_ids' => ($calendar_mode === 'specific' && !empty($calendar_ids)) ? implode(',', $calendar_ids) : null,
+                'limit_count' => $events_limit,
+                'days_ahead' => $days_ahead,
                 'show_time' => $show_time,
-                'show_location' => $show_location,
-                'show_description' => $show_description
+                'show_location' => $show_locations,
+                'show_description' => $show_descriptions,
+                'show_organizer' => $show_organizer
             );
             
-            error_log('RCTS Debug: Calling repo->save with data: ' . print_r($preset_data, true));
+            error_log('RCTS Debug: Preset data for save/update: ' . print_r($preset_data, true));
             
-            $preset_id = $repo->save($preset_data);
-            
+            // UPDATE existing preset
             if ($preset_id) {
-                wp_send_json_success(array(
-                    'message' => 'Preset erfolgreich gespeichert',
-                    'preset_id' => $preset_id
-                ));
-            } else {
-                wp_send_json_error(array('message' => 'Fehler beim Speichern des Presets'));
+                $success = $repo->update($preset_id, $preset_data);
+                
+                if ($success) {
+                    wp_send_json_success(array(
+                        'message' => 'Shortcode erfolgreich aktualisiert',
+                        'preset_id' => $preset_id,
+                        'shortcode' => '[' . $shortcode_tag . ']'
+                    ));
+                } else {
+                    wp_send_json_error(array('message' => 'Fehler beim Aktualisieren des Shortcodes'));
+                }
+            }
+            // CREATE new preset
+            else {
+                $new_preset_id = $repo->save($preset_data);
+                
+                if ($new_preset_id) {
+                    wp_send_json_success(array(
+                        'message' => 'Shortcode erfolgreich erstellt',
+                        'preset_id' => $new_preset_id,
+                        'shortcode' => '[' . $shortcode_tag . ']'
+                    ));
+                } else {
+                    wp_send_json_error(array('message' => 'Fehler beim Erstellen des Shortcodes'));
+                }
             }
             
         } catch (Exception $e) {

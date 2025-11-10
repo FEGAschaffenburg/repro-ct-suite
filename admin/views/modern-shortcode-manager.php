@@ -198,21 +198,32 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
                             <div class="sm-preset-list-meta">
                                 <?php if (!is_null($preset->calendar_ids) && !empty($preset->calendar_ids)): ?>
                                     <?php $calendar_count = count(explode(',', $preset->calendar_ids)); ?>
-                                    <span><?php echo $calendar_count; ?> Kalender</span>
+                                    <span>📅 <?php echo $calendar_count; ?> Kalender</span>
                                 <?php else: ?>
-                                    <span>Alle Kalender</span>
+                                    <span>📅 Alle Kalender</span>
                                 <?php endif; ?>
                                 
-                                <?php if (!empty($preset->view)): ?>
-                                    <span>• <?php echo ucfirst($preset->view); ?></span>
+                                <?php if (!empty($preset->display_mode)): ?>
+                                    <?php
+                                    $view_labels = array(
+                                        'compact' => '📋 Compact',
+                                        'list' => '📅 Liste',
+                                        'medium' => '⚖️ Medium',
+                                        'list-grouped' => '📍 Timeline',
+                                        'cards' => '🎴 Karten',
+                                        'sidebar' => '📌 Sidebar'
+                                    );
+                                    $view_label = isset($view_labels[$preset->display_mode]) ? $view_labels[$preset->display_mode] : ucfirst($preset->display_mode);
+                                    ?>
+                                    <span>• <?php echo esc_html($view_label); ?></span>
                                 <?php endif; ?>
                                 
                                 <?php if (!empty($preset->limit_count)): ?>
-                                    <span>• Limit: <?php echo $preset->limit_count; ?></span>
+                                    <span>• 🔢 Limit: <?php echo $preset->limit_count; ?></span>
                                 <?php endif; ?>
                                 
                                 <?php if (!empty($preset->days_ahead)): ?>
-                                    <span>• <?php echo $preset->days_ahead; ?> Tage</span>
+                                    <span>• 📆 <?php echo $preset->days_ahead; ?> Tage</span>
                                 <?php endif; ?>
                             </div>
                         </div>

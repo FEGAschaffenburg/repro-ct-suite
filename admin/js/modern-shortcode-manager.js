@@ -193,6 +193,13 @@
         resetForm() {
             this.form[0].reset();
             
+            // Preset-Modus zurücksetzen
+            this.isEditMode = false;
+            this.currentPresetId = null;
+            this.elements.presetId.val('');
+            this.elements.modalTitle.text('Neuen Shortcode erstellen');
+            this.elements.saveBtn.text('💾 Speichern');
+            
             // Kalender-Auswahl zurücksetzen
             $('.sm-calendar-item').removeClass('selected');
             $('.sm-calendar-checkbox').prop('checked', false);
