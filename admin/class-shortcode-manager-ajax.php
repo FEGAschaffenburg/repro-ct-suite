@@ -15,6 +15,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     public function __construct() {
         // AJAX actions for logged-in users - Namen korrigiert
         add_action('wp_ajax_sm_get_presets', array($this, 'get_presets'));
+        add_action('wp_ajax_sm_get_preset', array($this, 'get_preset')); // Einzelnes Preset laden (für Edit)
         add_action('wp_ajax_sm_get_all_presets', array($this, 'get_all_presets')); // Für Gutenberg Block
         add_action('wp_ajax_sm_save_preset', array($this, 'save_preset'));
         add_action('wp_ajax_sm_update_preset', array($this, 'update_preset'));
@@ -50,6 +51,49 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
             wp_send_json_success($presets);
         } catch (Exception $e) {
             wp_send_json_error(array('message' => $e->getMessage()));
+        }
+    }
+    
+    /**
+     * Get single preset by ID (für Edit-Funktion)
+     */
+    public function get_preset() {
+        // Security check
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'sm_nonce')) {
+            wp_send_json_error(array('message' => 'Security check failed'));
+            return;
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Insufficient permissions'));
+            return;
+        }
+        
+        $preset_id = isset($_POST['preset_id']) ? intval($_POST['preset_id']) : 0;
+        
+        if (empty($preset_id)) {
+            wp_send_json_error(array('message' => 'Keine Preset-ID angegeben'));
+            return;
+        }
+        
+        try {
+            // Repository laden
+            require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-repro-ct-suite-shortcode-presets-repository.php';
+            $repo = new Repro_CT_Suite_Shortcode_Presets_Repository();
+            
+            $preset = $repo->get_by_id($preset_id);
+            
+            if (!$preset) {
+                wp_send_json_error(array('message' => 'Shortcode nicht gefunden'));
+                return;
+            }
+            
+            wp_send_json_success($preset);
+            
+        } catch (Exception $e) {
+            wp_send_json_error(array(
+                'message' => 'Fehler beim Laden des Shortcodes: ' . $e->getMessage()
+            ));
         }
     }
     

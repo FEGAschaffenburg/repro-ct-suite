@@ -379,10 +379,12 @@
          * Formular mit Preset-Daten füllen
          */
         populateForm(preset) {
+            console.log('Populate form with preset:', preset);
+            
             this.elements.presetName.val(preset.name);
             
             // Kalender-Modus setzen
-            if (preset.calendar_ids && preset.calendar_ids !== 'all') {
+            if (preset.calendar_ids && preset.calendar_ids !== 'all' && preset.calendar_ids !== null) {
                 $('input[name="calendar_mode"][value="specific"]').prop('checked', true);
                 this.toggleCalendarSelection();
                 
@@ -402,13 +404,13 @@
             $(`.sm-option-card[data-mode="${preset.display_mode}"]`).addClass('active');
             $(`input[name="display_mode"][value="${preset.display_mode}"]`).prop('checked', true);
             
-            // Weitere Optionen setzen
-            $('#events-limit').val(preset.events_limit || 10);
+            // Weitere Optionen setzen - KORRIGIERT: limit_count statt events_limit
+            $('#events-limit').val(preset.limit_count || preset.events_limit || 10);
             $('#days-ahead').val(preset.days_ahead || 30);
             
-            // Features setzen
-            $('input[name="show_descriptions"]').prop('checked', preset.show_descriptions == 1);
-            $('input[name="show_locations"]').prop('checked', preset.show_locations == 1);
+            // Features setzen - KORRIGIERT: show_location/show_description (singular)
+            $('input[name="show_descriptions"]').prop('checked', (preset.show_description == 1 || preset.show_descriptions == 1));
+            $('input[name="show_locations"]').prop('checked', (preset.show_location == 1 || preset.show_locations == 1));
             $('input[name="show_time"]').prop('checked', preset.show_time == 1);
             $('input[name="show_organizer"]').prop('checked', preset.show_organizer == 1);
         }
