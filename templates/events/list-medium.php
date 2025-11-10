@@ -39,7 +39,7 @@ if ( empty( $events ) ) {
 		$location = $event->location ?? $event->venue ?? '';
 	?>
 		<div class="rcts-medium-item">
-			<div class="rcts-medium-date-col">
+			<div class="rcts-medium-date-col" style="<?php echo !empty($event->calendar_color) ? 'background: linear-gradient(135deg, ' . esc_attr($event->calendar_color) . ' 0%, ' . esc_attr($event->calendar_color) . 'dd 100%);' : ''; ?>">
 				<div class="rcts-medium-weekday"><?php echo esc_html( $weekday ); ?></div>
 				<div class="rcts-medium-date"><?php echo esc_html( $date_full ); ?></div>
 			</div>

@@ -39,7 +39,7 @@ if ( empty( $events ) ) {
 							($event->end_datetime ? date('H:i', strtotime($event->end_datetime)) : '');
 	?>
 		<article class="rcts-event-item">
-			<div class="rcts-event-date-box">
+			<div class="rcts-event-date-box" style="<?php echo !empty($event->calendar_color) ? 'background: linear-gradient(135deg, ' . esc_attr($event->calendar_color) . ' 0%, ' . esc_attr($event->calendar_color) . 'dd 100%);' : ''; ?>">
 				<span class="rcts-event-month"><?php echo esc_html( $month ); ?></span>
 				<span class="rcts-event-day"><?php echo esc_html( $day ); ?></span>
 			</div>

@@ -34,7 +34,7 @@ if ( empty( $events ) ) {
 							($event->end_time ? $event->end_time : '') ??
 							($event->end_datetime ? date('H:i', strtotime($event->end_datetime)) : '');
 	?>
-		<li class="rcts-compact-item">
+		<li class="rcts-compact-item" style="<?php echo !empty($event->calendar_color) ? 'border-left-color: ' . esc_attr($event->calendar_color) . ';' : ''; ?>">
 			<span class="rcts-compact-date"><?php echo esc_html( $date_short ); ?></span>
 			<?php if ( !empty( $time_display ) ) : ?>
 				<span class="rcts-compact-time">

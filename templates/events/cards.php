@@ -41,7 +41,7 @@ if ( empty( $events ) ) {
 							($event->end_datetime ? date('H:i', strtotime($event->end_datetime)) : '');
 	?>
 		<article class="rcts-event-card-modern">
-			<div class="rcts-card-date-badge">
+			<div class="rcts-card-date-badge" style="<?php echo !empty($event->calendar_color) ? 'background: linear-gradient(135deg, ' . esc_attr($event->calendar_color) . ' 0%, ' . esc_attr($event->calendar_color) . 'dd 100%);' : ''; ?>">
 				<div class="rcts-badge-content">
 					<span class="rcts-badge-month"><?php echo esc_html( $month ); ?></span>
 					<span class="rcts-badge-day"><?php echo esc_html( $day ); ?></span>

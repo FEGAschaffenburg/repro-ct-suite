@@ -34,7 +34,7 @@ if ( empty( $events ) ) {
 						($event->start_datetime ? date('H:i', strtotime($event->start_datetime)) : '');
 	?>
 		<div class="rcts-sidebar-item">
-			<div class="rcts-sidebar-date">
+			<div class="rcts-sidebar-date" style="<?php echo !empty($event->calendar_color) ? 'background: linear-gradient(135deg, ' . esc_attr($event->calendar_color) . ' 0%, ' . esc_attr($event->calendar_color) . 'dd 100%);' : ''; ?>">
 				<span class="rcts-sidebar-day"><?php echo esc_html( $day ); ?></span>
 				<span class="rcts-sidebar-month"><?php echo esc_html( $month ); ?></span>
 			</div>

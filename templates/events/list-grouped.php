@@ -36,7 +36,10 @@ foreach ( $events as $event ) {
 	?>
 		<div class="rcts-timeline-date-group">
 			<div class="rcts-timeline-date-header">
-				<div class="rcts-timeline-marker"></div>
+				<div class="rcts-timeline-marker" style="<?php 
+					$first_event_color = !empty($date_events[0]->calendar_color) ? $date_events[0]->calendar_color : '';
+					echo $first_event_color ? 'background: linear-gradient(135deg, ' . esc_attr($first_event_color) . ' 0%, ' . esc_attr($first_event_color) . 'dd 100%);' : ''; 
+				?>"></div>
 				<h3 class="rcts-timeline-date">
 					<span class="rcts-timeline-weekday"><?php echo esc_html( $weekday ); ?></span>
 					<span class="rcts-timeline-daymonth"><?php echo esc_html( $day_month ); ?></span>
