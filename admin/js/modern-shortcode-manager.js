@@ -44,7 +44,7 @@
             
             // Cache häufig verwendete Elemente
             this.elements = {
-                createBtn: $('#create-preset-btn, #create-first-preset-btn'),
+                createBtn: $('#create-shortcode-btn, #create-first-shortcode-btn'),
                 closeBtn: $('#close-modal, #cancel-preset'),
                 saveBtn: $('#save-preset'),
                 saveDraftBtn: $('#save-draft'),
@@ -126,9 +126,9 @@
             this.isEditMode = false;
             this.currentPresetId = null;
             
-            this.elements.modalTitle.text('Neues Preset erstellen');
+            this.elements.modalTitle.text('Neuen Shortcode erstellen');
             this.elements.presetId.val('');
-            this.elements.saveBtn.text('✨ Preset erstellen');
+            this.elements.saveBtn.text('✨ Shortcode erstellen');
             
             this.resetForm();
             this.showModal();
@@ -141,7 +141,7 @@
             this.isEditMode = true;
             this.currentPresetId = presetId;
             
-            this.elements.modalTitle.text('Preset bearbeiten');
+            this.elements.modalTitle.text('Shortcode bearbeiten');
             this.elements.presetId.val(presetId);
             this.elements.saveBtn.text('💾 Änderungen speichern');
             
@@ -320,7 +320,7 @@
          */
         validateFormData(data) {
             if (!data.name) {
-                this.showToast('Bitte gib einen Namen für das Preset ein', 'error');
+                this.showToast('Bitte gib einen Namen für den Shortcode ein', 'error');
                 this.elements.presetName.focus();
                 return false;
             }
@@ -352,11 +352,11 @@
                     const preset = response.data;
                     this.populateForm(preset);
                 } else {
-                    this.showToast('Fehler beim Laden der Preset-Daten', 'error');
+                    this.showToast('Fehler beim Laden der Shortcode-Daten', 'error');
                 }
             } catch (error) {
                 console.error('Load error:', error);
-                this.showToast('Fehler beim Laden der Preset-Daten', 'error');
+                this.showToast('Fehler beim Laden der Shortcode-Daten', 'error');
             }
         }
 
@@ -404,7 +404,7 @@
         async deletePreset(e) {
             const presetId = $(e.currentTarget).data('preset-id');
             
-            if (!confirm('Möchtest du dieses Preset wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+            if (!confirm('Möchtest du diesen Shortcode wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) {
                 return;
             }
             
@@ -412,14 +412,14 @@
                 const response = await this.makeAjaxRequest('delete_preset', { preset_id: presetId });
                 
                 if (response.success) {
-                    this.showToast('Preset erfolgreich gelöscht', 'success');
+                    this.showToast('Shortcode erfolgreich gelöscht', 'success');
                     this.refreshPresetsList();
                 } else {
                     this.showToast(response.data || 'Fehler beim Löschen', 'error');
                 }
             } catch (error) {
                 console.error('Delete error:', error);
-                this.showToast('Fehler beim Löschen des Presets', 'error');
+                this.showToast('Fehler beim Löschen des Shortcodes', 'error');
             }
         }
 
@@ -539,7 +539,7 @@
                 if (this.isEditMode) {
                     this.elements.saveBtn.text('💾 Änderungen speichern');
                 } else {
-                    this.elements.saveBtn.text('✨ Preset erstellen');
+                    this.elements.saveBtn.text('✨ Shortcode erstellen');
                 }
             }
         }
@@ -566,7 +566,7 @@
         }
 
         /**
-         * Presets-Liste aktualisieren
+         * Shortcode-Liste aktualisieren
          */
         refreshPresetsList() {
             location.reload(); // Einfacher Reload für jetzt

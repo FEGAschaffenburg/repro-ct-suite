@@ -37,9 +37,9 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
 
     <!-- Action Bar -->
     <div class="sm-action-bar">
-        <button type="button" class="sm-btn sm-btn-primary" id="create-preset-btn">
+        <button type="button" class="sm-btn sm-btn-primary" id="create-shortcode-btn">
             <span class="sm-btn-icon">✨</span>
-            Neues Preset
+            Neuer Shortcode
         </button>
         
         <div class="sm-stats-inline">
@@ -163,23 +163,23 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
         </div>
     </div>
 
-    <!-- Eigene Presets Section -->
+    <!-- Eigene Shortcodes Section -->
     <div class="sm-section">
         <div class="sm-section-header sm-collapsible-header" data-target="custom-presets">
             <h2>
                 <span class="sm-collapse-icon">▼</span>
-                ⭐ Eigene Presets
+                ⭐ Eigene Shortcodes
             </h2>
-            <span class="sm-badge"><?php echo count($presets); ?> Presets</span>
+            <span class="sm-badge"><?php echo count($presets); ?> Shortcodes</span>
         </div>
         
         <div class="sm-collapsible-content" id="custom-presets">
         <?php if (empty($presets)): ?>
             <div class="sm-empty-state-small">
-                <p>Noch keine eigenen Presets erstellt.</p>
-                <button type="button" class="sm-btn sm-btn-primary" id="create-first-preset-btn">
+                <p>Noch keine eigenen Shortcodes erstellt.</p>
+                <button type="button" class="sm-btn sm-btn-primary" id="create-first-shortcode-btn">
                     <span class="sm-btn-icon">✨</span>
-                    Erstes Preset erstellen
+                    Ersten Shortcode erstellen
                 </button>
             </div>
         <?php else: ?>
@@ -239,13 +239,13 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
 
 </div>
 
-<!-- Create/Edit Preset Modal -->
+<!-- Create/Edit Shortcode Modal -->
 <div id="preset-modal" class="sm-modal">
     <div class="sm-modal-content">
         
         <!-- Modal Header -->
         <div class="sm-modal-header">
-            <h2 class="sm-modal-title" id="modal-title">Neues Preset erstellen</h2>
+            <h2 class="sm-modal-title" id="modal-title">Neuen Shortcode erstellen</h2>
             <button type="button" class="sm-modal-close" id="close-modal">×</button>
         </div>
 
@@ -254,13 +254,13 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
             <form id="preset-form">
                 <input type="hidden" id="preset-id" name="preset_id" value="">
                 
-                <!-- Preset Name -->
+                <!-- Shortcode Name -->
                 <div class="sm-form-group">
-                    <label for="preset-name" class="sm-form-label">Preset Name *</label>
+                    <label for="preset-name" class="sm-form-label">Shortcode Name *</label>
                     <input type="text" id="preset-name" name="preset_name" class="sm-form-input" 
                            placeholder="z.B. Gottesdienste" required>
                     <div class="sm-form-description">
-                        Ein aussagekräftiger Name für dein Preset
+                        Ein aussagekräftiger Name für deinen Shortcode
                     </div>
                 </div>
 
@@ -310,25 +310,49 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
 
                 <!-- Display Options -->
                 <div class="sm-form-group">
-                    <label class="sm-form-label">Anzeige-Modus</label>
+                    <label class="sm-form-label">Template-Ansicht *</label>
                     
                     <div class="sm-options-grid">
+                        <div class="sm-option-card" data-mode="compact">
+                            <div class="sm-option-icon">📌</div>
+                            <input type="radio" name="display_mode" value="compact" class="sm-option-checkbox">
+                            <div class="sm-option-label">Compact</div>
+                            <div class="sm-option-desc">Ultra kompakt</div>
+                        </div>
+                        
                         <div class="sm-option-card" data-mode="list">
                             <div class="sm-option-icon">📋</div>
                             <input type="radio" name="display_mode" value="list" class="sm-option-checkbox" checked>
-                            <div class="sm-option-label">Listen-Ansicht</div>
+                            <div class="sm-option-label">Liste</div>
+                            <div class="sm-option-desc">Standard</div>
                         </div>
                         
-                        <div class="sm-option-card" data-mode="grid">
-                            <div class="sm-option-icon">📊</div>
-                            <input type="radio" name="display_mode" value="grid" class="sm-option-checkbox">
-                            <div class="sm-option-label">Raster-Ansicht</div>
+                        <div class="sm-option-card" data-mode="medium">
+                            <div class="sm-option-icon">📄</div>
+                            <input type="radio" name="display_mode" value="medium" class="sm-option-checkbox">
+                            <div class="sm-option-label">Medium</div>
+                            <div class="sm-option-desc">Ausgewogen</div>
                         </div>
                         
-                        <div class="sm-option-card" data-mode="calendar">
-                            <div class="sm-option-icon">📅</div>
-                            <input type="radio" name="display_mode" value="calendar" class="sm-option-checkbox">
-                            <div class="sm-option-label">Kalender-Ansicht</div>
+                        <div class="sm-option-card" data-mode="list-grouped">
+                            <div class="sm-option-icon">�</div>
+                            <input type="radio" name="display_mode" value="list-grouped" class="sm-option-checkbox">
+                            <div class="sm-option-label">Timeline</div>
+                            <div class="sm-option-desc">Gruppiert</div>
+                        </div>
+                        
+                        <div class="sm-option-card" data-mode="cards">
+                            <div class="sm-option-icon">🎴</div>
+                            <input type="radio" name="display_mode" value="cards" class="sm-option-checkbox">
+                            <div class="sm-option-label">Karten</div>
+                            <div class="sm-option-desc">Grid-Layout</div>
+                        </div>
+                        
+                        <div class="sm-option-card" data-mode="sidebar">
+                            <div class="sm-option-icon">📱</div>
+                            <input type="radio" name="display_mode" value="sidebar" class="sm-option-checkbox">
+                            <div class="sm-option-label">Sidebar</div>
+                            <div class="sm-option-desc">Widget</div>
                         </div>
                     </div>
                 </div>
@@ -389,7 +413,7 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
                     💾 Als Entwurf speichern
                 </button>
                 <button type="button" class="sm-btn sm-btn-primary" id="save-preset">
-                    ✨ Preset erstellen
+                    ✨ Shortcode erstellen
                 </button>
             </div>
         </div>
@@ -401,11 +425,11 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
 <div id="shortcode-result-modal" class="sm-modal">
     <div class="sm-modal-content">
         <div class="sm-modal-header">
-            <h2 class="sm-modal-title">🎉 Preset erfolgreich erstellt!</h2>
+            <h2 class="sm-modal-title">🎉 Shortcode erfolgreich erstellt!</h2>
             <button type="button" class="sm-modal-close" onclick="closeShortcodeModal()">×</button>
         </div>
         <div class="sm-modal-body">
-            <p>Dein Shortcode-Preset wurde erfolgreich erstellt. Du kannst den folgenden Shortcode in deine Beiträge und Seiten einfügen:</p>
+            <p>Dein Shortcode wurde erfolgreich erstellt. Du kannst ihn jetzt in deine Beiträge und Seiten einfügen:</p>
             
             <div class="sm-shortcode-display">
                 <span id="generated-shortcode">[rcts_events]</span>
@@ -419,7 +443,7 @@ $presets = $wpdb->get_results("SELECT * FROM {$table_presets} ORDER BY name ASC"
                 <ul>
                     <li>Kopiere den Shortcode und füge ihn in jeden Beitrag oder jede Seite ein</li>
                     <li>Der Shortcode wird automatisch durch deine Kalender-Events ersetzt</li>
-                    <li>Du kannst das Preset jederzeit über diese Seite bearbeiten</li>
+                    <li>Du kannst den Shortcode jederzeit über diese Seite bearbeiten</li>
                 </ul>
             </div>
         </div>
