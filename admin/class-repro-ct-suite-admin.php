@@ -755,6 +755,14 @@ class Repro_CT_Suite_Admin {
 
 		);
 
+		add_submenu_page(
+            'repro-ct-suite',
+            __( 'Dokumentation', 'repro-ct-suite' ),
+            __( 'Dokumentation', 'repro-ct-suite' ),
+            'manage_options',
+            'repro-ct-suite-dokumentation',
+            array( $this, 'display_documentation_page' )
+        );
 	}
 
 
@@ -796,6 +804,20 @@ class Repro_CT_Suite_Admin {
 	public function display_shortcode_manager_page() {
 
 		include_once plugin_dir_path( __FILE__ ) . 'views/modern-shortcode-manager.php';
+
+	}
+
+
+
+	/**
+
+	 * Display the documentation page.
+
+	 */
+
+	public function display_documentation_page() {
+
+		include_once plugin_dir_path( __FILE__ ) . 'page-dokumentation.php';
 
 	}
 
