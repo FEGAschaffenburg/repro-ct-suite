@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.6.3
+Stable tag: 0.9.6.4
 
 License: GPLv2 or later
 
@@ -146,6 +146,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 == Changelog ==
 
+
+= 0.9.6.4 - 2024-12-08 =
+* Fix: "Leeren"-Button funktioniert jetzt für Shortcode-Vorlagen (rcts_shortcode_presets)
+* Fix: "Anzeigen"-Button zeigt jetzt Daten aus Shortcode-Vorlagen
+* Verbesserung: Debug-Warnung erscheint nur noch bei UNBEKANNTEN Tabellen (nicht bei allen gefundenen)
+* Optimierung: Redundante Warnungen entfernt - bekannte Tabellen werden nicht mehr als "zusätzlich" gemeldet
 
 = 0.9.6.3 - 2024-12-08 =
 * Fix: Shortcode-Vorlagen (rcts_shortcode_presets) jetzt im Debug-Tab sichtbar
