@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.5.7
+Stable tag: 0.9.5.8
 
 License: GPLv2 or later
 
@@ -147,6 +147,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 == Changelog ==
 
 
+
+= 0.9.5.8 - 2024-12-08 =
+* Fix: Kritischer Bugfix im Updater - Updates funktionieren jetzt korrekt
+* Fix: Fehlerhafte Bedingung in download_package() korrigiert
+* Fix: 'Aktualisierung fehlgeschlagen' Fehler behoben
 
 = 0.9.5.7 - 2024-12-08 =
 * Feature: Neues Lizenz-Tab mit Lizenzverwaltung
@@ -1255,6 +1260,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 = 1.0.0 =
 
 * Legacy-Placeholder (veraltet)
+
 
 
 

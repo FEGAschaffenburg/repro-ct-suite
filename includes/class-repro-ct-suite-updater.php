@@ -638,9 +638,17 @@ class Repro_CT_Suite_Updater {
 
 		// Nur für GitHub-Downloads von diesem Repository.
 
-		if ( empty( $this->access_token ) || 
+		if ( strpos( $package, 'github.com/' . $this->username . '/' . $this->repository ) === false ) {
 
-		     strpos( $package, 'github.com/' . $this->username . '/' . $this->repository ) === false ) {
+			return $reply;
+
+		}
+
+
+
+		// Wenn kein Access Token gesetzt ist, Standard-Download verwenden
+
+		if ( empty( $this->access_token ) ) {
 
 			return $reply;
 
