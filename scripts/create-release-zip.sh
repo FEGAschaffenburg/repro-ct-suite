@@ -103,10 +103,18 @@ echo ""
 echo "Cleaning up temporary files..."
 rm -rf "$TEMP_DIR"
 
-# Get file size
+# Get file size and entry count
 ZIP_SIZE_KB=$(du -k "$OUTPUT_ZIP" | cut -f1)
-ZIP_SIZE_MB=$(echo "scale=2; $ZIP_SIZE_KB / 1024" | bc)
-ENTRY_COUNT=$(unzip -l "$OUTPUT_ZIP" 2>/dev/null | tail -n 1 | awk '{print $2}' || echo "unknown")
+# Use shell arithmetic for better portability (no bc dependency)
+ZIP_SIZE_MB=$(awk "BEGIN {printf \"%.2f\", $ZIP_SIZE_KB / 1024}")
+
+# Get entry count from unzip output (already called in validation)
+# We can skip this or just use a simpler approach
+if command -v unzip >/dev/null 2>&1; then
+    ENTRY_COUNT=$(unzip -l "$OUTPUT_ZIP" 2>/dev/null | tail -n 1 | awk '{print $2}' || echo "unknown")
+else
+    ENTRY_COUNT="unknown"
+fi
 
 # Result
 echo ""
