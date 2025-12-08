@@ -130,6 +130,17 @@ if ( $log_exists && $log_size > 0 ) {
 						</td>
 						<td>
 							<button 
+								class="repro-ct-suite-btn repro-ct-suite-btn-sm repro-ct-suite-btn-secondary repro-ct-suite-view-table-entries"
+								data-table="<?php echo esc_attr( $key ); ?>"
+								data-label="<?php echo esc_attr( $info['label'] ); ?>"
+								data-nonce="<?php echo esc_attr( wp_create_nonce( 'repro_ct_suite_admin' ) ); ?>"
+								<?php echo $info['count'] === 0 ? 'disabled' : ''; ?>
+								style="margin-right: 5px;"
+							>
+								<span class="dashicons dashicons-visibility"></span>
+								<?php esc_html_e( 'Anzeigen', 'repro-ct-suite' ); ?>
+							</button>
+							<button 
 								class="repro-ct-suite-btn repro-ct-suite-btn-sm repro-ct-suite-btn-danger repro-ct-suite-clear-single-table"
 								data-table="<?php echo esc_attr( $key ); ?>"
 								data-table-name="<?php echo esc_attr( $info['table'] ); ?>"
@@ -154,6 +165,16 @@ if ( $log_exists && $log_size > 0 ) {
 				>
 					<span class="dashicons dashicons-trash"></span>
 					<?php esc_html_e( 'Alle Tabellen leeren', 'repro-ct-suite' ); ?>
+				</button>
+				
+				<button 
+					id="repro-ct-suite-full-reset" 
+					class="repro-ct-suite-btn repro-ct-suite-btn-danger"
+					data-nonce="<?php echo esc_attr( wp_create_nonce( 'repro_ct_suite_admin' ) ); ?>"
+					style="margin-left: 10px; background-color: #8b0000;"
+				>
+					<span class="dashicons dashicons-update"></span>
+					<?php esc_html_e( 'Vollständiger Plugin-Reset', 'repro-ct-suite' ); ?>
 				</button>
 				
 				<span id="repro-ct-suite-clear-result" style="margin-left: 15px; display: none;"></span>
@@ -389,6 +410,25 @@ if ( $log_exists && $log_size > 0 ) {
 					</tr>
 				</tbody>
 			</table>
+		</div>
+	</div>
+
+	<!-- Modal für Tabelleneinträge -->
+	<div id="repro-ct-suite-table-entries-modal" class="repro-ct-suite-modal" style="display: none;">
+		<div class="repro-ct-suite-modal-content" style="max-width: 90%; max-height: 90%;">
+			<div class="repro-ct-suite-modal-header">
+				<h2 id="repro-ct-suite-modal-title"><?php esc_html_e( 'Tabelleneinträge', 'repro-ct-suite' ); ?></h2>
+				<span class="repro-ct-suite-modal-close">&times;</span>
+			</div>
+			<div class="repro-ct-suite-modal-body">
+				<div id="repro-ct-suite-entries-loader" style="text-align: center; padding: 40px;">
+					<span class="spinner is-active" style="float: none; margin: 0 auto;"></span>
+					<p><?php esc_html_e( 'Lade Daten...', 'repro-ct-suite' ); ?></p>
+				</div>
+				<div id="repro-ct-suite-entries-content" style="display: none;">
+					<div id="repro-ct-suite-entries-table"></div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
 
@@ -92,7 +92,7 @@ class Repro_CT_Suite_Admin {
 
 		
 
-		// Form Handler für Kalenderauswahl
+		// Form Handler fÃ¼r Kalenderauswahl
 
 		add_action( 'admin_init', array( $this, 'handle_calendar_selection' ) );
 
@@ -123,6 +123,8 @@ class Repro_CT_Suite_Admin {
 		add_action( 'wp_ajax_repro_ct_suite_delete_event', array( $this, 'ajax_delete_event' ) );
 
 		add_action( 'wp_ajax_repro_ct_suite_update_event', array( $this, 'ajax_update_event' ) );
+		add_action( 'wp_ajax_repro_ct_suite_get_table_entries', array( $this, 'ajax_get_table_entries' ) );
+		add_action( 'wp_ajax_repro_ct_suite_delete_single_entry', array( $this, 'ajax_delete_single_entry' ) );
 
 		add_action( 'wp_ajax_repro_ct_suite_dismiss_v6_notice', array( $this, 'ajax_dismiss_v6_notice' ) );
 
@@ -151,7 +153,7 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
-	 * Prüft ob ChurchTools-Verbindung konfiguriert ist
+	 * PrÃ¼ft ob ChurchTools-Verbindung konfiguriert ist
 
 	 *
 
@@ -175,7 +177,7 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
-	 * Prüft ob mindestens ein Kalender ausgewählt ist
+	 * PrÃ¼ft ob mindestens ein Kalender ausgewÃ¤hlt ist
 
 	 *
 
@@ -191,7 +193,7 @@ class Repro_CT_Suite_Admin {
 
 		
 
-		// Prüfe ob Tabelle existiert
+		// PrÃ¼fe ob Tabelle existiert
 
 		$table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $table ) );
 
@@ -219,7 +221,7 @@ class Repro_CT_Suite_Admin {
 
 	 * Schreibt Debug-Informationen ins WordPress Debug-Log.
 
-	 * Funktioniert unabhängig von WP_DEBUG - aktiviert sich selbst wenn nötig.
+	 * Funktioniert unabhÃ¤ngig von WP_DEBUG - aktiviert sich selbst wenn nÃ¶tig.
 
 	 *
 
@@ -235,7 +237,7 @@ class Repro_CT_Suite_Admin {
 
 		if ( ! defined( 'WP_DEBUG_LOG' ) ) {
 
-			// Temporär aktivieren für diesen Request
+			// TemporÃ¤r aktivieren fÃ¼r diesen Request
 
 			if ( ! @ini_get( 'log_errors' ) ) {
 
@@ -261,25 +263,25 @@ class Repro_CT_Suite_Admin {
 
 			case 'error':
 
-				$prefix .= '❌ ERROR: ';
+				$prefix .= 'âŒ ERROR: ';
 
 				break;
 
 			case 'warning':
 
-				$prefix .= '⚠️  WARNING: ';
+				$prefix .= 'âš ï¸  WARNING: ';
 
 				break;
 
 			case 'success':
 
-				$prefix .= '✅ SUCCESS: ';
+				$prefix .= 'âœ… SUCCESS: ';
 
 				break;
 
 			default:
 
-				$prefix .= 'ℹ️  INFO: ';
+				$prefix .= 'â„¹ï¸  INFO: ';
 
 		}
 
@@ -301,7 +303,7 @@ class Repro_CT_Suite_Admin {
 
 		if ( isset( $_GET['repro_ct_suite_check_update'] ) && current_user_can( 'update_plugins' ) ) {
 
-			// Lösche alle Update-bezogenen Transients
+			// LÃ¶sche alle Update-bezogenen Transients
 
 			delete_transient( 'repro_ct_suite_release_info' );
 
@@ -309,7 +311,7 @@ class Repro_CT_Suite_Admin {
 
 			
 
-			// Redirect zurück zur Plugins-Seite
+			// Redirect zurÃ¼ck zur Plugins-Seite
 
 			wp_safe_redirect( admin_url( 'plugins.php?repro_ct_suite_update_checked=1' ) );
 
@@ -327,7 +329,7 @@ class Repro_CT_Suite_Admin {
 
 				echo '<div class="notice notice-success is-dismissible"><p>';
 
-				esc_html_e( 'Update-Check durchgeführt. Bitte Seite neu laden um Updates zu sehen.', 'repro-ct-suite' );
+				esc_html_e( 'Update-Check durchgefÃ¼hrt. Bitte Seite neu laden um Updates zu sehen.', 'repro-ct-suite' );
 
 				echo '</p></div>';
 
@@ -357,7 +359,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Prüfen ob Sync-Notice vorhanden ist
+		// PrÃ¼fen ob Sync-Notice vorhanden ist
 
 		$sync_notice = get_transient( 'repro_ct_suite_sync_notice' );
 
@@ -369,7 +371,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Transient löschen (nur einmal anzeigen)
+		// Transient lÃ¶schen (nur einmal anzeigen)
 
 		delete_transient( 'repro_ct_suite_sync_notice' );
 
@@ -407,37 +409,37 @@ class Repro_CT_Suite_Admin {
 
 					<?php if ( isset( $stats['calendars_processed'] ) ) : ?>
 
-						📅 <?php printf( __( 'Kalender verarbeitet: %d', 'repro-ct-suite' ), $stats['calendars_processed'] ); ?><br>
+						ðŸ“… <?php printf( __( 'Kalender verarbeitet: %d', 'repro-ct-suite' ), $stats['calendars_processed'] ); ?><br>
 
 					<?php endif; ?>
 
 					<?php if ( isset( $stats['events_found'] ) ) : ?>
 
-						🔍 <?php printf( __( 'Events gefunden: %d', 'repro-ct-suite' ), $stats['events_found'] ); ?><br>
+						ðŸ” <?php printf( __( 'Events gefunden: %d', 'repro-ct-suite' ), $stats['events_found'] ); ?><br>
 
 					<?php endif; ?>
 
 					<?php if ( isset( $stats['appointments_found'] ) ) : ?>
 
-						📋 <?php printf( __( 'Termine gefunden: %d', 'repro-ct-suite' ), $stats['appointments_found'] ); ?><br>
+						ðŸ“‹ <?php printf( __( 'Termine gefunden: %d', 'repro-ct-suite' ), $stats['appointments_found'] ); ?><br>
 
 					<?php endif; ?>
 
 					<?php if ( isset( $stats['events_inserted'] ) ) : ?>
 
-						➕ <?php printf( __( 'Neu importiert: %d', 'repro-ct-suite' ), $stats['events_inserted'] ); ?><br>
+						âž• <?php printf( __( 'Neu importiert: %d', 'repro-ct-suite' ), $stats['events_inserted'] ); ?><br>
 
 					<?php endif; ?>
 
 					<?php if ( isset( $stats['events_updated'] ) ) : ?>
 
-						🔄 <?php printf( __( 'Aktualisiert: %d', 'repro-ct-suite' ), $stats['events_updated'] ); ?><br>
+						ðŸ”„ <?php printf( __( 'Aktualisiert: %d', 'repro-ct-suite' ), $stats['events_updated'] ); ?><br>
 
 					<?php endif; ?>
 
 					<?php if ( isset( $stats['events_skipped'] ) && $stats['events_skipped'] > 0 ) : ?>
 
-						⏭️ <?php printf( __( 'Übersprungen: %d', 'repro-ct-suite' ), $stats['events_skipped'] ); ?><br>
+						â­ï¸ <?php printf( __( 'Ãœbersprungen: %d', 'repro-ct-suite' ), $stats['events_skipped'] ); ?><br>
 
 					<?php endif; ?>
 
@@ -473,6 +475,13 @@ class Repro_CT_Suite_Admin {
 
 			'all'
 
+		);
+		wp_enqueue_style(
+			$this->plugin_name . '-modal',
+			plugin_dir_url( __FILE__ ) . 'css/repro-ct-suite-modal.css',
+			array(),
+			null,
+			'all'
 		);
 
 
@@ -529,7 +538,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Gutenberg Block für Events-Shortcode
+		// Gutenberg Block fÃ¼r Events-Shortcode
 
 		if ( function_exists( 'register_block_type' ) ) {
 
@@ -573,7 +582,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-			// AJAX-Daten für neuen Shortcode Manager
+			// AJAX-Daten fÃ¼r neuen Shortcode Manager
 
 			wp_localize_script(
 
@@ -632,12 +641,19 @@ class Repro_CT_Suite_Admin {
 				false
 
 			);
+			wp_enqueue_script(
+				$this->plugin_name . '-debug-extensions',
+				plugin_dir_url( __FILE__ ) . 'js/repro-ct-suite-debug-extensions.js',
+				array( 'jquery', $this->plugin_name . '-debug' ),
+				null,
+				false
+			);
 
 		}
 
 
 
-		// Localize script für AJAX
+		// Localize script fÃ¼r AJAX
 
 		wp_localize_script(
 
@@ -667,13 +683,13 @@ class Repro_CT_Suite_Admin {
 
 	public function add_admin_menu(): void {
 
-		// Prüfen ob Cron aktiv ist
+		// PrÃ¼fen ob Cron aktiv ist
 
 		$auto_sync_enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
 
 		
 
-		// Hauptmenü (Dashboard)
+		// HauptmenÃ¼ (Dashboard)
 
 		add_menu_page(
 
@@ -847,7 +863,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		Repro_CT_Suite_Logger::log( 'info', '🔌 Login-Test gestartet' );
+		Repro_CT_Suite_Logger::log( 'info', 'ðŸ”Œ Login-Test gestartet' );
 
 
 
@@ -873,9 +889,9 @@ class Repro_CT_Suite_Admin {
 
 		if ( empty( $test_tenant ) || empty( $test_username ) || empty( $test_password ) ) {
 
-			Repro_CT_Suite_Logger::log( 'error', '❌ Login-Test fehlgeschlagen: Zugangsdaten unvollständig' );
+			Repro_CT_Suite_Logger::log( 'error', 'âŒ Login-Test fehlgeschlagen: Zugangsdaten unvollstÃ¤ndig' );
 
-			set_transient( 'repro_ct_suite_test_result', new WP_Error( 'missing_credentials', __( 'Bitte alle Felder ausfüllen.', 'repro-ct-suite' ) ), 30 );
+			set_transient( 'repro_ct_suite_test_result', new WP_Error( 'missing_credentials', __( 'Bitte alle Felder ausfÃ¼llen.', 'repro-ct-suite' ) ), 30 );
 
 		} else {
 
@@ -889,23 +905,23 @@ class Repro_CT_Suite_Admin {
 
 			if ( is_wp_error( $login ) ) {
 
-				Repro_CT_Suite_Logger::log( 'error', sprintf( '❌ Login fehlgeschlagen: %s', $login->get_error_message() ) );
+				Repro_CT_Suite_Logger::log( 'error', sprintf( 'âŒ Login fehlgeschlagen: %s', $login->get_error_message() ) );
 
 				set_transient( 'repro_ct_suite_test_result', $login, 30 );
 
 			} else {
 
-				Repro_CT_Suite_Logger::log( 'success', '✅ Login erfolgreich, rufe whoami() ab' );
+				Repro_CT_Suite_Logger::log( 'success', 'âœ… Login erfolgreich, rufe whoami() ab' );
 
 				$whoami = $client->whoami();
 
 				if ( is_wp_error( $whoami ) ) {
 
-					Repro_CT_Suite_Logger::log( 'error', sprintf( '❌ whoami() fehlgeschlagen: %s', $whoami->get_error_message() ) );
+					Repro_CT_Suite_Logger::log( 'error', sprintf( 'âŒ whoami() fehlgeschlagen: %s', $whoami->get_error_message() ) );
 
 				} else {
 
-					Repro_CT_Suite_Logger::log( 'success', sprintf( '✅ Login-Test erfolgreich - User: %s', $whoami['userName'] ?? 'unbekannt' ) );
+					Repro_CT_Suite_Logger::log( 'success', sprintf( 'âœ… Login-Test erfolgreich - User: %s', $whoami['userName'] ?? 'unbekannt' ) );
 
 				}
 
@@ -917,7 +933,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Redirect zurück zum Settings-Tab ohne test_connection Parameter
+		// Redirect zurÃ¼ck zum Settings-Tab ohne test_connection Parameter
 
 		$redirect_url = add_query_arg(
 
@@ -957,7 +973,7 @@ class Repro_CT_Suite_Admin {
 
 			if ( ! check_admin_referer( 'repro_ct_suite_calendar_selection', 'repro_ct_suite_calendar_selection_nonce' ) ) {
 
-				wp_die( __( 'Sicherheitsprüfung fehlgeschlagen.', 'repro-ct-suite' ) );
+				wp_die( __( 'SicherheitsprÃ¼fung fehlgeschlagen.', 'repro-ct-suite' ) );
 
 			}
 
@@ -1057,7 +1073,7 @@ class Repro_CT_Suite_Admin {
 
 			if ( ! check_admin_referer( 'repro_ct_suite_sync_period', 'repro_ct_suite_sync_period_nonce' ) ) {
 
-				wp_die( __( 'Sicherheitsprüfung fehlgeschlagen.', 'repro-ct-suite' ) );
+				wp_die( __( 'SicherheitsprÃ¼fung fehlgeschlagen.', 'repro-ct-suite' ) );
 
 			}
 
@@ -1145,7 +1161,7 @@ class Repro_CT_Suite_Admin {
 
 		if ( ! check_admin_referer( 'repro_ct_suite_update_calendars', 'repro_ct_suite_calendars_nonce' ) ) {
 
-			wp_die( __( 'Sicherheitsprüfung fehlgeschlagen.', 'repro-ct-suite' ) );
+			wp_die( __( 'SicherheitsprÃ¼fung fehlgeschlagen.', 'repro-ct-suite' ) );
 
 		}
 
@@ -1257,7 +1273,7 @@ class Repro_CT_Suite_Admin {
 
 				'type'              => 'boolean',
 
-				'description'       => __( 'Automatische Updates für Repro CT-Suite aktivieren', 'repro-ct-suite' ),
+				'description'       => __( 'Automatische Updates fÃ¼r Repro CT-Suite aktivieren', 'repro-ct-suite' ),
 
 				'sanitize_callback' => function ( $value ) { return (int) ( ! empty( $value ) ); },
 
@@ -1293,7 +1309,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// ChurchTools Einstellungen: Tenant, Benutzername, Passwort (verschlüsselt)
+		// ChurchTools Einstellungen: Tenant, Benutzername, Passwort (verschlÃ¼sselt)
 
 		register_setting(
 
@@ -1305,7 +1321,7 @@ class Repro_CT_Suite_Admin {
 
 				'type'              => 'string',
 
-				'description'       => __( 'ChurchTools Tenant (z.B. "gemeinde" für gemeinde.church.tools)', 'repro-ct-suite' ),
+				'description'       => __( 'ChurchTools Tenant (z.B. "gemeinde" fÃ¼r gemeinde.church.tools)', 'repro-ct-suite' ),
 
 				'sanitize_callback' => function ( $value ) { return sanitize_text_field( trim( $value ) ); },
 
@@ -1349,7 +1365,7 @@ class Repro_CT_Suite_Admin {
 
 				'type'              => 'string',
 
-				'description'       => __( 'ChurchTools Passwort (wird verschlüsselt gespeichert)', 'repro-ct-suite' ),
+				'description'       => __( 'ChurchTools Passwort (wird verschlÃ¼sselt gespeichert)', 'repro-ct-suite' ),
 
 				'sanitize_callback' => function ( $value ) {
 
@@ -1389,7 +1405,7 @@ class Repro_CT_Suite_Admin {
 
 				'type'              => 'integer',
 
-				'description'       => __( 'Anzahl der Tage in der Vergangenheit für Event-Synchronisation (negativ)', 'repro-ct-suite' ),
+				'description'       => __( 'Anzahl der Tage in der Vergangenheit fÃ¼r Event-Synchronisation (negativ)', 'repro-ct-suite' ),
 
 				'sanitize_callback' => function ( $value ) {
 
@@ -1419,7 +1435,7 @@ class Repro_CT_Suite_Admin {
 
 				'type'              => 'integer',
 
-				'description'       => __( 'Anzahl der Tage in der Zukunft für Event-Synchronisation (positiv)', 'repro-ct-suite' ),
+				'description'       => __( 'Anzahl der Tage in der Zukunft fÃ¼r Event-Synchronisation (positiv)', 'repro-ct-suite' ),
 
 				'sanitize_callback' => function ( $value ) {
 
@@ -1449,7 +1465,7 @@ class Repro_CT_Suite_Admin {
 
 	 * Ruft Kalender von ChurchTools ab und speichert sie in der Datenbank.
 
-	 * Behält die Benutzer-Auswahl (is_selected) bei Updates bei.
+	 * BehÃ¤lt die Benutzer-Auswahl (is_selected) bei Updates bei.
 
 	 *
 
@@ -1459,19 +1475,19 @@ class Repro_CT_Suite_Admin {
 
 	public function ajax_sync_calendars(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -1555,7 +1571,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-			// Synchronisation durchführen
+			// Synchronisation durchfÃ¼hren
 
 			$result = $sync_service->sync_calendars();
 
@@ -1601,7 +1617,7 @@ class Repro_CT_Suite_Admin {
 
 			Repro_CT_Suite_Logger::log( 'Kalender gesamt: ' . ( isset( $result['total'] ) ? $result['total'] : '0' ), 'info' );
 
-			Repro_CT_Suite_Logger::log( 'Neu eingefügt: ' . ( isset( $result['inserted'] ) ? $result['inserted'] : '0' ), 'success' );
+			Repro_CT_Suite_Logger::log( 'Neu eingefÃ¼gt: ' . ( isset( $result['inserted'] ) ? $result['inserted'] : '0' ), 'success' );
 
 			Repro_CT_Suite_Logger::log( 'Aktualisiert: ' . ( isset( $result['updated'] ) ? $result['updated'] : '0' ), 'success' );
 
@@ -1759,7 +1775,7 @@ class Repro_CT_Suite_Admin {
 
 	 *
 
-	 * Verwendet den neuen vereinfachten Sync-Service für alle Termine.
+	 * Verwendet den neuen vereinfachten Sync-Service fÃ¼r alle Termine.
 
 	 *
 
@@ -1769,19 +1785,19 @@ class Repro_CT_Suite_Admin {
 
 	public function ajax_sync_appointments(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -1821,7 +1837,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Konfiguration prüfen
+		// Konfiguration prÃ¼fen
 
 		$tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
 
@@ -1835,7 +1851,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'ChurchTools-Verbindung nicht konfiguriert. Bitte prüfen Sie die Einstellungen.', 'repro-ct-suite' )
+				'message' => __( 'ChurchTools-Verbindung nicht konfiguriert. Bitte prÃ¼fen Sie die Einstellungen.', 'repro-ct-suite' )
 
 			) );
 
@@ -1859,7 +1875,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Ausgewählte Kalender ermitteln
+		// AusgewÃ¤hlte Kalender ermitteln
 
 		$selected_calendar_ids = $calendars_repo->get_selected_calendar_ids();
 
@@ -1869,7 +1885,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Kalender für den Import ausgewählt. Bitte wählen Sie Kalender in den Einstellungen aus.', 'repro-ct-suite' )
+				'message' => __( 'Keine Kalender fÃ¼r den Import ausgewÃ¤hlt. Bitte wÃ¤hlen Sie Kalender in den Einstellungen aus.', 'repro-ct-suite' )
 
 			) );
 
@@ -1879,7 +1895,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe ChurchTools-IDs): ' . implode( ', ', $selected_calendar_ids ) );
+		Repro_CT_Suite_Logger::log( 'AusgewÃ¤hlte Kalender (externe ChurchTools-IDs): ' . implode( ', ', $selected_calendar_ids ) );
 
 
 
@@ -1899,7 +1915,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Sync ausführen mit externen ChurchTools-IDs (kein lokales Mapping mehr!)
+		// Sync ausfÃ¼hren mit externen ChurchTools-IDs (kein lokales Mapping mehr!)
 
 		$result = $sync_service->sync_events( array(
 
@@ -2059,11 +2075,11 @@ class Repro_CT_Suite_Admin {
 
 
 
-			// Nur ausgewählte Kalender synchronisieren
+			// Nur ausgewÃ¤hlte Kalender synchronisieren
 
 			$selected_calendar_ids = $calendars_repo->get_selected_ids();
 
-			Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (lokale IDs): ' . ( $selected_calendar_ids ? implode( ',', $selected_calendar_ids ) : '[keine]' ) );
+			Repro_CT_Suite_Logger::log( 'AusgewÃ¤hlte Kalender (lokale IDs): ' . ( $selected_calendar_ids ? implode( ',', $selected_calendar_ids ) : '[keine]' ) );
 
 
 
@@ -2071,7 +2087,7 @@ class Repro_CT_Suite_Admin {
 
 				wp_send_json_error( array(
 
-					'message' => __( 'Keine Kalender ausgewählt. Bitte wählen Sie mindestens einen Kalender aus.', 'repro-ct-suite' )
+					'message' => __( 'Keine Kalender ausgewÃ¤hlt. Bitte wÃ¤hlen Sie mindestens einen Kalender aus.', 'repro-ct-suite' )
 
 				) );
 
@@ -2079,7 +2095,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-			// Externe Calendar-IDs für Events-Filterung holen
+			// Externe Calendar-IDs fÃ¼r Events-Filterung holen
 
 			$selected_calendar_ids = array();
 
@@ -2095,7 +2111,7 @@ class Repro_CT_Suite_Admin {
 
 			}
 
-			Repro_CT_Suite_Logger::log( 'Ausgewählte Kalender (externe IDs): ' . ( $selected_calendar_ids ? implode( ',', $selected_calendar_ids ) : '[keine]' ) );
+			Repro_CT_Suite_Logger::log( 'AusgewÃ¤hlte Kalender (externe IDs): ' . ( $selected_calendar_ids ? implode( ',', $selected_calendar_ids ) : '[keine]' ) );
 
 
 
@@ -2115,9 +2131,9 @@ class Repro_CT_Suite_Admin {
 
 			// STRATEGIE: 
 
-			// 1. Zuerst Events aus /events synchronisieren (enthält alle ChurchTools-Events)
+			// 1. Zuerst Events aus /events synchronisieren (enthÃ¤lt alle ChurchTools-Events)
 
-			//    WICHTIG: Mit calendar_ids filtern, damit nur Events ausgewählter Kalender importiert werden
+			//    WICHTIG: Mit calendar_ids filtern, damit nur Events ausgewÃ¤hlter Kalender importiert werden
 
 			// 2. Dann Appointments - ABER nur die, deren appointment_id noch NICHT in rcts_events vorkommt
 
@@ -2127,9 +2143,9 @@ class Repro_CT_Suite_Admin {
 
 
 
-			// 1) Events synchronisieren (nur von ausgewählten Kalendern)
+			// 1) Events synchronisieren (nur von ausgewÃ¤hlten Kalendern)
 
-			Repro_CT_Suite_Logger::log( 'SCHRITT 1: Events synchronisieren (nur ausgewählte Kalender)...' );
+			Repro_CT_Suite_Logger::log( 'SCHRITT 1: Events synchronisieren (nur ausgewÃ¤hlte Kalender)...' );
 
 			$events_service = new Repro_CT_Suite_Events_Sync_Service( $ct_client, $events_repo, $calendars_repo, $schedule_repo );
 
@@ -2283,7 +2299,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-			// Notice für nächsten Seitenaufruf vorbereiten
+			// Notice fÃ¼r nÃ¤chsten Seitenaufruf vorbereiten
 
 			$total_new = ( isset( $events_result['events_inserted'] ) ? (int) $events_result['events_inserted'] : 0 );
 
@@ -2299,7 +2315,7 @@ class Repro_CT_Suite_Admin {
 
 				'message' => sprintf(
 
-					__( '✅ Synchronisation erfolgreich abgeschlossen!', 'repro-ct-suite' )
+					__( 'âœ… Synchronisation erfolgreich abgeschlossen!', 'repro-ct-suite' )
 
 				),
 
@@ -2319,7 +2335,7 @@ class Repro_CT_Suite_Admin {
 
 				)
 
-			), 60 ); // 60 Sekunden gültig
+			), 60 ); // 60 Sekunden gÃ¼ltig
 
 
 
@@ -2407,25 +2423,25 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
-	 * AJAX: Leert alle Plugin-Tabellen (nur für Admins, Debug-Funktion)
+	 * AJAX: Leert alle Plugin-Tabellen (nur fÃ¼r Admins, Debug-Funktion)
 
 	 */
 
 	public function ajax_clear_tables(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -2437,7 +2453,7 @@ class Repro_CT_Suite_Admin {
 
 		
 
-		// Tabellen leeren (TRUNCATE löscht alle Daten und resettet AUTO_INCREMENT)
+		// Tabellen leeren (TRUNCATE lÃ¶scht alle Daten und resettet AUTO_INCREMENT)
 
 		$tables = array(
 
@@ -2463,7 +2479,7 @@ class Repro_CT_Suite_Admin {
 
 		foreach ( $tables as $table ) {
 
-			// Prüfe, ob Tabelle existiert
+			// PrÃ¼fe, ob Tabelle existiert
 
 			$table_exists = $wpdb->get_var( $wpdb->prepare( 
 
@@ -2551,19 +2567,19 @@ class Repro_CT_Suite_Admin {
 
 	public function ajax_clear_single_table(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -2613,7 +2629,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Ungültige Tabelle.', 'repro-ct-suite' )
+				'message' => __( 'UngÃ¼ltige Tabelle.', 'repro-ct-suite' )
 
 			) );
 
@@ -2625,7 +2641,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Prüfe, ob Tabelle existiert
+		// PrÃ¼fe, ob Tabelle existiert
 
 		$table_exists = $wpdb->get_var( $wpdb->prepare( 
 
@@ -2701,25 +2717,25 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
-	 * AJAX: Führt DB-Migrationen manuell aus
+	 * AJAX: FÃ¼hrt DB-Migrationen manuell aus
 
 	 */
 
 	public function ajax_run_migrations(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -2739,7 +2755,7 @@ class Repro_CT_Suite_Admin {
 
 		try {
 
-			// Migration ausführen
+			// Migration ausfÃ¼hren
 
 			Repro_CT_Suite_Migrations::run();
 
@@ -2817,19 +2833,19 @@ class Repro_CT_Suite_Admin {
 
 	public function ajax_clear_log(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -2883,13 +2899,13 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
-	 * AJAX: Löscht alle ChurchTools-Zugangsdaten
+	 * AJAX: LÃ¶scht alle ChurchTools-Zugangsdaten
 
 	 */
 
 	/**
 
-	 * AJAX Handler: Zugangsdaten zurücksetzen
+	 * AJAX Handler: Zugangsdaten zurÃ¼cksetzen
 
 	 *
 
@@ -2899,19 +2915,19 @@ class Repro_CT_Suite_Admin {
 
 	public function ajax_reset_credentials(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -2919,7 +2935,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Zugangsdaten löschen
+		// Zugangsdaten lÃ¶schen
 
 		delete_option( 'repro_ct_suite_ct_tenant' );
 
@@ -2935,7 +2951,7 @@ class Repro_CT_Suite_Admin {
 
 		wp_send_json_success( array(
 
-			'message' => __( 'Zugangsdaten wurden erfolgreich gelöscht.', 'repro-ct-suite' ),
+			'message' => __( 'Zugangsdaten wurden erfolgreich gelÃ¶scht.', 'repro-ct-suite' ),
 
 			'ask_full_reset' => true
 
@@ -2947,7 +2963,7 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
-	 * AJAX Handler: Vollständiger Reset (Zugangsdaten + alle Daten + Einstellungen)
+	 * AJAX Handler: VollstÃ¤ndiger Reset (Zugangsdaten + alle Daten + Einstellungen)
 
 	 *
 
@@ -2957,19 +2973,19 @@ class Repro_CT_Suite_Admin {
 
 	public function ajax_full_reset(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3005,7 +3021,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Alle Plugin-Optionen löschen
+		// Alle Plugin-Optionen lÃ¶schen
 
 		delete_option( 'repro_ct_suite_ct_tenant' );
 
@@ -3027,7 +3043,7 @@ class Repro_CT_Suite_Admin {
 
 		wp_send_json_success( array(
 
-			'message' => __( 'Vollständiger Reset durchgeführt. Alle Zugangsdaten, Einstellungen und Daten wurden gelöscht.', 'repro-ct-suite' )
+			'message' => __( 'VollstÃ¤ndiger Reset durchgefÃ¼hrt. Alle Zugangsdaten, Einstellungen und Daten wurden gelÃ¶scht.', 'repro-ct-suite' )
 
 		) );
 
@@ -3047,19 +3063,19 @@ class Repro_CT_Suite_Admin {
 
 	public function ajax_fix_calendar_ids(): void {
 
-		// Nonce-Prüfung
+		// Nonce-PrÃ¼fung
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
 
 
-		// Berechtigungsprüfung
+		// BerechtigungsprÃ¼fung
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3269,7 +3285,7 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
-	 * AJAX Handler: Einzelnes Event löschen
+	 * AJAX Handler: Einzelnes Event lÃ¶schen
 
 	 *
 
@@ -3287,7 +3303,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3303,7 +3319,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Ungültige Event-ID.', 'repro-ct-suite' )
+				'message' => __( 'UngÃ¼ltige Event-ID.', 'repro-ct-suite' )
 
 			) );
 
@@ -3321,7 +3337,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Prüfen ob Event existiert
+		// PrÃ¼fen ob Event existiert
 
 		if ( ! $events_repo->exists( $event_id ) ) {
 
@@ -3335,7 +3351,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Event löschen
+		// Event lÃ¶schen
 
 		$result = $events_repo->delete_by_id( $event_id );
 
@@ -3345,7 +3361,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Fehler beim Löschen des Events.', 'repro-ct-suite' )
+				'message' => __( 'Fehler beim LÃ¶schen des Events.', 'repro-ct-suite' )
 
 			) );
 
@@ -3355,7 +3371,7 @@ class Repro_CT_Suite_Admin {
 
 		wp_send_json_success( array(
 
-			'message' => __( 'Event erfolgreich gelöscht.', 'repro-ct-suite' )
+			'message' => __( 'Event erfolgreich gelÃ¶scht.', 'repro-ct-suite' )
 
 		) );
 
@@ -3383,7 +3399,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3399,7 +3415,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Ungültige Event-ID.', 'repro-ct-suite' )
+				'message' => __( 'UngÃ¼ltige Event-ID.', 'repro-ct-suite' )
 
 			) );
 
@@ -3417,7 +3433,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Prüfen ob Event existiert
+		// PrÃ¼fen ob Event existiert
 
 		if ( ! $events_repo->exists( $event_id ) ) {
 
@@ -3509,7 +3525,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3547,7 +3563,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3571,7 +3587,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Shortcode ausführen
+		// Shortcode ausfÃ¼hren
 
 		$html = do_shortcode( $shortcode );
 
@@ -3611,7 +3627,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3655,7 +3671,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3685,7 +3701,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Prüfe ob Name bereits existiert
+		// PrÃ¼fe ob Name bereits existiert
 
 		if ( $repository->name_exists( $preset_data['name'] ) ) {
 
@@ -3743,7 +3759,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3787,7 +3803,7 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Prüfe ob Name bereits existiert (außer bei diesem Preset)
+		// PrÃ¼fe ob Name bereits existiert (auÃŸer bei diesem Preset)
 
 		if ( $repository->name_exists( $preset_data['name'], $preset_id ) ) {
 
@@ -3829,7 +3845,7 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
-	 * AJAX Handler: Preset löschen
+	 * AJAX Handler: Preset lÃ¶schen
 
 	 */
 
@@ -3843,7 +3859,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3881,7 +3897,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Fehler beim Löschen des Presets.', 'repro-ct-suite' )
+				'message' => __( 'Fehler beim LÃ¶schen des Presets.', 'repro-ct-suite' )
 
 			) );
 
@@ -3891,7 +3907,7 @@ class Repro_CT_Suite_Admin {
 
 		wp_send_json_success( array(
 
-			'message' => __( 'Preset erfolgreich gelöscht.', 'repro-ct-suite' )
+			'message' => __( 'Preset erfolgreich gelÃ¶scht.', 'repro-ct-suite' )
 
 		) );
 
@@ -3915,7 +3931,7 @@ class Repro_CT_Suite_Admin {
 
 			wp_send_json_error( array(
 
-				'message' => __( 'Keine Berechtigung für diese Aktion.', 'repro-ct-suite' )
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
 
 			) );
 
@@ -3975,7 +3991,7 @@ class Repro_CT_Suite_Admin {
 		// Include der Klasse
 		require_once plugin_dir_path( __FILE__ ) . 'class-modern-shortcode-manager.php';
 		
-		// Instanz erstellen - die Klasse registriert sich selbst für AJAX
+		// Instanz erstellen - die Klasse registriert sich selbst fÃ¼r AJAX
 		new Repro_CT_Suite_Modern_Shortcode_Manager();
 	}
 
@@ -4146,7 +4162,7 @@ class Repro_CT_Suite_Admin {
 			$result = $wpdb->query("DELETE FROM {$table_name}");
 
 			if ($result === false) {
-				wp_send_json_error('Fehler beim Löschen der Daten: ' . $wpdb->last_error);
+				wp_send_json_error('Fehler beim LÃ¶schen der Daten: ' . $wpdb->last_error);
 				return;
 			}
 
@@ -4154,12 +4170,12 @@ class Repro_CT_Suite_Admin {
 			$deleted_rows = $count_before - $count_after;
 
 			if (class_exists('Repro_CT_Suite_Logger')) {
-				Repro_CT_Suite_Logger::log("Debug: Tabelle '{$table_key}' erfolgreich geleert - {$deleted_rows} Einträge gelöscht", 'success');
+				Repro_CT_Suite_Logger::log("Debug: Tabelle '{$table_key}' erfolgreich geleert - {$deleted_rows} EintrÃ¤ge gelÃ¶scht", 'success');
 			}
 
 			wp_send_json_success([
 				'deleted_rows' => $deleted_rows,
-				'message' => sprintf('Erfolgreich %d Einträge aus Tabelle %s gelöscht', $deleted_rows, $table_key)
+				'message' => sprintf('Erfolgreich %d EintrÃ¤ge aus Tabelle %s gelÃ¶scht', $deleted_rows, $table_key)
 			]);
 
 		} catch (Exception $e) {
@@ -4167,11 +4183,141 @@ class Repro_CT_Suite_Admin {
 				Repro_CT_Suite_Logger::log("Debug: Fehler beim Leeren der Tabelle '{$table_key}': " . $e->getMessage(), 'error');
 			}
 			
-			wp_send_json_error('Fehler beim Löschen: ' . $e->getMessage());
+			wp_send_json_error('Fehler beim LÃ¶schen: ' . $e->getMessage());
 		}
 	}
 
+	/**
+	 * AJAX Handler: TabelleneintrÃ¤ge abrufen
+	 *
+	 * @since 0.9.5.3
+	 */
+	public function ajax_get_table_entries(): void {
+		// Nonce-PrÃ¼fung
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		// BerechtigungsprÃ¼fung
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		global $wpdb;
+
+		$table_key = isset( $_POST['table'] ) ? sanitize_text_field( $_POST['table'] ) : '';
+
+		if ( empty( $table_key ) ) {
+			wp_send_json_error( array( 'message' => __( 'Keine Tabelle angegeben.', 'repro-ct-suite' ) ) );
+		}
+
+		// Tabellen-Mapping
+		$tables_map = array(
+			'rcts_calendars' => array(
+				'table' => $wpdb->prefix . 'rcts_calendars',
+				'columns' => array( 'id', 'ct_id', 'name', 'created_at' )
+			),
+			'rcts_events' => array(
+				'table' => $wpdb->prefix . 'rcts_events',
+				'columns' => array( 'id', 'ct_id', 'name', 'start_date', 'calendar_id' )
+			),
+			'rcts_event_services' => array(
+				'table' => $wpdb->prefix . 'rcts_event_services',
+				'columns' => array( 'id', 'ct_id', 'name', 'service_group_id' )
+			),
+			'rcts_schedule' => array(
+				'table' => $wpdb->prefix . 'rcts_schedule',
+				'columns' => array( 'id', 'ct_id', 'name', 'start_date', 'event_id' )
+			),
+		);
+
+		if ( ! isset( $tables_map[ $table_key ] ) ) {
+			wp_send_json_error( array( 'message' => __( 'UngÃ¼ltige Tabelle.', 'repro-ct-suite' ) ) );
+		}
+
+		$table_info = $tables_map[ $table_key ];
+		$table_name = $table_info['table'];
+		$columns = implode( ', ', $table_info['columns'] );
+
+		// EintrÃ¤ge abrufen (limitiert auf 100)
+		$results = $wpdb->get_results( "SELECT {$columns} FROM {$table_name} ORDER BY id DESC LIMIT 100", ARRAY_A );
+
+		if ( $wpdb->last_error ) {
+			wp_send_json_error( array( 'message' => 'Datenbankfehler: ' . $wpdb->last_error ) );
+		}
+
+		wp_send_json_success( array(
+			'entries' => $results,
+			'columns' => $table_info['columns'],
+			'total' => count( $results )
+		) );
+	}
+
+	/**
+	 * AJAX Handler: Einzelnen Eintrag lÃ¶schen
+	 *
+	 * @since 0.9.5.3
+	 */
+	public function ajax_delete_single_entry(): void {
+		// Nonce-PrÃ¼fung
+		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+
+		// BerechtigungsprÃ¼fung
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
+			) );
+		}
+
+		global $wpdb;
+
+		$table_key = isset( $_POST['table'] ) ? sanitize_text_field( $_POST['table'] ) : '';
+		$entry_id = isset( $_POST['entry_id'] ) ? absint( $_POST['entry_id'] ) : 0;
+
+		if ( empty( $table_key ) || $entry_id === 0 ) {
+			wp_send_json_error( array( 'message' => __( 'UngÃ¼ltige Parameter.', 'repro-ct-suite' ) ) );
+		}
+
+		// Tabellen-Mapping
+		$tables_map = array(
+			'rcts_calendars' => $wpdb->prefix . 'rcts_calendars',
+			'rcts_events' => $wpdb->prefix . 'rcts_events',
+			'rcts_event_services' => $wpdb->prefix . 'rcts_event_services',
+			'rcts_schedule' => $wpdb->prefix . 'rcts_schedule',
+		);
+
+		if ( ! isset( $tables_map[ $table_key ] ) ) {
+			wp_send_json_error( array( 'message' => __( 'UngÃ¼ltige Tabelle.', 'repro-ct-suite' ) ) );
+		}
+
+		$table_name = $tables_map[ $table_key ];
+
+		// PrÃ¼fen ob Eintrag existiert
+		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE id = %d", $entry_id ) );
+
+		if ( ! $exists ) {
+			wp_send_json_error( array( 'message' => __( 'Eintrag nicht gefunden.', 'repro-ct-suite' ) ) );
+		}
+
+		// LÃ¶schen
+		$result = $wpdb->delete( $table_name, array( 'id' => $entry_id ), array( '%d' ) );
+
+		if ( $result === false ) {
+			wp_send_json_error( array( 'message' => 'Datenbankfehler: ' . $wpdb->last_error ) );
+		}
+
+		if ( class_exists( 'Repro_CT_Suite_Logger' ) ) {
+			Repro_CT_Suite_Logger::log( "Debug: Eintrag #{$entry_id} aus Tabelle '{$table_key}' gelÃ¶scht", 'info' );
+		}
+
+		wp_send_json_success( array(
+			'message' => sprintf( __( 'Eintrag #%d erfolgreich gelÃ¶scht.', 'repro-ct-suite' ), $entry_id )
+		) );
+	}
+
 }
+
+
 
 
 
