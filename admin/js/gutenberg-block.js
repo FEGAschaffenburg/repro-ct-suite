@@ -11,6 +11,7 @@
 	const { useState, useEffect } = element;
 
 	registerBlockType('repro-ct-suite/events', {
+		apiVersion: 3,
 		title: 'ChurchTools Termine',
 		icon: 'calendar-alt',
 		category: 'widgets',

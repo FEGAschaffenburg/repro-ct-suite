@@ -1,11 +1,11 @@
-<?php
+﻿<?php
 /**
  * Tab: Synchronisation
  *
  * Vereinfachte Synchronisation mit dem neuen einheitlichen Sync-Service:
  * - Kalenderauswahl
  * - Zeitraum-Konfiguration  
- * - Einheitlicher Sync-Button für alle Termine
+ * - Einheitlicher Sync-Button fÃ¼r alle Termine
  *
  * @package    Repro_CT_Suite
  * @subpackage Repro_CT_Suite/admin/views/tabs
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Credentials prüfen
+// Credentials prÃ¼fen
 $ct_tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
 $ct_username = get_option( 'repro_ct_suite_ct_username', '' );
 $ct_password = get_option( 'repro_ct_suite_ct_password', '' );
@@ -75,7 +75,7 @@ try {
 			</div>
 			<div class="repro-ct-suite-card-body">
 				<p class="description">
-					<?php esc_html_e( 'Lädt die Kalenderliste aus ChurchTools und aktualisiert die verfügbaren Kalender in der Datenbank.', 'repro-ct-suite' ); ?>
+					<?php esc_html_e( 'LÃ¤dt die Kalenderliste aus ChurchTools und aktualisiert die verfÃ¼gbaren Kalender in der Datenbank.', 'repro-ct-suite' ); ?>
 				</p>
 				<p>
 					<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-secondary repro-ct-suite-sync-calendars-btn">
@@ -101,7 +101,7 @@ try {
 					<p class="description">
 						<?php
 						printf(
-							esc_html__( 'Wählen Sie die Kalender aus, deren Termine synchronisiert werden sollen. Aktuell ausgewählt: %d von %d', 'repro-ct-suite' ),
+							esc_html__( 'WÃ¤hlen Sie die Kalender aus, deren Termine synchronisiert werden sollen. Aktuell ausgewÃ¤hlt: %d von %d', 'repro-ct-suite' ),
 							(int) $selected_count,
 							count( $calendars )
 						);
@@ -116,7 +116,7 @@ try {
 							<thead>
 								<tr>
 									<th style="width: 40px;">
-										<input type="checkbox" id="select-all-calendars">
+										<input type="checkbox" id="select-all-calendars-sync">
 									</th>
 									<th><?php esc_html_e( 'Kalender', 'repro-ct-suite' ); ?></th>
 									<th><?php esc_html_e( 'ChurchTools-ID', 'repro-ct-suite' ); ?></th>
@@ -148,7 +148,7 @@ try {
 										<td>
 											<?php if ( $calendar->is_public ) : ?>
 												<span class="repro-ct-suite-badge repro-ct-suite-badge-success">
-													<?php esc_html_e( 'Öffentlich', 'repro-ct-suite' ); ?>
+													<?php esc_html_e( 'Ã–ffentlich', 'repro-ct-suite' ); ?>
 												</span>
 											<?php else : ?>
 												<span class="repro-ct-suite-badge repro-ct-suite-badge-secondary">
@@ -160,7 +160,7 @@ try {
 											<?php if ( ! empty( $calendar->color ) ) : ?>
 												<div style="display: inline-block; width: 30px; height: 20px; background-color: <?php echo esc_attr( $calendar->color ); ?>; border: 1px solid #ddd; border-radius: 3px;"></div>
 											<?php else : ?>
-												—
+												â€”
 											<?php endif; ?>
 										</td>
 									</tr>
@@ -178,13 +178,13 @@ try {
 
 					<script>
 					jQuery(document).ready(function($) {
-						$('#select-all-calendars').on('change', function() {
+						$('#select-all-calendars-sync').on('change', function() {
 							$('.calendar-checkbox').prop('checked', $(this).prop('checked'));
 						});
 						$('.calendar-checkbox').on('change', function() {
 							var totalCheckboxes = $('.calendar-checkbox').length;
 							var checkedCheckboxes = $('.calendar-checkbox:checked').length;
-							$('#select-all-calendars').prop('checked', totalCheckboxes === checkedCheckboxes);
+							$('#select-all-calendars-sync').prop('checked', totalCheckboxes === checkedCheckboxes);
 						});
 					});
 					</script>
@@ -200,7 +200,7 @@ try {
 			</div>
 			<div class="repro-ct-suite-card-body">
 				<p class="description">
-					<?php esc_html_e( 'Legen Sie fest, welcher Zeitraum bei der Synchronisation berücksichtigt werden soll.', 'repro-ct-suite' ); ?>
+					<?php esc_html_e( 'Legen Sie fest, welcher Zeitraum bei der Synchronisation berÃ¼cksichtigt werden soll.', 'repro-ct-suite' ); ?>
 				</p>
 				
 				<form method="post" action="">
@@ -226,7 +226,7 @@ try {
 										max="0"
 									>
 									<p class="description">
-										<?php esc_html_e( 'Tage in der Vergangenheit (negative Zahl, z.B. -7 für eine Woche zurück)', 'repro-ct-suite' ); ?>
+										<?php esc_html_e( 'Tage in der Vergangenheit (negative Zahl, z.B. -7 fÃ¼r eine Woche zurÃ¼ck)', 'repro-ct-suite' ); ?>
 									</p>
 								</td>
 							</tr>
@@ -247,7 +247,7 @@ try {
 										max="730"
 									>
 									<p class="description">
-										<?php esc_html_e( 'Tage in der Zukunft (z.B. 90 für drei Monate voraus)', 'repro-ct-suite' ); ?>
+										<?php esc_html_e( 'Tage in der Zukunft (z.B. 90 fÃ¼r drei Monate voraus)', 'repro-ct-suite' ); ?>
 									</p>
 								</td>
 							</tr>
@@ -287,19 +287,19 @@ try {
 			<div class="repro-ct-suite-card-body">
 				<?php if ( $selected_count === 0 ) : ?>
 					<div class="notice notice-warning inline">
-						<p><?php esc_html_e( 'Keine Kalender ausgewählt. Bitte wählen Sie mindestens einen Kalender aus.', 'repro-ct-suite' ); ?></p>
+						<p><?php esc_html_e( 'Keine Kalender ausgewÃ¤hlt. Bitte wÃ¤hlen Sie mindestens einen Kalender aus.', 'repro-ct-suite' ); ?></p>
 					</div>
 				<?php else : ?>
 					<p class="description">
 						<?php
 						printf(
-							esc_html__( 'Synchronisiert Termine und Events für %d ausgewählte Kalender im konfigurierten Zeitraum.', 'repro-ct-suite' ),
+							esc_html__( 'Synchronisiert Termine und Events fÃ¼r %d ausgewÃ¤hlte Kalender im konfigurierten Zeitraum.', 'repro-ct-suite' ),
 							(int) $selected_count
 						);
 						?>
 					</p>
 					<p class="description">
-						<?php esc_html_e( 'Der neue einheitliche Sync-Service importiert alle Termine aus den ausgewählten Kalendern in einem Schritt.', 'repro-ct-suite' ); ?>
+						<?php esc_html_e( 'Der neue einheitliche Sync-Service importiert alle Termine aus den ausgewÃ¤hlten Kalendern in einem Schritt.', 'repro-ct-suite' ); ?>
 					</p>
 					<p class="repro-ct-suite-mt-15">
 						<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-primary repro-ct-suite-sync-appointments-btn">
