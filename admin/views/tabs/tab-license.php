@@ -19,16 +19,50 @@ $license_expiry = get_option( 'repro_ct_suite_license_expiry', '' );
 ?>
 
 <div class="rcts-section">
-	<h2><?php esc_html_e( 'Lizenzverwaltung', 'repro-ct-suite' ); ?></h2>
+	<h2><?php esc_html_e( 'Lizenz & Unterstützung', 'repro-ct-suite' ); ?></h2>
 	
-	<div class="rcts-info-box">
+	<div class="rcts-info-box" style="background-color: #d4edda; border-left: 4px solid #28a745;">
+		<p>
+			<span class="dashicons dashicons-heart" style="color: #28a745;"></span>
+			<strong><?php esc_html_e( 'Aktuell wird keine Lizenz benötigt!', 'repro-ct-suite' ); ?></strong>
+		</p>
+		<p>
+			<?php esc_html_e( 'Dieses Plugin ist kostenlos nutzbar. Automatische Updates und alle Features stehen Ihnen ohne Lizenz zur Verfügung.', 'repro-ct-suite' ); ?>
+		</p>
+	</div>
+
+	<hr>
+
+	<div class="rcts-info-box" style="background-color: #fff3cd; border-left: 4px solid #ffc107;">
+		<h3 style="margin-top: 0;">
+			<span class="dashicons dashicons-heart" style="color: #dc3545;"></span>
+			<?php esc_html_e( 'Unterstützen Sie die Entwicklung', 'repro-ct-suite' ); ?>
+		</h3>
+		<p>
+			<?php esc_html_e( 'Die Entwicklung und Pflege dieses Plugins erfordert Zeit und Ressourcen. Wenn Sie das Plugin nützlich finden, würden wir uns über eine Spende freuen!', 'repro-ct-suite' ); ?>
+		</p>
+		<p>
+			<a href="https://feg-aschaffenburg.de/spenden/" target="_blank" rel="noopener" class="button button-primary" style="background-color: #dc3545; border-color: #dc3545;">
+				<span class="dashicons dashicons-heart" style="margin-top: 3px;"></span>
+				<?php esc_html_e( 'Jetzt spenden', 'repro-ct-suite' ); ?>
+			</a>
+			<a href="https://feg-aschaffenburg.de/kontakt/" target="_blank" rel="noopener" class="button button-secondary">
+				<span class="dashicons dashicons-email"></span>
+				<?php esc_html_e( 'Kontakt aufnehmen', 'repro-ct-suite' ); ?>
+			</a>
+		</p>
+	</div>
+
+	<hr style="display: none;">
+
+	<div class="rcts-info-box" style="display: none;">
 		<p>
 			<span class="dashicons dashicons-info"></span>
 			<?php esc_html_e( 'Verwalten Sie hier Ihre Plugin-Lizenz. Eine gültige Lizenz ist erforderlich für automatische Updates und Support.', 'repro-ct-suite' ); ?>
 		</p>
 	</div>
 
-	<form method="post" action="options.php" class="rcts-form">
+	<form method="post" action="options.php" class="rcts-form" style="display: none;">
 		<?php settings_fields( 'repro_ct_suite_license_group' ); ?>
 		
 		<table class="form-table">
@@ -113,11 +147,11 @@ $license_expiry = get_option( 'repro_ct_suite_license_expiry', '' );
 	</form>
 
 	<?php if ( ! empty( $license_key ) ) : ?>
-		<hr>
+		<hr style="display: none;">
 		
-		<h3><?php esc_html_e( 'Lizenzaktionen', 'repro-ct-suite' ); ?></h3>
+		<h3 style="display: none;"><?php esc_html_e( 'Lizenzaktionen', 'repro-ct-suite' ); ?></h3>
 		
-		<div class="rcts-button-group">
+		<div class="rcts-button-group" style="display: none;">
 			<?php if ( $license_status !== 'active' ) : ?>
 				<button type="button" id="activate-license" class="button button-primary">
 					<span class="dashicons dashicons-yes"></span>
@@ -142,18 +176,22 @@ $license_expiry = get_option( 'repro_ct_suite_license_expiry', '' );
 	<hr>
 
 	<div class="rcts-info-box" style="margin-top: 20px;">
-		<h3><?php esc_html_e( 'Lizenz erwerben', 'repro-ct-suite' ); ?></h3>
+		<h3><?php esc_html_e( 'Weitere Informationen', 'repro-ct-suite' ); ?></h3>
 		<p>
-			<?php esc_html_e( 'Sie haben noch keine Lizenz? Erwerben Sie eine Lizenz, um Zugriff auf automatische Updates und Premium-Support zu erhalten.', 'repro-ct-suite' ); ?>
+			<?php esc_html_e( 'Haben Sie Fragen, Anregungen oder benötigen Sie Hilfe? Wir sind für Sie da!', 'repro-ct-suite' ); ?>
 		</p>
 		<p>
-			<a href="https://feg-aschaffenburg.de/produkt/churchtools-suite/" target="_blank" rel="noopener" class="button button-primary">
-				<span class="dashicons dashicons-cart"></span>
-				<?php esc_html_e( 'Lizenz kaufen', 'repro-ct-suite' ); ?>
+			<a href="https://feg-aschaffenburg.de/kontakt/" target="_blank" rel="noopener" class="button button-secondary">
+				<span class="dashicons dashicons-email"></span>
+				<?php esc_html_e( 'Kontakt', 'repro-ct-suite' ); ?>
 			</a>
-			<a href="https://feg-aschaffenburg.de/support/" target="_blank" rel="noopener" class="button button-secondary">
+			<a href="https://github.com/FEGAschaffenburg/repro-ct-suite" target="_blank" rel="noopener" class="button button-secondary">
+				<span class="dashicons dashicons-github" style="font-family: dashicons;"></span>
+				<?php esc_html_e( 'GitHub Repository', 'repro-ct-suite' ); ?>
+			</a>
+			<a href="https://github.com/FEGAschaffenburg/repro-ct-suite/issues" target="_blank" rel="noopener" class="button button-secondary">
 				<span class="dashicons dashicons-sos"></span>
-				<?php esc_html_e( 'Support kontaktieren', 'repro-ct-suite' ); ?>
+				<?php esc_html_e( 'Issue melden', 'repro-ct-suite' ); ?>
 			</a>
 		</p>
 	</div>

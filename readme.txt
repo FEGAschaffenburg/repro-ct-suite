@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.6.0
+Stable tag: 0.9.6.1
 
 License: GPLv2 or later
 
@@ -147,6 +147,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 == Changelog ==
 
 
+
+= 0.9.6.1 - 2024-12-08 =
+* Update: Lizenz-Tab zeigt Spendenaufruf statt Lizenzverwaltung
+* Feature: Plugin ist kostenlos nutzbar ohne Lizenz
+* Feature: Direkter Spendenlink zu /spenden/
+* Info: Alle Features ohne Lizenz verfügbar
 
 = 0.9.6.0 - 2024-12-08 =
 * Fix: Debug-Tab JavaScript wird jetzt korrekt geladen
@@ -1270,6 +1276,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 = 1.0.0 =
 
 * Legacy-Placeholder (veraltet)
+
 
 
 
