@@ -77,16 +77,20 @@ $tables_info = array_filter( $tables_info, function( $info ) {
 	return true;
 } );
 
-// DEBUG: Prüfe auf ungewöhnliche Tabellen (mehr als erwartet)
+// DEBUG: Prüfe auf UNBEKANNTE Tabellen (nicht in $tables_info definiert)
 $debug_all_plugin_tables = $wpdb->get_results( "SHOW TABLES LIKE '%rcts_%'" );
-$debug_table_list = array();
+$known_tables = array_column( $tables_info, 'table' );
+$unknown_tables = array();
+
 foreach ( $debug_all_plugin_tables as $table ) {
 	$table_name = array_values( (array) $table )[0];
-	$debug_table_list[] = $table_name;
+	if ( ! in_array( $table_name, $known_tables, true ) ) {
+		$unknown_tables[] = $table_name;
+	}
 }
 
-// Zeige Warnung wenn mehr als 4 Tabellen gefunden wurden
-$show_debug_info = count( $debug_table_list ) > 4;
+// Zeige Warnung nur wenn UNBEKANNTE Tabellen gefunden wurden
+$show_debug_info = ! empty( $unknown_tables );
 
 // DB-Version abrufen
 $current_db_version = get_option( 'repro_ct_suite_db_version', '0' );
@@ -197,18 +201,18 @@ if ( $log_exists && $log_size > 0 ) {
 	</div>
 
 	<?php if ( $show_debug_info ) : ?>
-	<!-- Debug-Warnung: Ungewöhnliche Tabellen gefunden -->
-	<div class="repro-ct-suite-card repro-ct-suite-mt-20" style="border-left: 4px solid #ff9800;">
-		<div class="repro-ct-suite-card-header" style="background-color: #fff3cd;">
-			<span class="dashicons dashicons-warning" style="color: #ff9800;"></span>
-			<h2 style="color: #856404;"><?php esc_html_e( 'Debug-Warnung: Zusätzliche Tabellen gefunden', 'repro-ct-suite' ); ?></h2>
+	<!-- Debug-Warnung: Unbekannte Tabellen gefunden -->
+	<div class="repro-ct-suite-card repro-ct-suite-mt-20" style="border-left: 4px solid #dc3545;">
+		<div class="repro-ct-suite-card-header" style="background-color: #f8d7da;">
+			<span class="dashicons dashicons-warning" style="color: #dc3545;"></span>
+			<h2 style="color: #721c24;"><?php esc_html_e( 'Debug-Warnung: Unbekannte Tabellen gefunden', 'repro-ct-suite' ); ?></h2>
 		</div>
 		<div class="repro-ct-suite-card-body">
-			<p style="color: #856404;">
-				<strong><?php esc_html_e( 'Es wurden mehr Plugin-Tabellen gefunden als erwartet:', 'repro-ct-suite' ); ?></strong>
+			<p style="color: #721c24;">
+				<strong><?php esc_html_e( 'Es wurden unbekannte Plugin-Tabellen in der Datenbank gefunden:', 'repro-ct-suite' ); ?></strong>
 			</p>
 			<div style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">
-				<?php foreach ( $debug_table_list as $table_name ) : ?>
+				<?php foreach ( $unknown_tables as $table_name ) : ?>
 					<div><?php echo esc_html( $table_name ); ?></div>
 				<?php endforeach; ?>
 			</div>

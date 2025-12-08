@@ -2757,7 +2757,7 @@ class Repro_CT_Suite_Admin {
 			'rcts_event_services'  => $wpdb->prefix . 'rcts_event_services',
 
 			'rcts_schedule'        => $wpdb->prefix . 'rcts_schedule',
-
+			'rcts_shortcode_presets' => $wpdb->prefix . 'rcts_shortcode_presets',
 		);
 
 
@@ -4421,6 +4421,7 @@ class Repro_CT_Suite_Admin {
 			'rcts_events' => $wpdb->prefix . 'rcts_events',
 			'rcts_event_services' => $wpdb->prefix . 'rcts_event_services',
 			'rcts_schedule' => $wpdb->prefix . 'rcts_schedule',
+			'rcts_shortcode_presets' => $wpdb->prefix . 'rcts_shortcode_presets',
 		);
 
 		if ( ! isset( $tables_map[ $table_key ] ) ) {
