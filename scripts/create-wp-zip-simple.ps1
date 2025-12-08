@@ -21,8 +21,24 @@ if (Test-Path $OutputZip) { Remove-Item -Force $OutputZip }
 # Create temp dir structure
 New-Item -ItemType Directory -Path $PluginDir -Force | Out-Null
 
-# Copy files
-$ExcludeItems = @('.git', '.gitignore', 'repro-ct-suite*.zip', '*.log')
+# Copy files - Exclude development files
+$ExcludeItems = @(
+    '.git',
+    '.github',
+    '.gitignore',
+    '.editorconfig',
+    '.gitattributes',
+    'scripts',
+    'tests',
+    'node_modules',
+    'repro-ct-suite*.zip',
+    '*.log',
+    '.vscode',
+    '.idea',
+    'phpunit.xml',
+    'phpcs.xml',
+    '.phpcs.xml.dist'
+)
 
 Write-Host "Copying files..."
 Get-ChildItem -Path $RepoRoot -Force | Where-Object {
@@ -42,6 +58,7 @@ Get-ChildItem -Path $RepoRoot -Force | Where-Object {
     } else {
         Copy-Item -Path $_.FullName -Destination $dest -Force
     }
+    Write-Host "  Copied: $($_.Name)" -ForegroundColor Gray
 }
 
 # Create ZIP with proper forward slashes for WordPress compatibility
