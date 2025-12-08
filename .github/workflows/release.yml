@@ -12,6 +12,8 @@ jobs:
   build-and-publish:
     name: Build ZIP and publish release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,30 +30,15 @@ jobs:
           echo "Creating ZIP for version: $VERSION"
           ./scripts/create-release-zip.sh "$VERSION"
 
-      - name: Set version output
-        id: vars
+      - name: Create GitHub Release with ZIP
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: ${{ github.ref_name }}
-          body: "Automated release for ${{ github.ref_name }}"
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload release ZIP asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: repro-ct-suite-${{ steps.vars.outputs.version }}-fs.zip
-          asset_name: repro-ct-suite-${{ steps.vars.outputs.version }}-fs.zip
-          asset_content_type: application/zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZIP_FILE="repro-ct-suite-${VERSION}-fs.zip"
+          
+          # Create release and upload asset
+          gh release create "$GITHUB_REF_NAME" \
+            "$ZIP_FILE" \
+            --title "$GITHUB_REF_NAME" \
+            --notes "Automated release for $GITHUB_REF_NAME"
