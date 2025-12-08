@@ -469,22 +469,21 @@ class Repro_CT_Suite_Admin {
 
 			plugin_dir_url( __FILE__ ) . 'css/repro-ct-suite-admin.css',
 
-			array(),
 
-			null,
+		array(),
 
-			'all'
+		$this->version,
 
-		);
-		wp_enqueue_style(
-			$this->plugin_name . '-modal',
-			plugin_dir_url( __FILE__ ) . 'css/repro-ct-suite-modal.css',
-			array(),
-			null,
-			'all'
-		);
+		'all'
 
-
+	);
+	wp_enqueue_style(
+		$this->plugin_name . '-modal',
+		plugin_dir_url( __FILE__ ) . 'css/repro-ct-suite-modal.css',
+		array(),
+		$this->version,
+		'all'
+	);
 
 		// Shortcode Manager Styles (nur auf Shortcode Manager Seite)
 
@@ -636,20 +635,18 @@ class Repro_CT_Suite_Admin {
 
 				array( 'jquery' ),
 
-				null,
+			$this->version,
 
-				false
+			false
 
-			);
-			wp_enqueue_script(
-				$this->plugin_name . '-debug-extensions',
-				plugin_dir_url( __FILE__ ) . 'js/repro-ct-suite-debug-extensions.js',
-				array( 'jquery', $this->plugin_name . '-debug' ),
-				null,
-				false
-			);
-
-		}
+		);
+		wp_enqueue_script(
+			$this->plugin_name . '-debug-extensions',
+			plugin_dir_url( __FILE__ ) . 'js/repro-ct-suite-debug-extensions.js',
+			array( 'jquery', $this->plugin_name . '-debug' ),
+			$this->version,
+			false
+		);		}
 
 
 

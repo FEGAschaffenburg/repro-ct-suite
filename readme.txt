@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.5.3
+Stable tag: 0.9.5.4
 
 License: GPLv2 or later
 
@@ -147,6 +147,10 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 == Changelog ==
 
 
+
+= 0.9.5.4 - 2024-12-08 =
+* Fix: Cache-Versionierung für Debug-JavaScript
+* Test: Update-Mechanismus und neue Debug-Funktionen
 
 = 0.9.5.3 - 2024-12-08 =
 * Neu: Debug-Funktion zum Anzeigen einzelner Datensätze in Tabellen
@@ -1238,6 +1242,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 = 1.0.0 =
 
 * Legacy-Placeholder (veraltet)
+
 
 
 
