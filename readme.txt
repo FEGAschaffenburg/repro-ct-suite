@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.5.8
+Stable tag: 0.9.5.9
 
 License: GPLv2 or later
 
@@ -147,6 +147,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 == Changelog ==
 
 
+
+= 0.9.5.9 - 2024-12-08 =
+* Fix: Updater-Hook nur noch bei privatem Repository registriert
+* Fix: Verhindert Konflikte bei öffentlichen Downloads
+* Hinweis: Bei Upload-Problemen manuelle FTP-Installation verwenden
 
 = 0.9.5.8 - 2024-12-08 =
 * Fix: Kritischer Bugfix im Updater - Updates funktionieren jetzt korrekt
@@ -1260,6 +1265,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 = 1.0.0 =
 
 * Legacy-Placeholder (veraltet)
+
 
 
 

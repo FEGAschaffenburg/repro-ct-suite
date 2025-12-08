@@ -158,25 +158,31 @@ class Repro_CT_Suite_Updater {
 
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		}
+	}
 
-		$this->plugin_data = get_plugin_data( $plugin_file );
+	$this->plugin_data = get_plugin_data( $plugin_file );
 
 
 
-		// Hooks registrieren.
+	// Hooks registrieren.
 
-		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
+	add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
 
-		add_filter( 'plugins_api', array( $this, 'plugin_info' ), 20, 3 );
+	add_filter( 'plugins_api', array( $this, 'plugin_info' ), 20, 3 );
 
-		add_filter( 'upgrader_post_install', array( $this, 'after_install' ), 10, 3 );
+	add_filter( 'upgrader_post_install', array( $this, 'after_install' ), 10, 3 );
+
+	
+
+	// Download-Hook nur registrieren wenn Access Token vorhanden ist
+
+	if ( ! empty( $this->access_token ) ) {
 
 		add_filter( 'upgrader_pre_download', array( $this, 'download_package' ), 10, 3 );
 
 	}
 
-
+}
 
 	/**
 
