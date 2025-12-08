@@ -1,11 +1,12 @@
 name: Build and publish release
 
-# Deaktiviert - Manuelle Releases werden bevorzugt
+# Automatisches Release bei Version-Tags
 on:
-  workflow_dispatch: # Nur manuell ausführbar
-  # push:
-  #   tags:
-  #     - 'v*.*.*.*'
+  workflow_dispatch: # Auch manuell ausführbar
+  push:
+    tags:
+      - 'v*.*.*.*'
+      - 'v*.*.*'
 
 jobs:
   build-and-publish:
