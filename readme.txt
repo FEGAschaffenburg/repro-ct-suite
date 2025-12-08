@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.6.4
+Stable tag: 0.9.6.5
 
 License: GPLv2 or later
 
@@ -146,6 +146,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 == Changelog ==
 
+
+= 0.9.6.5 - 2024-12-08 =
+* Fix: Gutenberg Block - apiVersion 3 hinzugefügt (behebt WordPress 6.3+ Warnung)
+* Fix: Doppelte IDs behoben - select-all-calendars jetzt eindeutig (settings/sync)
+* Verbesserung: Browser-Konsolenfehler eliminiert
+* Optimierung: Alle Checkbox-IDs sind jetzt eindeutig über alle Tabs hinweg
 
 = 0.9.6.4 - 2024-12-08 =
 * Fix: "Leeren"-Button funktioniert jetzt für Shortcode-Vorlagen (rcts_shortcode_presets)
