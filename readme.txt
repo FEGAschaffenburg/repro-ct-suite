@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.6.5
+Stable tag: 0.9.6.6
 
 License: GPLv2 or later
 
@@ -146,6 +146,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 == Changelog ==
 
+
+= 0.9.6.6 - 2024-12-08 =
+* Fix: KRITISCH - Debug-Buttons "Leeren" und "Anzeigen" funktionierten nicht
+* Fix: JavaScript-Initialisierung prüft jetzt auch auf tab=debug URL-Parameter
+* Ursache: URL-Check war zu spezifisch (nur 'repro-ct-suite-debug', nicht 'tab=debug')
+* Betroffen: Beide Debug-JavaScript-Dateien (debug.js + debug-extensions.js)
 
 = 0.9.6.5 - 2024-12-08 =
 * Fix: Gutenberg Block - apiVersion 3 hinzugefügt (behebt WordPress 6.3+ Warnung)
