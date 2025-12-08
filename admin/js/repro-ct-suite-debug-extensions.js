@@ -1,5 +1,5 @@
-/**
- * Debug-Seite JavaScript - Erweiterungen für Einzellöschung und Plugin-Reset
+﻿/**
+ * Debug-Seite JavaScript - Erweiterungen fÃ¼r EinzellÃ¶schung und Plugin-Reset
  *
  * @package Repro_CT_Suite
  * @version 0.9.5.3
@@ -8,7 +8,7 @@
 (function( $ ) {
 	'use strict';
 
-	// Warte bis ReproCTSuiteDebug verfügbar ist
+	// Warte bis ReproCTSuiteDebug verfÃ¼gbar ist
 	$(function() {
 		if (typeof window.ReproCTSuiteDebug === 'undefined') {
 			console.error('ReproCTSuiteDebug nicht gefunden');
@@ -18,19 +18,19 @@
 		const Debug = window.ReproCTSuiteDebug;
 
 		/**
-		 * Handler für Tabelleneinträge anzeigen
+		 * Handler fÃ¼r TabelleneintrÃ¤ge anzeigen
 		 */
 		Debug.initViewTableEntriesHandler = function() {
 			const self = this;
 
-			// Modal schließen
+			// Modal schlieÃŸen
 			$(document).on('click', '.repro-ct-suite-modal-close, .repro-ct-suite-modal', function(e) {
 				if (e.target === this) {
 					$('#repro-ct-suite-table-entries-modal').hide();
 				}
 			});
 
-			// Tabelleneinträge anzeigen
+			// TabelleneintrÃ¤ge anzeigen
 			$('.repro-ct-suite-view-table-entries').on('click', function(e) {
 				e.preventDefault();
 				
@@ -39,8 +39,8 @@
 				const label = $button.data('label');
 				const nonce = $button.data('nonce');
 				
-				// Modal öffnen
-				$('#repro-ct-suite-modal-title').text(label + ' - Einträge');
+				// Modal Ã¶ffnen
+				$('#repro-ct-suite-modal-title').text(label + ' - EintrÃ¤ge');
 				$('#repro-ct-suite-entries-loader').show();
 				$('#repro-ct-suite-entries-content').hide();
 				$('#repro-ct-suite-table-entries-modal').show();
@@ -71,13 +71,13 @@
 		};
 
 		/**
-		 * Rendert die Tabelleneinträge
+		 * Rendert die TabelleneintrÃ¤ge
 		 */
 		Debug.renderTableEntries = function(data, table, nonce) {
 			$('#repro-ct-suite-entries-loader').hide();
 			
 			if (!data.entries || data.entries.length === 0) {
-				$('#repro-ct-suite-entries-content').html('<p>Keine Einträge gefunden.</p>').show();
+				$('#repro-ct-suite-entries-content').html('<p>Keine EintrÃ¤ge gefunden.</p>').show();
 				return;
 			}
 
@@ -100,21 +100,21 @@
 					}
 					html += '<td>' + value + '</td>';
 				});
-				html += '<td><button class="button button-small button-link-delete repro-ct-suite-delete-entry" data-entry-id="' + entry.id + '" data-table="' + table + '" data-nonce="' + nonce + '">Löschen</button></td>';
+				html += '<td><button class="button button-small button-link-delete repro-ct-suite-delete-entry" data-entry-id="' + entry.id + '" data-table="' + table + '" data-nonce="' + nonce + '">LÃ¶schen</button></td>';
 				html += '</tr>';
 			});
 			
 			html += '</tbody></table></div>';
-			html += '<p class="description" style="margin-top: 10px;">Angezeigt: ' + data.total + ' Einträge (max. 100)</p>';
+			html += '<p class="description" style="margin-top: 10px;">Angezeigt: ' + data.total + ' EintrÃ¤ge (max. 100)</p>';
 			
 			$('#repro-ct-suite-entries-content').html(html).show();
 			
-			// Event-Handler für Löschen-Buttons
+			// Event-Handler fÃ¼r LÃ¶schen-Buttons
 			this.initDeleteEntryHandlers();
 		};
 
 		/**
-		 * Handler für einzelne Einträge löschen
+		 * Handler fÃ¼r einzelne EintrÃ¤ge lÃ¶schen
 		 */
 		Debug.initDeleteEntryHandlers = function() {
 			const self = this;
@@ -127,11 +127,11 @@
 				const table = $button.data('table');
 				const nonce = $button.data('nonce');
 				
-				if (!confirm('Eintrag #' + entryId + ' wirklich löschen?')) {
+				if (!confirm('Eintrag #' + entryId + ' wirklich lÃ¶schen?')) {
 					return;
 				}
 				
-				$button.prop('disabled', true).text('Lösche...');
+				$button.prop('disabled', true).text('LÃ¶sche...');
 				
 				$.ajax({
 					url: ajaxurl,
@@ -147,9 +147,9 @@
 							$button.closest('tr').fadeOut(300, function() {
 								$(this).remove();
 								
-								// Prüfen ob Tabelle leer ist
+								// PrÃ¼fen ob Tabelle leer ist
 								if ($('#repro-ct-suite-entries-content table tbody tr:visible').length === 0) {
-									$('#repro-ct-suite-entries-content').html('<p>Alle Einträge gelöscht.</p>');
+									$('#repro-ct-suite-entries-content').html('<p>Alle EintrÃ¤ge gelÃ¶scht.</p>');
 									
 									// Nach 2 Sekunden Seite neu laden
 									setTimeout(function() {
@@ -160,19 +160,19 @@
 							self.showNotice(response.data.message, 'success');
 						} else {
 							self.showNotice(response.data.message, 'error');
-							$button.prop('disabled', false).text('Löschen');
+							$button.prop('disabled', false).text('LÃ¶schen');
 						}
 					},
 					error: function(xhr, status, error) {
 						self.showNotice('Verbindungsfehler: ' + error, 'error');
-						$button.prop('disabled', false).text('Löschen');
+						$button.prop('disabled', false).text('LÃ¶schen');
 					}
 				});
 			});
 		};
 
 		/**
-		 * Handler für vollständigen Plugin-Reset
+		 * Handler fÃ¼r vollstÃ¤ndigen Plugin-Reset
 		 */
 		Debug.initFullResetHandler = function() {
 			const self = this;
@@ -183,12 +183,12 @@
 				const $button = $(this);
 				const nonce = $button.data('nonce');
 				
-				if (!confirm('⚠️ ACHTUNG: Dies setzt das gesamte Plugin zurück!\n\nFolgende Daten werden gelöscht:\n- Alle Tabellendaten (Kalender, Events, Services, Schedule)\n- ChurchTools Zugangsdaten\n- Synchronisations-Zeitstempel\n- Alle Plugin-Einstellungen\n\nDieser Vorgang kann NICHT rückgängig gemacht werden!\n\nMöchten Sie wirklich fortfahren?')) {
+				if (!confirm('âš ï¸ ACHTUNG: Dies setzt das gesamte Plugin zurÃ¼ck!\n\nFolgende Daten werden gelÃ¶scht:\n- Alle Tabellendaten (Kalender, Events, Services, Schedule)\n- ChurchTools Zugangsdaten\n- Synchronisations-Zeitstempel\n- Alle Plugin-Einstellungen\n\nDieser Vorgang kann NICHT rÃ¼ckgÃ¤ngig gemacht werden!\n\nMÃ¶chten Sie wirklich fortfahren?')) {
 					return;
 				}
 				
-				// Zweite Bestätigung
-				if (!confirm('🚨 Sind Sie ABSOLUT SICHER?\n\nDas Plugin wird komplett zurückgesetzt und Sie müssen alle Einstellungen neu vornehmen!')) {
+				// Zweite BestÃ¤tigung
+				if (!confirm('ðŸš¨ Sind Sie ABSOLUT SICHER?\n\nDas Plugin wird komplett zurÃ¼ckgesetzt und Sie mÃ¼ssen alle Einstellungen neu vornehmen!')) {
 					return;
 				}
 				
@@ -223,7 +223,7 @@
 		};
 
 		// Initialisiere neue Handler
-		if ($('.repro-ct-suite-admin-wrapper').length && window.location.href.indexOf('repro-ct-suite-debug') !== -1) {
+		if ($('.repro-ct-suite-admin-wrapper').length && (window.location.href.indexOf('repro-ct-suite-debug') !== -1 || window.location.href.indexOf('tab=debug') !== -1)) {
 			Debug.initViewTableEntriesHandler();
 			Debug.initFullResetHandler();
 		}

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Debug-Seite JavaScript
  *
  * Behandelt AJAX-Interaktionen auf der Debug-Seite.
@@ -24,7 +24,7 @@
 		},
 
 		/**
-		 * Handler für Tabellen-Reset
+		 * Handler fÃ¼r Tabellen-Reset
 		 */
 		initClearTableHandlers: function() {
 			const self = this;
@@ -39,7 +39,7 @@
 				const label = $button.data('label');
 				const nonce = $button.data('nonce');
 				
-				if (!confirm('WARNUNG: Alle Daten in der Tabelle "' + label + '" werden unwiderruflich gelöscht!\n\nMöchten Sie fortfahren?')) {
+				if (!confirm('WARNUNG: Alle Daten in der Tabelle "' + label + '" werden unwiderruflich gelÃ¶scht!\n\nMÃ¶chten Sie fortfahren?')) {
 					return;
 				}
 				
@@ -81,7 +81,7 @@
 				const $result = $('#repro-ct-suite-clear-result');
 				const nonce = $button.data('nonce');
 				
-				if (!confirm('WARNUNG: ALLE synchronisierten Daten werden unwiderruflich gelöscht!\n\nTabellen die geleert werden:\n- rcts_events\n- rcts_appointments\n- rcts_calendars\n- rcts_event_services\n\nMöchten Sie wirklich fortfahren?')) {
+				if (!confirm('WARNUNG: ALLE synchronisierten Daten werden unwiderruflich gelÃ¶scht!\n\nTabellen die geleert werden:\n- rcts_events\n- rcts_appointments\n- rcts_calendars\n- rcts_event_services\n\nMÃ¶chten Sie wirklich fortfahren?')) {
 					return;
 				}
 				
@@ -138,7 +138,7 @@
 		},
 
 		/**
-		 * Handler für DB-Migrationen
+		 * Handler fÃ¼r DB-Migrationen
 		 */
 		initMigrationHandler: function() {
 			const self = this;
@@ -150,7 +150,7 @@
 				const $result = $('#repro-ct-suite-migration-result');
 				const nonce = $button.data('nonce');
 				
-				if (!confirm('Datenbank-Migrationen jetzt ausführen?\n\nDies kann Änderungen an der Datenbank-Struktur vornehmen.')) {
+				if (!confirm('Datenbank-Migrationen jetzt ausfÃ¼hren?\n\nDies kann Ã„nderungen an der Datenbank-Struktur vornehmen.')) {
 					return;
 				}
 				
@@ -234,7 +234,7 @@
 		},
 
 		/**
-		 * Handler für Log-Funktionen
+		 * Handler fÃ¼r Log-Funktionen
 		 */
 		initLogHandlers: function() {
 			const self = this;
@@ -264,13 +264,13 @@
 							return this.nodeType === 3; // Text-Node
 						}).text().trim();
 						
-						// Button temporär ändern
+						// Button temporÃ¤r Ã¤ndern
 						originalIcon.removeClass('dashicons-clipboard').addClass('dashicons-yes');
 						$button.contents().filter(function() {
 							return this.nodeType === 3;
 						}).replaceWith(' Kopiert!');
 						
-						// Nach 2 Sekunden zurücksetzen
+						// Nach 2 Sekunden zurÃ¼cksetzen
 						setTimeout(function() {
 							originalIcon.removeClass('dashicons-yes').addClass('dashicons-clipboard');
 							$button.contents().filter(function() {
@@ -282,7 +282,7 @@
 						self.showNotice('Fehler beim Kopieren: ' + err, 'error');
 					});
 				} else {
-					// Fallback für ältere Browser
+					// Fallback fÃ¼r Ã¤ltere Browser
 					const textarea = document.createElement('textarea');
 					textarea.value = logText;
 					textarea.style.position = 'fixed';
@@ -298,7 +298,7 @@
 							self.showNotice('Kopieren fehlgeschlagen', 'error');
 						}
 					} catch (err) {
-						self.showNotice('Kopieren nicht unterstützt: ' + err, 'error');
+						self.showNotice('Kopieren nicht unterstÃ¼tzt: ' + err, 'error');
 					}
 					
 					document.body.removeChild(textarea);
@@ -382,7 +382,7 @@
 				});
 			}, 5000);
 			
-			// Schließen-Button
+			// SchlieÃŸen-Button
 			$notice.on('click', function() {
 				$(this).slideUp(300, function() {
 					$(this).remove();
@@ -398,7 +398,7 @@
 				$button.data('original-text', $button.html());
 				$button
 					.prop('disabled', true)
-					.html('<span class="repro-ct-suite-spinner"></span> Lädt...')
+					.html('<span class="repro-ct-suite-spinner"></span> LÃ¤dt...')
 					.css('opacity', '0.7');
 			} else {
 				$button
@@ -413,8 +413,8 @@
 	 * Initialisierung beim Document Ready
 	 */
 	$(function() {
-		// Nur auf der Debug-Seite ausführen
-		if ($('.repro-ct-suite-admin-wrapper').length && window.location.href.indexOf('repro-ct-suite-debug') !== -1) {
+		// Nur auf der Debug-Seite ausfÃ¼hren
+		if ($('.repro-ct-suite-admin-wrapper').length && (window.location.href.indexOf('repro-ct-suite-debug') !== -1 || window.location.href.indexOf('tab=debug') !== -1)) {
 			ReproCTSuiteDebug.init();
 		}
 	});
