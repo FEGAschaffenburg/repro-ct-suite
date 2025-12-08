@@ -2,14 +2,20 @@
 /**
  * Migration V10: Shortcode Manager Erweiterungen
  * Fügt neue Felder zur rcts_shortcode_presets Tabelle hinzu
+ * 
+ * HINWEIS: Diese Datei ist nur eine Referenz/Dokumentation.
+ * Der eigentliche Code sollte in class-repro-ct-suite-migrations.php implementiert werden.
  */
 
-// Einfügen in class-repro-ct-suite-migrations.php nach migrate_v9()
-
 /**
+ * Beispiel-Implementierung der Migration V10
+ * 
+ * Einfügen in class-repro-ct-suite-migrations.php nach migrate_v9()
+ * 
  * Migration V10: Erweitere Shortcode-Presets Tabelle
  * Fügt neue Felder für Shortcode Manager v0.9.5 hinzu
  */
+/*
 private static function migrate_v10() {
 	global $wpdb;
 	$presets_table = $wpdb->prefix . 'rcts_shortcode_presets';
@@ -46,16 +52,15 @@ private static function migrate_v10() {
 	foreach ( $presets as $preset ) {
 		$shortcode_tag = 'ct_' . sanitize_title( $preset->name );
 		$wpdb->update(
-			$presets_table,
-			array( 'shortcode_tag' => $shortcode_tag ),
-			array( 'id' => $preset->id )
-		);
-	}
-	
-	error_log( 'Migration V10: Shortcode Manager Erweiterungen abgeschlossen' );
+		$presets_table,
+		array( 'shortcode_tag' => $shortcode_tag ),
+		array( 'id' => $preset->id )
+	);
 }
 
-// Auch die migrate() Methode erweitern um V10 aufzurufen:
+error_log( 'Migration V10: Shortcode Manager Erweiterungen abgeschlossen' );
+}
+*/// Auch die migrate() Methode erweitern um V10 aufzurufen:
 // Nach dem V9 Block:
 if ( version_compare( $current, '10', '<' ) ) {
 	self::migrate_v10();

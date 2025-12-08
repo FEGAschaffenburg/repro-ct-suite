@@ -100,7 +100,7 @@ class Repro_CT_Suite {
 
 	 */
 
-	private function load_dependencies() {
+	private function load_dependencies(): void {
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-loader.php';
 
@@ -140,7 +140,7 @@ class Repro_CT_Suite {
 
 	 */
 
-	private function set_locale() {
+	private function set_locale(): void {
 
 		$plugin_i18n = new Repro_CT_Suite_i18n();
 
@@ -156,7 +156,7 @@ class Repro_CT_Suite {
 
 	 */
 
-	private function define_admin_hooks() {
+	private function define_admin_hooks(): void {
 
 		$plugin_admin = new Repro_CT_Suite_Admin( $this->get_plugin_name(), $this->get_version() );
 
@@ -218,7 +218,7 @@ class Repro_CT_Suite {
 
 	 */
 
-	private function define_public_hooks() {
+	private function define_public_hooks(): void {
 
 		$plugin_public = new Repro_CT_Suite_Public( $this->get_plugin_name(), $this->get_version() );
 
@@ -238,7 +238,7 @@ class Repro_CT_Suite {
 
 	 */
 
-	public function run() {
+	public function run(): void {
 
 		$this->loader->run();
 
@@ -256,7 +256,7 @@ class Repro_CT_Suite {
 
 	 */
 
-	public function get_plugin_name() {
+	public function get_plugin_name(): string {
 
 		return $this->plugin_name;
 
@@ -274,7 +274,7 @@ class Repro_CT_Suite {
 
 	 */
 
-	public function get_loader() {
+	public function get_loader(): object {
 
 		return $this->loader;
 
@@ -292,11 +292,19 @@ class Repro_CT_Suite {
 
 	 */
 
-	public function get_version() {
+	public function get_version(): string {
 
 		return $this->version;
 
 	}
 
 }
+
+
+
+
+
+
+
+
 

@@ -868,6 +868,11 @@ class Repro_CT_Suite_Admin {
 			'stats' => $result,
 		) );
 	}
+	
+
+	private function sync_appointments_deprecated() {
+		try {
+			Repro_CT_Suite_Logger::log( 'Dependencies werden geladen (appointments)...' );
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-appointments-repository.php';
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-schedule-repository.php';
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-events-sync-service.php';

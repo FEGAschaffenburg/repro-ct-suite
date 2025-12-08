@@ -13,7 +13,7 @@ class Repro_CT_Suite_Event_Services_Repository extends Repro_CT_Suite_Repository
 		parent::__construct( $wpdb->prefix . 'rcts_event_services' );
 	}
 
-	public function upsert( $data ) {
+	public function upsert( array $data ): int|false {
 		$defaults = array(
 			'event_id'      => null,
 			'external_id'   => null,
@@ -45,7 +45,12 @@ class Repro_CT_Suite_Event_Services_Repository extends Repro_CT_Suite_Repository
 		return (int) $this->db->insert_id;
 	}
 
-	public function get_for_event( $event_id ) {
+	public function get_for_event( int $event_id ): array {
 		return $this->db->get_results( $this->db->prepare( "SELECT * FROM {$this->table} WHERE event_id=%d ORDER BY start_datetime IS NULL, start_datetime ASC", $event_id ) );
 	}
 }
+
+
+
+
+

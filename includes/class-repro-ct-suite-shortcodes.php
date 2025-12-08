@@ -108,7 +108,7 @@ class Repro_CT_Suite_Shortcodes {
 
 	 */
 
-	public function render_events( $atts ) {
+	public function render_events( array $atts ): string {
 
 		// Debug Start
 		Repro_CT_Suite_Logger::log( 'SHORTCODE RENDER START: ' . print_r($atts, true), 'info' );
@@ -233,7 +233,7 @@ class Repro_CT_Suite_Shortcodes {
 
 	 */
 
-	private function get_events( $atts ) {
+	private function get_events( array $atts ): array {
 
 		global $wpdb;
 
@@ -405,7 +405,7 @@ class Repro_CT_Suite_Shortcodes {
 
 	 */
 
-	private function get_template_name( $view ) {
+	private function get_template_name( string $view ): string {
 
 		$templates = array(
 
@@ -443,7 +443,7 @@ class Repro_CT_Suite_Shortcodes {
 
 	 */
 
-	private function load_preset_by_name( $preset_name ) {
+	private function load_preset_by_name( string $preset_name ): ?array {
 
 		global $wpdb;
 
@@ -544,6 +544,13 @@ class Repro_CT_Suite_Shortcodes {
 	}
 
 }
+
+
+
+
+
+
+
 
 
 

@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.5
+Stable tag: 0.9.5.2
 
 License: GPLv2 or later
 
@@ -145,6 +145,18 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 
 == Changelog ==
+
+
+
+= 0.9.5.2 - 2024-12-08 =
+
+* Code-Verbesserungen: PHP 7.4+ Type Hints für bessere Code-Qualität
+
+* Refactoring: Repository- und Service-Klassen mit strikter Typisierung
+
+* Wartung: Code-Formatierung und Konsistenz-Verbesserungen
+
+* Optimierung: Verbesserte Fehlerbehandlung in allen Service-Klassen
 
 
 

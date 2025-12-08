@@ -40,7 +40,7 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     /**
      * Security check helper
      */
-    private function verify_request() {
+    private function verify_request(): bool {
         Repro_CT_Suite_Logger::log('Security Check: Nonce = ' . ($_POST['nonce'] ?? 'nicht vorhanden'), 'info');
         
         if (!wp_verify_nonce($_POST['nonce'], 'sm_ajax_nonce')) {
@@ -62,7 +62,7 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     /**
      * Get all shortcode presets
      */
-    public function get_presets() {
+    public function get_presets(): void {
         Repro_CT_Suite_Logger::log('AJAX get_presets: Request empfangen', 'info');
         
         if (!$this->verify_request()) {
@@ -93,7 +93,7 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     /**
      * Get single preset by ID
      */
-    public function get_preset() {
+    public function get_preset(): void {
         Repro_CT_Suite_Logger::log('AJAX get_preset: Request empfangen', 'info');
         Repro_CT_Suite_Logger::log('AJAX get_preset: POST Data: ' . print_r($_POST, true), 'info');
         
@@ -135,7 +135,7 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     /**
      * Get available calendars
      */
-    public function get_calendars() {
+    public function get_calendars(): void {
         Repro_CT_Suite_Logger::log('AJAX get_calendars: Request empfangen', 'info');
         Repro_CT_Suite_Logger::log('AJAX get_calendars: POST Data: ' . print_r($_POST, true), 'info');
         
@@ -176,7 +176,7 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     /**
      * Save new preset
      */
-    public function save_preset() {
+    public function save_preset(): void {
         Repro_CT_Suite_Logger::log('AJAX save_preset: Request empfangen', 'info');
         Repro_CT_Suite_Logger::log('AJAX save_preset: POST Data: ' . print_r($_POST, true), 'info');
         
@@ -241,7 +241,7 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     /**
      * Update existing preset
      */
-    public function update_preset() {
+    public function update_preset(): void {
         Repro_CT_Suite_Logger::log('AJAX update_preset: Request empfangen', 'info');
         Repro_CT_Suite_Logger::log('AJAX update_preset: POST Data: ' . print_r($_POST, true), 'info');
         
@@ -311,7 +311,7 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     /**
      * Delete preset
      */
-    public function delete_preset() {
+    public function delete_preset(): void {
         Repro_CT_Suite_Logger::log('AJAX delete_preset: Request empfangen', 'info');
         Repro_CT_Suite_Logger::log('AJAX delete_preset: POST Data: ' . print_r($_POST, true), 'info');
         
@@ -354,7 +354,7 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     /**
      * Preview shortcode output
      */
-    public function preview_shortcode() {
+    public function preview_shortcode(): void {
         if (!$this->verify_request()) return;
         
         try {
@@ -399,3 +399,13 @@ class Repro_CT_Suite_Modern_Shortcode_Manager {
     }
 }
 ?>
+
+
+
+
+
+
+
+
+
+

@@ -20,7 +20,7 @@ class Repro_CT_Suite_Cron {
 	/**
 	 * Initialisierung
 	 */
-	public static function init() {
+	public static function init(): void {
 		// Cron-Hook registrieren
 		add_action( self::HOOK_NAME, array( __CLASS__, 'execute_sync' ) );
 		
@@ -37,7 +37,7 @@ class Repro_CT_Suite_Cron {
 	 * @param array $schedules Vorhandene Intervalle
 	 * @return array Erweiterte Intervalle
 	 */
-	public static function add_custom_cron_intervals( $schedules ) {
+	public static function add_custom_cron_intervals( array $schedules ): array {
 		// 30 Minuten
 		$schedules['repro_ct_suite_30min'] = array(
 			'interval' => 1800,
@@ -80,7 +80,7 @@ class Repro_CT_Suite_Cron {
 	/**
 	 * Scheduliert den Sync-Job neu basierend auf den Einstellungen
 	 */
-	public static function reschedule_sync_job() {
+	public static function reschedule_sync_job(): void {
 		// Alten Job entfernen
 		$timestamp = wp_next_scheduled( self::HOOK_NAME );
 		if ( $timestamp ) {
@@ -121,7 +121,7 @@ class Repro_CT_Suite_Cron {
 	 * @param string $unit     Einheit (minutes, hours, days)
 	 * @return int Sekunden
 	 */
-	private static function calculate_interval_seconds( $interval, $unit ) {
+	private static function calculate_interval_seconds( int $interval, string $unit ): int {
 		switch ( $unit ) {
 			case 'hours':
 				return $interval * 3600;
@@ -139,7 +139,7 @@ class Repro_CT_Suite_Cron {
 	 * @param int $seconds Intervall in Sekunden
 	 * @return string Recurrence-String
 	 */
-	private static function get_recurrence_string( $seconds ) {
+	private static function get_recurrence_string( int $seconds ): string {
 		// Mapping von bekannten Intervallen
 		$intervals = array(
 			1800   => 'repro_ct_suite_30min',
@@ -176,7 +176,7 @@ class Repro_CT_Suite_Cron {
 	/**
 	 * Führt den Sync-Job aus
 	 */
-	public static function execute_sync() {
+	public static function execute_sync(): void {
 		// Logger initialisieren
 		require_once plugin_dir_path( __FILE__ ) . 'class-repro-ct-suite-logger.php';
 		
@@ -281,10 +281,18 @@ class Repro_CT_Suite_Cron {
 	/**
 	 * Cleanup bei Plugin-Deaktivierung
 	 */
-	public static function cleanup() {
+	public static function cleanup(): void {
 		$timestamp = wp_next_scheduled( self::HOOK_NAME );
 		if ( $timestamp ) {
 			wp_unschedule_event( $timestamp, self::HOOK_NAME );
 		}
 	}
 }
+
+
+
+
+
+
+
+

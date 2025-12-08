@@ -29,7 +29,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     /**
      * Get all presets for Gutenberg Block (public access for editor)
      */
-    public function get_all_presets() {
+    public function get_all_presets(): void {
         // Security check
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'sm_ajax_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
@@ -57,8 +57,8 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     /**
      * Get single preset by ID (für Edit-Funktion)
      */
-    public function get_preset() {
-        // Security check
+    public function get_preset(): void {
+        // Sicherheitsprüfung
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'sm_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
             return;
@@ -100,7 +100,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     /**
      * Get all presets (renamed from get_preset)
      */
-    public function get_presets() {
+    public function get_presets(): void {
         // Security check
         if (!wp_verify_nonce($_POST['nonce'], 'sm_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
@@ -134,7 +134,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     /**
      * Get calendars for selection
      */
-    public function get_calendars() {
+    public function get_calendars(): void {
         // Security check
         if (!wp_verify_nonce($_POST['nonce'], 'sm_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
@@ -169,7 +169,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     /**
      * Save new preset or update existing
      */
-    public function save_preset() {
+    public function save_preset(): void {
         // Security check
         if (!wp_verify_nonce($_POST['nonce'], 'sm_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
@@ -278,7 +278,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     /**
      * Update existing preset
      */
-    public function update_preset() {
+    public function update_preset(): void {
         // Security check
         if (!wp_verify_nonce($_POST['nonce'], 'sm_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
@@ -349,7 +349,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     /**
      * Delete preset
      */
-    public function delete_preset() {
+    public function delete_preset(): void {
         // Security check
         if (!wp_verify_nonce($_POST['nonce'], 'sm_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
@@ -390,7 +390,7 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     /**
      * Preview preset (generate shortcode output)
      */
-    public function preview_preset() {
+    public function preview_preset(): void {
         // Security check
         if (!wp_verify_nonce($_POST['nonce'], 'sm_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
@@ -450,3 +450,6 @@ class Repro_CT_Suite_Shortcode_Manager_Ajax {
     }
 }
 ?>
+
+
+

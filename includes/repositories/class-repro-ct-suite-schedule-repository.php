@@ -21,7 +21,7 @@ class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base 
 	 * @param array $args Optional filters: from, to (Y-m-d)
 	 * @return array Counts: events, appointments
 	 */
-	public function rebuild_from_existing( $args = array() ) {
+	public function rebuild_from_existing( array $args = array() ): array {
 		$defaults = array(
 			'from' => null,
 			'to'   => null,
@@ -91,7 +91,7 @@ class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base 
 	 * @param array $event Array mit Event-Feldern (id, external_id, calendar_id, title, description, start_datetime, end_datetime, location_name, status)
 	 * @return int Lokale Schedule-ID
 	 */
-	public function upsert_from_event( $event ) {
+	public function upsert_from_event( array $event ): int|false {
 		$data = array(
 			'source_type'     => 'event',
 			'source_local_id' => (int) ( $event['id'] ?? 0 ),
@@ -114,7 +114,7 @@ class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base 
 	 * @param array $appointment Array mit Appointment-Feldern (id, external_id, calendar_id, title, description, start_datetime, end_datetime, is_all_day)
 	 * @return int Lokale Schedule-ID
 	 */
-	public function upsert_from_appointment( $appointment ) {
+	public function upsert_from_appointment( array $appointment ): int|false {
 		$data = array(
 			'source_type'     => 'appointment',
 			'source_local_id' => (int) ( $appointment['id'] ?? 0 ),
@@ -134,7 +134,7 @@ class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base 
 	/**
 	 * Upsert basierend auf (source_type, source_local_id)
 	 */
-	private function upsert_unique_source( $data ) {
+	private function upsert_unique_source( array $data ): int|false {
 		$data['updated_at'] = $this->now();
 
 		$existing_id = $this->db->get_var(
@@ -219,3 +219,10 @@ class Repro_CT_Suite_Schedule_Repository extends Repro_CT_Suite_Repository_Base 
 		return (int) $this->db->get_var( $sql );
 	}
 }
+
+
+
+
+
+
+

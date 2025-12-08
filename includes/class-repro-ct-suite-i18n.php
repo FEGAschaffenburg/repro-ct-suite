@@ -14,7 +14,7 @@ class Repro_CT_Suite_i18n {
 	/**
 	 * Load the plugin text domain for translation.
 	 */
-	public function load_plugin_textdomain() {
+	public function load_plugin_textdomain(): void {
 		load_plugin_textdomain(
 			'repro-ct-suite',
 			false,
@@ -22,3 +22,4 @@ class Repro_CT_Suite_i18n {
 		);
 	}
 }
+

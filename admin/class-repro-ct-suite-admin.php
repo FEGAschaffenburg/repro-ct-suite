@@ -159,7 +159,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	private function has_connection() {
+	private function has_connection(): bool {
 
 		$tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
 
@@ -183,7 +183,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	private function has_calendars_selected() {
+	private function has_calendars_selected(): bool {
 
 		global $wpdb;
 
@@ -229,7 +229,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	private function debug_log( $message, $level = 'info' ) {
+	private function debug_log( string $message, string $level = 'info' ): void {
 
 		// Stelle sicher, dass Debug-Log aktiviert ist
 
@@ -297,7 +297,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function check_manual_update_request() {
+	public function check_manual_update_request(): void {
 
 		if ( isset( $_GET['repro_ct_suite_check_update'] ) && current_user_can( 'update_plugins' ) ) {
 
@@ -345,7 +345,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function show_sync_success_notice() {
+	public function show_sync_success_notice(): void {
 
 		// Nur auf Plugin-Seiten anzeigen
 
@@ -459,7 +459,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function enqueue_styles() {
+	public function enqueue_styles(): void {
 
 		wp_enqueue_style(
 
@@ -511,7 +511,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function enqueue_scripts() {
+	public function enqueue_scripts(): void {
 
 		wp_enqueue_script(
 
@@ -665,7 +665,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function add_admin_menu() {
+	public function add_admin_menu(): void {
 
 		// Prüfen ob Cron aktiv ist
 
@@ -773,7 +773,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function display_admin_page() {
+	public function display_admin_page(): void {
 
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-display.php';
 
@@ -787,7 +787,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function display_events_page() {
+	public function display_events_page(): void {
 
 		include_once plugin_dir_path( __FILE__ ) . 'views/admin-events.php';
 
@@ -801,7 +801,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function display_shortcode_manager_page() {
+	public function display_shortcode_manager_page(): void {
 
 		include_once plugin_dir_path( __FILE__ ) . 'views/modern-shortcode-manager.php';
 
@@ -815,7 +815,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function display_documentation_page() {
+	public function display_documentation_page(): void {
 
 		include_once plugin_dir_path( __FILE__ ) . 'page-dokumentation.php';
 
@@ -829,7 +829,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function handle_test_connection() {
+	public function handle_test_connection(): void {
 
 		if ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'repro-ct-suite' ) {
 
@@ -947,7 +947,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function handle_calendar_selection() {
+	public function handle_calendar_selection(): void {
 
 		// Kalenderauswahl speichern
 
@@ -1245,7 +1245,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function register_settings() {
+	public function register_settings(): void {
 
 		register_setting(
 
@@ -1457,7 +1457,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_sync_calendars() {
+	public function ajax_sync_calendars(): void {
 
 		// Nonce-Prüfung
 
@@ -1767,7 +1767,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_sync_appointments() {
+	public function ajax_sync_appointments(): void {
 
 		// Nonce-Prüfung
 
@@ -2411,7 +2411,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_clear_tables() {
+	public function ajax_clear_tables(): void {
 
 		// Nonce-Prüfung
 
@@ -2549,7 +2549,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_clear_single_table() {
+	public function ajax_clear_single_table(): void {
 
 		// Nonce-Prüfung
 
@@ -2705,7 +2705,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_run_migrations() {
+	public function ajax_run_migrations(): void {
 
 		// Nonce-Prüfung
 
@@ -2815,7 +2815,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_clear_log() {
+	public function ajax_clear_log(): void {
 
 		// Nonce-Prüfung
 
@@ -2897,7 +2897,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_reset_credentials() {
+	public function ajax_reset_credentials(): void {
 
 		// Nonce-Prüfung
 
@@ -2955,7 +2955,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_full_reset() {
+	public function ajax_full_reset(): void {
 
 		// Nonce-Prüfung
 
@@ -3045,7 +3045,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_fix_calendar_ids() {
+	public function ajax_fix_calendar_ids(): void {
 
 		// Nonce-Prüfung
 
@@ -3277,7 +3277,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_delete_event() {
+	public function ajax_delete_event(): void {
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
@@ -3373,7 +3373,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_update_event() {
+	public function ajax_update_event(): void {
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
@@ -3499,7 +3499,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_dismiss_v6_notice() {
+	public function ajax_dismiss_v6_notice(): void {
 
 		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
 
@@ -3537,7 +3537,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_preview_shortcode() {
+	public function ajax_preview_shortcode(): void {
 
 		check_ajax_referer( 'repro_ct_suite_preview', 'nonce' );
 
@@ -3601,7 +3601,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_get_presets() {
+	public function ajax_get_presets(): void {
 
 		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
 
@@ -3645,7 +3645,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_save_preset() {
+	public function ajax_save_preset(): void {
 
 		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
 
@@ -3733,7 +3733,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_update_preset() {
+	public function ajax_update_preset(): void {
 
 		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
 
@@ -3833,7 +3833,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_delete_preset() {
+	public function ajax_delete_preset(): void {
 
 		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
 
@@ -3905,7 +3905,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_load_preset() {
+	public function ajax_load_preset(): void {
 
 		check_ajax_referer( 'repro_ct_suite_presets', 'nonce' );
 
@@ -3971,7 +3971,7 @@ class Repro_CT_Suite_Admin {
 	/**
 	 * Modern Shortcode Manager initialisieren
 	 */
-	private function init_modern_shortcode_manager() {
+	private function init_modern_shortcode_manager(): void {
 		// Include der Klasse
 		require_once plugin_dir_path( __FILE__ ) . 'class-modern-shortcode-manager.php';
 		
@@ -3984,7 +3984,7 @@ class Repro_CT_Suite_Admin {
 	 *
 	 * @return string|null
 	 */
-	public function remove_admin_footer_text( $text ) {
+	public function remove_admin_footer_text( string $text ): string {
 		// Nur auf Plugin-Seiten ausblenden
 		$screen = get_current_screen();
 		if ( $screen && strpos( $screen->id, 'repro-ct-suite' ) !== false ) {
@@ -3998,7 +3998,7 @@ class Repro_CT_Suite_Admin {
 	 *
 	 * @return string|null
 	 */
-	public function remove_update_footer( $text ) {
+	public function remove_update_footer( string $text ): string {
 		// Nur auf Plugin-Seiten ausblenden
 		$screen = get_current_screen();
 		if ( $screen && strpos( $screen->id, 'repro-ct-suite' ) !== false ) {
@@ -4007,7 +4007,192 @@ class Repro_CT_Suite_Admin {
 		return $text;
 	}
 
+	/**
+	 * Handle Debug AJAX requests
+	 */
+	public function handle_debug_ajax() {
+		if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'repro_ct_suite_debug_nonce')) {
+			wp_send_json_error('Security check failed');
+		}
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error('Insufficient permissions');
+		}
+
+		$action = sanitize_text_field($_POST['debug_action']);
+		$table = sanitize_text_field($_POST['table']);
+
+		global $wpdb;
+
+		$allowed_tables = [
+			'calendars' => $wpdb->prefix . 'rcts_calendars',
+			'events' => $wpdb->prefix . 'rcts_events',
+			'event_services' => $wpdb->prefix . 'rcts_event_services'
+		];
+
+		if (!array_key_exists($table, $allowed_tables)) {
+			wp_send_json_error('Invalid table');
+			return;
+		}
+
+		$table_name = $allowed_tables[$table];
+
+		switch ($action) {
+			case 'view_data':
+				$this->handle_debug_view_data($table_name);
+				break;
+			case 'export_data':
+				$this->handle_debug_export_data($table_name);
+				break;
+			case 'clear_table':
+				$this->handle_debug_clear_table($table_name, $table);
+				break;
+			default:
+				wp_send_json_error('Invalid action');
+		}
+	}
+
+	/**
+	 * Handle debug view data request
+	 */
+	private function handle_debug_view_data($table_name) {
+		global $wpdb;
+
+		try {
+			$results = $wpdb->get_results("SELECT * FROM {$table_name} LIMIT 50", ARRAY_A);
+			
+			if (empty($results)) {
+				wp_send_json_error('Keine Daten vorhanden');
+				return;
+			}
+
+			$html = '<table style="width: 100%; border-collapse: collapse;">';
+			$html .= '<thead><tr>';
+			
+			foreach (array_keys($results[0]) as $header) {
+				$html .= '<th style="border: 1px solid #ddd; padding: 8px; text-align: left; background: #f5f5f5; font-weight: bold;">' . esc_html($header) . '</th>';
+			}
+			
+			$html .= '</tr></thead><tbody>';
+			
+			foreach ($results as $row) {
+				$html .= '<tr>';
+				foreach ($row as $cell) {
+					$html .= '<td style="border: 1px solid #ddd; padding: 8px;">' . esc_html(is_array($cell) ? json_encode($cell) : $cell) . '</td>';
+				}
+				$html .= '</tr>';
+			}
+			
+			$html .= '</tbody></table>';
+
+			wp_send_json_success(['html' => $html]);
+
+		} catch (Exception $e) {
+			wp_send_json_error('Fehler beim Laden: ' . $e->getMessage());
+		}
+	}
+
+	/**
+	 * Handle debug export data request
+	 */
+	private function handle_debug_export_data($table_name) {
+		global $wpdb;
+
+		try {
+			$results = $wpdb->get_results("SELECT * FROM {$table_name}", ARRAY_A);
+			
+			if (empty($results)) {
+				wp_send_json_error('Keine Daten zum Exportieren vorhanden');
+				return;
+			}
+
+			$headers = array_keys($results[0]);
+			$csv = implode(',', array_map(function($h) { return '"' . str_replace('"', '""', $h) . '"'; }, $headers)) . "\n";
+
+			foreach ($results as $row) {
+				$csv_row = [];
+				foreach ($row as $value) {
+					$value = str_replace('"', '""', $value);
+					$csv_row[] = '"' . $value . '"';
+				}
+				$csv .= implode(',', $csv_row) . "\n";
+			}
+
+			wp_send_json_success(['csv' => $csv]);
+
+		} catch (Exception $e) {
+			wp_send_json_error('Fehler beim Export: ' . $e->getMessage());
+		}
+	}
+
+	/**
+	 * Handle debug clear table request
+	 */
+	private function handle_debug_clear_table($table_name, $table_key) {
+		global $wpdb;
+
+		try {
+			$count_before = $wpdb->get_var("SELECT COUNT(*) FROM {$table_name}");
+			
+			if ($count_before == 0) {
+				wp_send_json_error('Tabelle ist bereits leer');
+				return;
+			}
+
+			if (class_exists('Repro_CT_Suite_Logger')) {
+				Repro_CT_Suite_Logger::log("Debug: Tabelle '{$table_key}' wird geleert", 'warning');
+			}
+
+			$result = $wpdb->query("DELETE FROM {$table_name}");
+
+			if ($result === false) {
+				wp_send_json_error('Fehler beim Löschen der Daten: ' . $wpdb->last_error);
+				return;
+			}
+
+			$count_after = $wpdb->get_var("SELECT COUNT(*) FROM {$table_name}");
+			$deleted_rows = $count_before - $count_after;
+
+			if (class_exists('Repro_CT_Suite_Logger')) {
+				Repro_CT_Suite_Logger::log("Debug: Tabelle '{$table_key}' erfolgreich geleert - {$deleted_rows} Einträge gelöscht", 'success');
+			}
+
+			wp_send_json_success([
+				'deleted_rows' => $deleted_rows,
+				'message' => sprintf('Erfolgreich %d Einträge aus Tabelle %s gelöscht', $deleted_rows, $table_key)
+			]);
+
+		} catch (Exception $e) {
+			if (class_exists('Repro_CT_Suite_Logger')) {
+				Repro_CT_Suite_Logger::log("Debug: Fehler beim Leeren der Tabelle '{$table_key}': " . $e->getMessage(), 'error');
+			}
+			
+			wp_send_json_error('Fehler beim Löschen: ' . $e->getMessage());
+		}
+	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

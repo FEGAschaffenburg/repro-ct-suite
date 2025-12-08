@@ -8,7 +8,7 @@
 
  * Description:       ChurchTools-Integration für WordPress. Synchronisiert Termine und Events aus ChurchTools.
 
- * Version:           0.9.5.1
+ * Version:           0.9.5.2
 
  * Requires at least: 5.0
 

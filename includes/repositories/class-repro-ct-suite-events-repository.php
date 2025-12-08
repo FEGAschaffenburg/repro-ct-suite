@@ -28,7 +28,7 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 
 
 
-	public function upsert_by_event_id( $data ) {
+	public function upsert_by_event_id( array $data ): int|false {
 
 		$defaults = array(
 
@@ -82,7 +82,7 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 
 
 
-	public function get_by_id( $id ) {
+	public function get_by_id( int $id ) {
 
 		return $this->db->get_row( $this->db->prepare( "SELECT * FROM {$this->table} WHERE id=%d", $id ) );
 
@@ -102,7 +102,7 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 
 	 */
 
-	public function get_id_by_event_id( $event_id ) {
+	public function get_id_by_event_id( int $event_id ): ?int {
 
 		$val = $this->db->get_var(
 
@@ -134,7 +134,7 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 
 	 */
 
-	public function get_by_event_id( $event_id ) {
+	public function get_by_event_id( int $event_id ) {
 
 		return $this->db->get_row(
 
@@ -164,7 +164,7 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 
 	 */
 
-	public function get_by_appointment_id( $appointment_id ) {
+	public function get_by_appointment_id( int $appointment_id ) {
 
 		return $this->db->get_row(
 
@@ -181,4 +181,12 @@ class Repro_CT_Suite_Events_Repository extends Repro_CT_Suite_Repository_Base {
 	}
 
 }
+
+
+
+
+
+
+
+
 

@@ -38,7 +38,7 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 	 *
 	 * @return array Liste aller Presets
 	 */
-	public function get_all() {
+	public function get_all(): array {
 		$results = $this->wpdb->get_results(
 			"SELECT * FROM {$this->table_name} ORDER BY name ASC",
 			ARRAY_A
@@ -53,7 +53,7 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 	 * @param int $id Preset ID
 	 * @return array|null Preset-Daten oder null
 	 */
-	public function get_by_id( $id ) {
+	public function get_by_id( int $id ): ?array {
 		$result = $this->wpdb->get_row(
 			$this->wpdb->prepare(
 				"SELECT * FROM {$this->table_name} WHERE id = %d",
@@ -71,7 +71,7 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 	 * @param array $data Preset-Daten
 	 * @return int|false Neue ID oder false bei Fehler
 	 */
-	public function save( $data ) {
+	public function save(array $data): int|false {
 		$current_time = current_time( 'mysql' );
 
 		$insert_data = array(
@@ -114,7 +114,7 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 	 * @param array $data Neue Daten
 	 * @return bool Success
 	 */
-	public function update( $id, $data ) {
+	public function update( int $id, array $data ): int|false {
 		$current_time = current_time( 'mysql' );
 
 		$update_data = array(
@@ -153,7 +153,7 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 	 * @param int $id Preset ID
 	 * @return bool Success
 	 */
-	public function delete( $id ) {
+	public function delete( int $id ): int|false {
 		$result = $this->wpdb->delete(
 			$this->table_name,
 			array( 'id' => $id ),
@@ -169,7 +169,7 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 	 * @param string $name Preset Name
 	 * @return array|null Preset-Daten oder null
 	 */
-	public function get_by_name( $name ) {
+	public function get_by_name( string $name ): ?array {
 		$result = $this->wpdb->get_row(
 			$this->wpdb->prepare(
 				"SELECT * FROM {$this->table_name} WHERE name = %s",
@@ -188,7 +188,7 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 	 * @param int    $exclude_id Optional: ID zum Ausschließen (für Update)
 	 * @return bool True wenn Name existiert
 	 */
-	public function name_exists( $name, $exclude_id = null ) {
+	public function name_exists( string $name, ?int $exclude_id = null ): bool {
 		$query = "SELECT COUNT(*) FROM {$this->table_name} WHERE name = %s";
 		$params = array( $name );
 
@@ -204,3 +204,16 @@ class Repro_CT_Suite_Shortcode_Presets_Repository {
 		return $count > 0;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
