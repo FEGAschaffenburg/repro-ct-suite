@@ -148,6 +148,12 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 
 
+
+= 0.9.6.2 - 2024-12-08 =
+* Fix: DB-Management-Features im Debug-Tab jetzt sichtbar
+* Fix: "Anzeigen" und "Leeren" Buttons für Datenbank-Tabellen
+* Fix: "Vollständiger Plugin-Reset" Button wieder verfügbar
+* Verbesserung: Tab-Struktur konsolidiert (tab-debug.php hat jetzt alle Features)
 = 0.9.6.1 - 2024-12-08 =
 * Update: Lizenz-Tab zeigt Spendenaufruf statt Lizenzverwaltung
 * Feature: Plugin ist kostenlos nutzbar ohne Lizenz
