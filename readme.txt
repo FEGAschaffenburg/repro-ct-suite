@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.6.1
+Stable tag: 0.9.6.3
 
 License: GPLv2 or later
 
@@ -147,7 +147,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 == Changelog ==
 
 
-
+= 0.9.6.3 - 2024-12-08 =
+* Fix: Shortcode-Vorlagen (rcts_shortcode_presets) jetzt im Debug-Tab sichtbar
+* Fix: Legacy-Tabelle rcts_appointments wird nur angezeigt wenn vorhanden
+* Feature: Legacy-Tabellen werden mit orangem Badge und gelber Hintergrundfarbe markiert
+* Verbesserung: Debug-Warnung aktualisiert - 5 Tabellen werden erwartet
 
 = 0.9.6.2 - 2024-12-08 =
 * Fix: DB-Management-Features im Debug-Tab jetzt sichtbar

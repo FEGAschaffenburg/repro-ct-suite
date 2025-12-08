@@ -41,15 +41,41 @@ $tables_info = array(
 		'count' => 0,
 		'icon'  => 'admin-page',
 	),
+	'rcts_shortcode_presets' => array(
+		'label' => __( 'Shortcode-Vorlagen', 'repro-ct-suite' ),
+		'table' => $wpdb->prefix . 'rcts_shortcode_presets',
+		'count' => 0,
+		'icon'  => 'editor-code',
+	),
+	'rcts_appointments' => array(
+		'label' => __( 'Termine (Legacy)', 'repro-ct-suite' ),
+		'table' => $wpdb->prefix . 'rcts_appointments',
+		'count' => 0,
+		'icon'  => 'archive',
+		'legacy' => true,
+	),
 );
 
-// Counts abrufen
+// Counts abrufen und Legacy-Tabellen filtern
 foreach ( $tables_info as $key => &$info ) {
 	$table_exists = $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $info['table'] ) );
 	if ( $table_exists ) {
 		$info['count'] = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$info['table']}" );
+		$info['exists'] = true;
+	} else {
+		$info['exists'] = false;
 	}
 }
+unset( $info ); // Referenz aufheben
+
+// Legacy-Tabellen ausfiltern, die nicht existieren
+$tables_info = array_filter( $tables_info, function( $info ) {
+	// Nur Legacy-Tabellen ausfiltern, wenn sie nicht existieren
+	if ( ! empty( $info['legacy'] ) && ! $info['exists'] ) {
+		return false;
+	}
+	return true;
+} );
 
 // DEBUG: Prüfe auf ungewöhnliche Tabellen (mehr als erwartet)
 $debug_all_plugin_tables = $wpdb->get_results( "SHOW TABLES LIKE '%rcts_%'" );
@@ -101,10 +127,13 @@ if ( $log_exists && $log_size > 0 ) {
 				</thead>
 				<tbody>
 					<?php foreach ( $tables_info as $key => $info ) : ?>
-					<tr>
+					<tr<?php echo ! empty( $info['legacy'] ) ? ' style="background-color: #fff3cd;"' : ''; ?>>
 						<td>
 							<span class="dashicons dashicons-<?php echo esc_attr( $info['icon'] ); ?>"></span>
 							<strong><?php echo esc_html( $info['label'] ); ?></strong>
+							<?php if ( ! empty( $info['legacy'] ) ) : ?>
+								<span class="repro-ct-suite-badge" style="background-color: #ff9800; color: white; font-size: 10px; margin-left: 5px;">LEGACY</span>
+							<?php endif; ?>
 							<br>
 							<code style="font-size: 11px; color: #666;"><?php echo esc_html( $info['table'] ); ?></code>
 						</td>
@@ -185,7 +214,7 @@ if ( $log_exists && $log_size > 0 ) {
 			</div>
 			<p class="description" style="margin-top: 10px; color: #856404;">
 				<?php esc_html_e( 'WordPress-Präfix:', 'repro-ct-suite' ); ?> <code><?php echo esc_html( $wpdb->prefix ); ?></code><br>
-				<?php esc_html_e( 'Erwartet werden 4 Tabellen (calendars, events, event_services, schedule). Zusätzliche Tabellen könnten auf alte Installationen oder Migrationen hinweisen.', 'repro-ct-suite' ); ?>
+				<?php esc_html_e( 'Erwartet werden 5 Tabellen (calendars, events, event_services, schedule, shortcode_presets). Zusätzliche Tabellen könnten auf alte Installationen oder Migrationen hinweisen.', 'repro-ct-suite' ); ?>
 			</p>
 		</div>
 	</div>
