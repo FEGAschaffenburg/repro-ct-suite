@@ -170,15 +170,21 @@ class Repro_CT_Suite {
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_admin_menu' );
 
-		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_test_connection' );
+	$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_test_connection' );
 
-		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_calendar_selection' );
+	$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_calendar_selection' );
+
+	
+
+	// Plugin action links
+
+	$plugin_basename = plugin_basename( dirname( __DIR__ ) . '/repro-ct-suite.php' );
+
+	$this->loader->add_filter( "plugin_action_links_{$plugin_basename}", $plugin_admin, 'add_plugin_action_links' );
 
 
 
-		// AJAX Hooks: Kalender synchronisieren
-
-		$this->loader->add_action( 'wp_ajax_repro_ct_suite_sync_calendars', $plugin_admin, 'ajax_sync_calendars' );
+	// AJAX Hooks: Kalender synchronisieren		$this->loader->add_action( 'wp_ajax_repro_ct_suite_sync_calendars', $plugin_admin, 'ajax_sync_calendars' );
 
 
 

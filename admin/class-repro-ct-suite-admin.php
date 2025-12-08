@@ -457,6 +457,62 @@ class Repro_CT_Suite_Admin {
 
 	/**
 
+	 * Add plugin action links.
+
+	 *
+
+	 * @param array $links Existing plugin action links.
+
+	 * @return array Modified plugin action links.
+
+	 */
+
+	public function add_plugin_action_links( array $links ): array {
+
+		$custom_links = array(
+
+			'dashboard'  => sprintf(
+
+				'<a href="%s">%s</a>',
+
+				esc_url( admin_url( 'admin.php?page=repro-ct-suite' ) ),
+
+				__( 'Dashboard', 'repro-ct-suite' )
+
+			),
+
+			'settings'   => sprintf(
+
+				'<a href="%s">%s</a>',
+
+				esc_url( admin_url( 'admin.php?page=repro-ct-suite-settings' ) ),
+
+				__( 'Einstellungen', 'repro-ct-suite' )
+
+			),
+
+			'license'    => sprintf(
+
+				'<a href="%s">%s</a>',
+
+				esc_url( admin_url( 'admin.php?page=repro-ct-suite-settings&tab=license' ) ),
+
+				__( 'Lizenz', 'repro-ct-suite' )
+
+			),
+
+		);
+
+
+
+		return array_merge( $custom_links, $links );
+
+	}
+
+
+
+	/**
+
 	 * Register the stylesheets for the admin area.
 
 	 */
