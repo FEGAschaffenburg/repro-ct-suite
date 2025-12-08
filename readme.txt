@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.5.6
+Stable tag: 0.9.5.7
 
 License: GPLv2 or later
 
@@ -147,6 +147,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 == Changelog ==
 
 
+
+= 0.9.5.7 - 2024-12-08 =
+* Feature: Neues Lizenz-Tab mit Lizenzverwaltung
+* Fix: Korrektur der Plugin-Action-Links (Dashboard, Einstellungen, Lizenz)
+* Verbesserung: Lizenzaktivierung, Deaktivierung und Prüfung per AJAX
 
 = 0.9.5.6 - 2024-12-08 =
 * Feature: Plugin-Action-Links (Dashboard, Einstellungen, Lizenz) im Plugins-Bereich
@@ -1250,6 +1255,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 = 1.0.0 =
 
 * Legacy-Placeholder (veraltet)
+
 
 
 

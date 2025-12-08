@@ -485,7 +485,7 @@ class Repro_CT_Suite_Admin {
 
 				'<a href="%s">%s</a>',
 
-				esc_url( admin_url( 'admin.php?page=repro-ct-suite-settings' ) ),
+				esc_url( admin_url( 'admin.php?page=repro-ct-suite&tab=settings' ) ),
 
 				__( 'Einstellungen', 'repro-ct-suite' )
 
@@ -495,7 +495,7 @@ class Repro_CT_Suite_Admin {
 
 				'<a href="%s">%s</a>',
 
-				esc_url( admin_url( 'admin.php?page=repro-ct-suite-settings&tab=license' ) ),
+				esc_url( admin_url( 'admin.php?page=repro-ct-suite&tab=license' ) ),
 
 				__( 'Lizenz', 'repro-ct-suite' )
 
@@ -1439,6 +1439,92 @@ class Repro_CT_Suite_Admin {
 				},
 
 				'default'           => '',
+
+			)
+
+		);
+
+
+
+		// Sync-Zeitraum: Termine von (Tage in der Vergangenheit, negativ)
+
+
+
+		// Lizenz-Einstellungen
+
+		register_setting(
+
+			'repro_ct_suite_license_group',
+
+			'repro_ct_suite_license_key',
+
+			array(
+
+				'type'              => 'string',
+
+				'description'       => __( 'Lizenzschlüssel', 'repro-ct-suite' ),
+
+				'sanitize_callback' => 'sanitize_text_field',
+
+				'default'           => '',
+
+			)
+
+		);
+
+
+
+		register_setting(
+
+			'repro_ct_suite_license_group',
+
+			'repro_ct_suite_license_email',
+
+			array(
+
+				'type'              => 'string',
+
+				'description'       => __( 'Lizenz E-Mail', 'repro-ct-suite' ),
+
+				'sanitize_callback' => 'sanitize_email',
+
+				'default'           => '',
+
+			)
+
+		);
+
+
+
+		register_setting(
+
+			'repro_ct_suite_license_group',
+
+			'repro_ct_suite_license_status',
+
+			array(
+
+				'type'    => 'string',
+
+				'default' => 'inactive',
+
+			)
+
+		);
+
+
+
+		register_setting(
+
+			'repro_ct_suite_license_group',
+
+			'repro_ct_suite_license_expiry',
+
+			array(
+
+				'type'    => 'string',
+
+				'default' => '',
 
 			)
 

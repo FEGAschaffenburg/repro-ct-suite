@@ -67,16 +67,20 @@ $auto_sync_enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
 					<?php esc_html_e( 'Update', 'repro-ct-suite' ); ?>
 				</a>
 			</li>
-			<li>
-				<a href="?page=repro-ct-suite&tab=debug" class="<?php echo $active_tab === 'debug' ? 'active' : ''; ?>">
-					<span class="dashicons dashicons-admin-tools"></span>
-					<?php esc_html_e( 'Debug', 'repro-ct-suite' ); ?>
-				</a>
-			</li>
-		</ul>
-	</div>
-
-	<!-- Tab: Dashboard -->
+		<li>
+			<a href="?page=repro-ct-suite&tab=debug" class="<?php echo $active_tab === 'debug' ? 'active' : ''; ?>">
+				<span class="dashicons dashicons-admin-tools"></span>
+				<?php esc_html_e( 'Debug', 'repro-ct-suite' ); ?>
+			</a>
+		</li>
+		<li>
+			<a href="?page=repro-ct-suite&tab=license" class="<?php echo $active_tab === 'license' ? 'active' : ''; ?>">
+				<span class="dashicons dashicons-admin-network"></span>
+				<?php esc_html_e( 'Lizenz', 'repro-ct-suite' ); ?>
+			</a>
+		</li>
+	</ul>
+</div>	<!-- Tab: Dashboard -->
 	<div id="dashboard" class="rcts-tab-content <?php echo $active_tab === 'dashboard' ? 'active' : ''; ?>">
 		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-dashboard.php'; ?>
 	</div>
@@ -101,6 +105,11 @@ $auto_sync_enabled = get_option( 'repro_ct_suite_auto_sync_enabled', 0 );
 	<!-- Tab: Debug -->
 	<div id="debug" class="rcts-tab-content <?php echo $active_tab === 'debug' ? 'active' : ''; ?>">
 		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-debug.php'; ?>
+	</div>
+
+	<!-- Tab: Lizenz -->
+	<div id="license" class="rcts-tab-content <?php echo $active_tab === 'license' ? 'active' : ''; ?>">
+		<?php require_once plugin_dir_path( __FILE__ ) . 'tabs/tab-license.php'; ?>
 	</div>
 
 </div>
