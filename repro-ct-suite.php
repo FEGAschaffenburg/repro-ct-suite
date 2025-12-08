@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
  */
 
-define( 'REPRO_CT_SUITE_VERSION', '0.9.5' );
+define( 'REPRO_CT_SUITE_VERSION', '0.9.5.2' );
 
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 
