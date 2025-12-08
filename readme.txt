@@ -10,7 +10,7 @@ Tested up to: 6.4
 
 Requires PHP: 7.4
 
-Stable tag: 0.9.5.9
+Stable tag: 0.9.6.0
 
 License: GPLv2 or later
 
@@ -147,6 +147,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 == Changelog ==
 
 
+
+= 0.9.6.0 - 2024-12-08 =
+* Fix: Debug-Tab JavaScript wird jetzt korrekt geladen
+* Fix: Anzeigen und Löschen von DB-Einträgen funktioniert jetzt
+* Fix: Debug-Extensions laden bei tab=debug
 
 = 0.9.5.9 - 2024-12-08 =
 * Fix: Updater-Hook nur noch bei privatem Repository registriert
@@ -1265,6 +1270,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 = 1.0.0 =
 
 * Legacy-Placeholder (veraltet)
+
 
 
 

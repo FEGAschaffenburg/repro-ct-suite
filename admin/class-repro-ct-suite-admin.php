@@ -659,31 +659,29 @@ class Repro_CT_Suite_Admin {
 
 
 
-		// Debug-Seite JavaScript
+	// Debug-Seite JavaScript
 
-		// Enqueue debug JS either on the dedicated debug page OR on the main plugin page when the Logs tab is active
+	// Enqueue debug JS either on the dedicated debug page OR on the main plugin page when the Debug tab is active
 
-		$enqueue_debug = false;
+	$enqueue_debug = false;
 
-		if ( $screen && strpos( $screen->id, 'repro-ct-suite-debug' ) !== false ) {
+	if ( $screen && strpos( $screen->id, 'repro-ct-suite-debug' ) !== false ) {
+
+		$enqueue_debug = true;
+
+	} elseif ( $screen && strpos( $screen->id, 'toplevel_page_repro-ct-suite' ) !== false ) {
+
+		// If we're on the main plugin page and the Debug tab is requested, enqueue the debug script
+
+		if ( isset( $_GET['tab'] ) && ( $_GET['tab'] === 'debug' || $_GET['tab'] === 'logs' ) ) {
 
 			$enqueue_debug = true;
 
-		} elseif ( $screen && strpos( $screen->id, 'toplevel_page_repro-ct-suite' ) !== false ) {
-
-			// If we're on the main plugin page and the Logs tab is requested, enqueue the debug script so the buttons work
-
-			if ( isset( $_GET['tab'] ) && $_GET['tab'] === 'logs' ) {
-
-				$enqueue_debug = true;
-
-			}
-
 		}
 
-		if ( $enqueue_debug ) {
+	}
 
-			wp_enqueue_script(
+	if ( $enqueue_debug ) {			wp_enqueue_script(
 
 				$this->plugin_name . '-debug',
 
