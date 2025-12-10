@@ -6,9 +6,9 @@
 
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
 
- * Description:       ChurchTools-Integration fÃ¼r WordPress. Synchronisiert Termine und Events aus ChurchTools.
+ * Description:       ChurchTools-Integration fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r WordPress. Synchronisiert Termine und Events aus ChurchTools.
 
- * Version:           0.9.6.6
+ * Version: 1.0.0.2
 
  * Requires at least: 5.0
 
@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
  */
 
-define( 'REPRO_CT_SUITE_VERSION', '0.9.6.6' );
+define( 'REPRO_CT_SUITE_VERSION', '1.0.0.2' );
 
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 
@@ -116,7 +116,7 @@ require_once REPRO_CT_SUITE_PATH . 'includes/class-repro-ct-suite.php';
 
 /**
 
- * GitHub Updater fÃ¼r automatische Updates
+ * GitHub Updater fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r automatische Updates
 
  */
 
@@ -134,7 +134,7 @@ if ( is_admin() ) {
 
 	add_action( 'admin_init', function() {
 
-		// Force-Check Parameter fÃ¼r manuelles Update-PrÃ¼fung
+		// Force-Check Parameter fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r manuelles Update-PrÃ¼fung
 
 		if ( isset( $_GET['force-check'] ) && current_user_can( 'update_plugins' ) ) {
 
@@ -156,7 +156,7 @@ if ( is_admin() ) {
 
 			'repro-ct-suite',
 
-			'' // Leer fÃ¼r Ã¶ffentliche Repositories
+			'' // Leer fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¶ffentliche Repositories
 
 		);
 
@@ -168,21 +168,21 @@ if ( is_admin() ) {
 
 /**
 
- * Fix fÃ¼r private GitHub Repository Downloads
+ * Fix fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r private GitHub Repository Downloads
 
  *
 
- * WordPress kann standardmÃ¤ÃŸig keine privaten GitHub Assets herunterladen,
+ * WordPress kann standardmÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¤Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¤Æ’Ã¢â‚¬Â¦Ã¤â€šÃ‚Â¸ig keine privaten GitHub Assets herunterladen,
 
- * da die Download-URL eine Authentifizierung erfordert. Dieser Filter fÃ¼gt
+ * da die Download-URL eine Authentifizierung erfordert. Dieser Filter fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼gt
 
  * den Authorization-Header hinzu, damit der Download funktioniert.
 
  *
 
- * Hinweis: Dieser Filter wird nur benÃ¶tigt, wenn das Repository privat ist.
+ * Hinweis: Dieser Filter wird nur benÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¶tigt, wenn das Repository privat ist.
 
- * Bei Ã¶ffentlichen Repositories kann dieser Code entfernt werden.
+ * Bei Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¶ffentlichen Repositories kann dieser Code entfernt werden.
 
  *
 
@@ -196,7 +196,7 @@ add_filter(
 
 	function ( $reply, $package, $upgrader ) {
 
-		// Nur fÃ¼r unsere GitHub Releases
+		// Nur fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r unsere GitHub Releases
 
 		if ( strpos( $package, 'github.com/FEGAschaffenburg/repro-ct-suite' ) === false ) {
 
@@ -206,9 +206,9 @@ add_filter(
 
 
 
-		// GitHub Token (nur fÃ¼r private Repositories erforderlich)
+		// GitHub Token (nur fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r private Repositories erforderlich)
 
-		$github_token = ''; // Leer lassen fÃ¼r Ã¶ffentliche Repositories
+		$github_token = ''; // Leer lassen fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¶ffentliche Repositories
 
 
 
@@ -222,7 +222,7 @@ add_filter(
 
 
 
-		// Download mit Authorization Header (nur fÃ¼r private Repos)
+		// Download mit Authorization Header (nur fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r private Repos)
 
 		$temp_file = download_url(
 
@@ -270,13 +270,13 @@ add_filter(
 
 /**
 
- * Auto-Updates fÃ¼r dieses Plugin erlauben (opt-in Ã¼ber Option)
+ * Auto-Updates fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r dieses Plugin erlauben (opt-in Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼ber Option)
 
  *
 
  * Wenn die Option 'repro_ct_suite_auto_update' aktiv ist, gibt dieser Filter
 
- * fÃ¼r dieses Plugin true zurÃ¼ck. Damit fÃ¼hrt WordPress im Hintergrund automatische
+ * fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r dieses Plugin true zurÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼ck. Damit fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼hrt WordPress im Hintergrund automatische
 
  * Updates aus, sobald im Transient ein Update vorhanden ist.
 
@@ -352,7 +352,7 @@ function run_repro_ct_suite() {
 
 /**
 
- * Registriere Gutenberg Block fÃ¼r ChurchTools Events
+ * Registriere Gutenberg Block fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r ChurchTools Events
 
  */
 
@@ -382,7 +382,7 @@ add_action( 'init', 'repro_ct_suite_register_block' );
 
 /**
 
- * Render-Callback fÃ¼r Gutenberg Block
+ * Render-Callback fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r Gutenberg Block
 
  */
 

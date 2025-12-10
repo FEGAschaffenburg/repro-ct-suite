@@ -1,0 +1,12 @@
+		// Debug-Informationen sammeln
+		$debug_info = array(
+			'tenant' => $tenant,
+			'username' => $username,
+			'api_base_url' => sprintf( 'https://%s.church.tools/api', $tenant ),
+			'endpoint' => '/calendars',
+			'full_url' => sprintf( 'https://%s.church.tools/api/calendars', $tenant ),
+			'timestamp' => current_time( 'mysql' ),
+			'php_version' => PHP_VERSION,
+			'wordpress_version' => get_bloginfo( 'version' )
+		);
+

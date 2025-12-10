@@ -1,0 +1,110 @@
+
+
+	/**
+	 * Prüft ob Cookie abgelaufen ist
+	 *
+	 * @return bool
+	 */
+	public function is_cookie_expired(): bool {
+		if ( $this->cookie_created_at === 0 ) {
+			return true;
+		}
+		$age = time() - $this->cookie_created_at;
+		return $age >= self::COOKIE_LIFETIME;
+	}
+
+	/**
+	 * Gibt verbleibende Cookie-Gültigkeit in Sekunden zurück
+	 *
+	 * @return int Sekunden bis zum Ablauf, 0 wenn abgelaufen
+	 */
+	public function get_cookie_remaining_time(): int {
+		if ( $this->cookie_created_at === 0 ) {
+			return 0;
+		}
+		$age = time() - $this->cookie_created_at;
+		$remaining = self::COOKIE_LIFETIME - $age;
+		return max( 0, $remaining );
+	}
+
+	/**
+	 * Gibt Cookie-Status-Informationen zurück
+	 *
+	 * @return array
+	 */
+	public function get_cookie_status(): array {
+		$has_cookies = ! empty( $this->cookies );
+		$created_at = $this->cookie_created_at;
+		$age = $created_at > 0 ? time() - $created_at : 0;
+		$remaining = $this->get_cookie_remaining_time();
+		$expired = $this->is_cookie_expired();
+		$authenticated = $this->is_authenticated();
+
+		return array(
+			'has_cookies' => $has_cookies,
+			'cookie_count' => count( $this->cookies ),
+			'created_at' => $created_at,
+			'created_at_formatted' => $created_at > 0 ? date( 'Y-m-d H:i:s', $created_at ) : 'Nie',
+			'age_seconds' => $age,
+			'age_formatted' => $this->format_duration( $age ),
+			'remaining_seconds' => $remaining,
+			'remaining_formatted' => $this->format_duration( $remaining ),
+			'lifetime_seconds' => self::COOKIE_LIFETIME,
+			'lifetime_formatted' => $this->format_duration( self::COOKIE_LIFETIME ),
+			'expired' => $expired,
+			'authenticated' => $authenticated,
+			'status' => $authenticated ? 'Aktiv' : ( $expired ? 'Abgelaufen' : 'Nicht angemeldet' ),
+		);
+	}
+
+	/**
+	 * Formatiert Zeitdauer in lesbarer Form
+	 *
+	 * @param int $seconds
+	 * @return string
+	 */
+	private function format_duration( int $seconds ): string {
+		if ( $seconds === 0 ) {
+			return '0 Sekunden';
+		}
+
+		$hours = floor( $seconds / 3600 );
+		$minutes = floor( ( $seconds % 3600 ) / 60 );
+		$secs = $seconds % 60;
+
+		$parts = array();
+		if ( $hours > 0 ) {
+			$parts[] = $hours . 'h';
+		}
+		if ( $minutes > 0 ) {
+			$parts[] = $minutes . 'm';
+		}
+		if ( $secs > 0 || empty( $parts ) ) {
+			$parts[] = $secs . 's';
+		}
+
+		return implode( ' ', $parts );
+	}
+
+	/**
+	 * Erneuert Cookie proaktiv (wenn weniger als 1h verbleibend)
+	 *
+	 * @return bool|WP_Error true bei Erfolg, WP_Error bei Fehler
+	 */
+	public function refresh_cookie_if_needed() {
+		$remaining = $this->get_cookie_remaining_time();
+		
+		// Erneuere wenn weniger als 1 Stunde verbleibend
+		if ( $remaining > 0 && $remaining < 3600 ) {
+			Repro_CT_Suite_Logger::log( 'Cookie läuft bald ab (verbleibend: ' . $this->format_duration( $remaining ) . '), erneuere...', 'warning' );
+			$result = $this->login();
+			if ( is_wp_error( $result ) ) {
+				Repro_CT_Suite_Logger::log( 'Cookie-Erneuerung fehlgeschlagen: ' . $result->get_error_message(), 'error' );
+				return $result;
+			}
+			Repro_CT_Suite_Logger::log( 'Cookie erfolgreich erneuert', 'success' );
+			return true;
+		}
+		
+		return true;
+	}

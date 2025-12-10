@@ -38,7 +38,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * ChurchTools Tenant (z.B. "gemeinde" fä¼r gemeinde.church.tools)
+	 * ChurchTools Tenant (z.B. "gemeinde" für gemeinde.church.tools)
 
 	 *
 
@@ -80,7 +80,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Gespeicherte Cookies fä¼r Session-Wiederverwendung
+	 * Gespeicherte Cookies für Session-Wiederverwendung
 
 	 *
 
@@ -94,20 +94,11 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Option-Key fä¼r Cookie-Speicherung
+	 * Option-Key für Cookie-Speicherung
 
 	 */
 
 	const COOKIE_OPTION_KEY = 'repro_ct_suite_ct_cookies';
-
-	/**
-	 * Option-Key fuer Cookie-Ablaufzeit
-	 */
-	const COOKIE_EXPIRY_KEY = 'repro_ct_suite_ct_cookie_expiry';
-
-	const COOKIE_LIFETIME = 43200;
-
-	private $cookie_created_at = 0;
 
 
 
@@ -145,7 +136,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Basis-URL fä¼r ChurchTools API
+	 * Basis-URL für ChurchTools API
 
 	 *
 
@@ -261,7 +252,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Prä¼ft, ob eine gä¼ltige Session vorhanden ist (via gespeicherte Cookies)
+	 * Prüft, ob eine gültige Session vorhanden ist (via gespeicherte Cookies)
 
 	 *
 
@@ -279,9 +270,9 @@ class Repro_CT_Suite_CT_Client {
 
 
 
-		// Optionaler Whoami-Check (kann hinzugefä¼gt werden)
+		// Optionaler Whoami-Check (kann hinzugefügt werden)
 
-		// Fä¼r jetzt: wenn Cookies da sind, annehmen dass Session aktiv ist
+		// Für jetzt: wenn Cookies da sind, annehmen dass Session aktiv ist
 
 		return true;
 
@@ -635,7 +626,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Headers fä¼r API-Requests (inkl. Cookies)
+	 * Headers für API-Requests (inkl. Cookies)
 
 	 *
 
@@ -661,7 +652,7 @@ class Repro_CT_Suite_CT_Client {
 
 			foreach ( $this->cookies as $name => $value ) {
 
-				// Gekä¼rzte Cookie-Werte fä¼r Debug-Log (erste 20 + letzte 10 Zeichen)
+				// Gekürzte Cookie-Werte für Debug-Log (erste 20 + letzte 10 Zeichen)
 
 				$masked_value = strlen( $value ) > 30 ? substr( $value, 0, 20 ) . '...' . substr( $value, -10 ) : $value;
 
@@ -677,7 +668,7 @@ class Repro_CT_Suite_CT_Client {
 
 		} else {
 
-			Repro_CT_Suite_Logger::log( "âš ï¸ Keine Cookies vorhanden - Request kä¶nnte fehlschlagen!", 'warning' );
+			Repro_CT_Suite_Logger::log( "⚠️ Keine Cookies vorhanden - Request könnte fehlschlagen!", 'warning' );
 
 		}
 
@@ -696,10 +687,8 @@ class Repro_CT_Suite_CT_Client {
 	 */
 
 	private function save_cookies(): void {
-		$this->cookie_created_at = time();
 
 		update_option( self::COOKIE_OPTION_KEY, $this->cookies, false );
-		update_option( self::COOKIE_EXPIRY_KEY, $this->cookie_created_at, false );
 
 	}
 
@@ -718,7 +707,6 @@ class Repro_CT_Suite_CT_Client {
 		if ( is_array( $cookies ) ) {
 
 			$this->cookies = $cookies;
-			$this->cookie_created_at = (int) get_option( self::COOKIE_EXPIRY_KEY, 0 );
 
 		}
 
@@ -728,17 +716,15 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Cookies lä¶schen (Logout)
+	 * Cookies löschen (Logout)
 
 	 */
 
 	public function clear_cookies(): void {
 
 		$this->cookies = array();
-		$this->cookie_created_at = 0;
 
 		delete_option( self::COOKIE_OPTION_KEY );
-		delete_option( self::COOKIE_EXPIRY_KEY );
 
 	}
 
@@ -746,7 +732,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Hilfsmethode: Whoami-Check (optional fä¼r is_authenticated)
+	 * Hilfsmethode: Whoami-Check (optional für is_authenticated)
 
 	 *
 

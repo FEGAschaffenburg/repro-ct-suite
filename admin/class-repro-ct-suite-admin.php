@@ -1920,30 +1920,41 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_sync_appointments(): void {
+	public function ajax_sync_appointments() {
+		error_log('========================================');
+		error_log('TERMINE-SYNC START - ' . date('Y-m-d H:i:s'));
+		error_log('========================================');
 
-		// Nonce-PrÃ¼fung
-
-		check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
-
-
-
-		// BerechtigungsprÃ¼fung
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-
-			wp_send_json_error( array(
-
-				'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
-
-			) );
-
+		try {
+			error_log('SCHRITT 1: Nonce-Prüfung');
+			// Nonce-PrÃ¼fung
+			check_ajax_referer( 'repro_ct_suite_admin', 'nonce' );
+			error_log('SCHRITT 1: OK');
+		} catch (Exception $e) {
+			error_log('SCHRITT 1: FEHLER - ' . $e->getMessage());
+			wp_send_json_error(array('message' => 'Nonce-Fehler: ' . $e->getMessage()));
+			return;
 		}
 
+		try {
+			error_log('SCHRITT 2: Berechtigungsprüfung');
+			// BerechtigungsprÃ¼fung
+			if ( ! current_user_can( 'manage_options' ) ) {
+				error_log('SCHRITT 2: FEHLER - Keine Berechtigung');
+				wp_send_json_error( array(
+					'message' => __( 'Keine Berechtigung fÃ¼r diese Aktion.', 'repro-ct-suite' )
+				) );
+				return;
+			}
+			error_log('SCHRITT 2: OK');
+		} catch (Exception $e) {
+			error_log('SCHRITT 2: FEHLER - ' . $e->getMessage());
+			wp_send_json_error(array('message' => 'Berechtigungsfehler: ' . $e->getMessage()));
+			return;
+		}
 
-
+		error_log('SCHRITT 3: Dependencies laden');
 		// Dependencies laden
-
 		try {
 
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-repro-ct-suite-logger.php';
@@ -1959,165 +1970,152 @@ class Repro_CT_Suite_Admin {
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/repositories/class-repro-ct-suite-schedule-repository.php';
 
 			require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/services/class-repro-ct-suite-sync-service.php';
+			error_log('SCHRITT 3: OK - Alle Dependencies geladen');
 
 		} catch ( Exception $e ) {
-
+			error_log('SCHRITT 3: FEHLER - ' . $e->getMessage());
 			wp_send_json_error( array(
-
 				'message' => 'Fehler beim Laden der Dependencies: ' . $e->getMessage()
-
 			) );
-
 			return;
-
 		}
 
+		try {
+			error_log('SCHRITT 4: Konfiguration prüfen');
+			// Konfiguration prÃ¼fen
+			$tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
+			$username = get_option( 'repro_ct_suite_ct_username', '' );
+			$password = get_option( 'repro_ct_suite_ct_password', '' );
+			error_log('SCHRITT 4: Tenant=' . $tenant . ', Username=' . $username);
 
-
-		// Konfiguration prÃ¼fen
-
-		$tenant   = get_option( 'repro_ct_suite_ct_tenant', '' );
-
-		$username = get_option( 'repro_ct_suite_ct_username', '' );
-
-		$password = get_option( 'repro_ct_suite_ct_password', '' );
-
-
-
-		if ( empty( $tenant ) || empty( $username ) || empty( $password ) ) {
-
-			wp_send_json_error( array(
-
-				'message' => __( 'ChurchTools-Verbindung nicht konfiguriert. Bitte prÃ¼fen Sie die Einstellungen.', 'repro-ct-suite' )
-
-			) );
-
+			if ( empty( $tenant ) || empty( $username ) || empty( $password ) ) {
+				error_log('SCHRITT 4: FEHLER - Konfiguration unvollständig');
+				wp_send_json_error( array(
+					'message' => __( 'ChurchTools-Verbindung nicht konfiguriert. Bitte prÃ¼fen Sie die Einstellungen.', 'repro-ct-suite' )
+				) );
+				return;
+			}
+			error_log('SCHRITT 4: OK');
+		} catch (Exception $e) {
+			error_log('SCHRITT 4: FEHLER - ' . $e->getMessage());
+			wp_send_json_error(array('message' => 'Konfigurationsfehler: ' . $e->getMessage()));
 			return;
-
 		}
 
+		try {
+			error_log('SCHRITT 5: Services initialisieren');
+			// Services initialisieren
+			$ct_client      = new Repro_CT_Suite_CT_Client( $tenant, $username, $password );
+			error_log('SCHRITT 5: CT_Client erstellt');
+			$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
+			error_log('SCHRITT 5: Calendars_Repository erstellt');
+			$events_repo    = new Repro_CT_Suite_Events_Repository();
+			error_log('SCHRITT 5: Events_Repository erstellt');
+			$schedule_repo  = new Repro_CT_Suite_Schedule_Repository();
+			error_log('SCHRITT 5: Schedule_Repository erstellt');
+			$sync_service   = new Repro_CT_Suite_Sync_Service( $ct_client, $events_repo, $calendars_repo, $schedule_repo );
+			error_log('SCHRITT 5: OK - Sync_Service erstellt');
+		} catch (Exception $e) {
+			error_log('SCHRITT 5: FEHLER - ' . $e->getMessage());
+			wp_send_json_error(array('message' => 'Service-Initialisierungsfehler: ' . $e->getMessage()));
+			return;
+		}
 
-
-		// Services initialisieren
-
-		$ct_client      = new Repro_CT_Suite_CT_Client( $tenant, $username, $password );
-
-		$calendars_repo = new Repro_CT_Suite_Calendars_Repository();
-
-		$events_repo    = new Repro_CT_Suite_Events_Repository();
-
-		$schedule_repo  = new Repro_CT_Suite_Schedule_Repository();
-
-		$sync_service   = new Repro_CT_Suite_Sync_Service( $ct_client, $events_repo, $calendars_repo, $schedule_repo );
-
-
-
-		// AusgewÃ¤hlte Kalender ermitteln
-
-		$selected_calendar_ids = $calendars_repo->get_selected_calendar_ids();
+		try {
+			error_log('SCHRITT 6: Ausgewählte Kalender ermitteln');
+			// AusgewÃ¤hlte Kalender ermitteln
+			$selected_calendar_ids = $calendars_repo->get_selected_calendar_ids();
+			error_log('SCHRITT 6: Gefundene Kalender-IDs: ' . implode(', ', $selected_calendar_ids));
 
 		
 
-		if ( empty( $selected_calendar_ids ) ) {
+			if ( empty( $selected_calendar_ids ) ) {
+				error_log('SCHRITT 6: FEHLER - Keine Kalender ausgewählt');
+				wp_send_json_error( array(
+					'message' => __( 'Keine Kalender fÃ¼r den Import ausgewÃ¤hlt. Bitte wÃ¤hlen Sie Kalender in den Einstellungen aus.', 'repro-ct-suite' )
+				) );
+				return;
+			}
+			error_log('SCHRITT 6: OK');
 
-			wp_send_json_error( array(
-
-				'message' => __( 'Keine Kalender fÃ¼r den Import ausgewÃ¤hlt. Bitte wÃ¤hlen Sie Kalender in den Einstellungen aus.', 'repro-ct-suite' )
-
-			) );
-
+			Repro_CT_Suite_Logger::log( 'AusgewÃ¤hlte Kalender (externe ChurchTools-IDs): ' . implode( ', ', $selected_calendar_ids ) );
+		} catch (Exception $e) {
+			error_log('SCHRITT 6: FEHLER - ' . $e->getMessage());
+			wp_send_json_error(array('message' => 'Kalender-Ermittlungsfehler: ' . $e->getMessage()));
 			return;
-
 		}
 
+		try {
+			error_log('SCHRITT 7: Sync-Zeitraum berechnen');
+			// Sync-Zeitraum
+			$sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
+			$sync_to_days   = get_option( 'repro_ct_suite_sync_to_days', 90 );
+			$from = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_from_days * DAY_IN_SECONDS ) );
+			$to   = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_to_days * DAY_IN_SECONDS ) );
+			error_log('SCHRITT 7: Von=' . $from . ', Bis=' . $to);
+			error_log('SCHRITT 7: OK');
 
-
-		Repro_CT_Suite_Logger::log( 'AusgewÃ¤hlte Kalender (externe ChurchTools-IDs): ' . implode( ', ', $selected_calendar_ids ) );
-
-
-
-		// Sync-Zeitraum
-
-		$sync_from_days = get_option( 'repro_ct_suite_sync_from_days', -7 );
-
-		$sync_to_days   = get_option( 'repro_ct_suite_sync_to_days', 90 );
-
-		$from = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_from_days * DAY_IN_SECONDS ) );
-
-		$to   = date( 'Y-m-d', current_time( 'timestamp' ) + ( (int) $sync_to_days * DAY_IN_SECONDS ) );
-
-
-
-		Repro_CT_Suite_Logger::log( 'Zeitraum: von ' . $from . ' bis ' . $to );
-
-
-
-		// Sync ausfÃ¼hren mit externen ChurchTools-IDs (kein lokales Mapping mehr!)
-
-		$result = $sync_service->sync_events( array(
-
-			'calendar_ids' => $selected_calendar_ids, // Direkt ChurchTools-IDs!
-
-			'from'         => $from,
-
-			'to'           => $to,
-
-		) );
-
-
-
-		if ( is_wp_error( $result ) ) {
-
-			Repro_CT_Suite_Logger::header( 'SYNC FEHLGESCHLAGEN', 'error' );
-
-			Repro_CT_Suite_Logger::log( 'Error: ' . $result->get_error_message(), 'error' );
-
-
-
-			wp_send_json_error( array(
-
-				'message' => sprintf(
-
-					__( 'Fehler beim Synchronisieren der Termine: %s', 'repro-ct-suite' ),
-
-					$result->get_error_message()
-
-				),
-
-				'debug' => array(
-
-					'error_code'    => $result->get_error_code(),
-
-					'error_message' => $result->get_error_message(),
-
-				),
-
-			) );
-
+			Repro_CT_Suite_Logger::log( 'Zeitraum: von ' . $from . ' bis ' . $to );
+		} catch (Exception $e) {
+			error_log('SCHRITT 7: FEHLER - ' . $e->getMessage());
+			wp_send_json_error(array('message' => 'Zeitraum-Berechnungsfehler: ' . $e->getMessage()));
 			return;
-
 		}
 
+		try {
+			error_log('SCHRITT 8: Sync ausführen');
+			error_log('SCHRITT 8: Rufe sync_events() mit ' . count($selected_calendar_ids) . ' Kalendern auf');
+			// Sync ausfÃ¼hren mit externen ChurchTools-IDs (kein lokales Mapping mehr!)
+			$result = $sync_service->sync_events( array(
+				'calendar_ids' => $selected_calendar_ids, // Direkt ChurchTools-IDs!
+				'from'         => $from,
+				'to'           => $to,
+			) );
+			error_log('SCHRITT 8: sync_events() hat Ergebnis zurückgegeben');
 
 
+
+			if ( is_wp_error( $result ) ) {
+				error_log('SCHRITT 8: FEHLER - WP_Error: ' . $result->get_error_message());
+				Repro_CT_Suite_Logger::header( 'SYNC FEHLGESCHLAGEN', 'error' );
+				Repro_CT_Suite_Logger::log( 'Error: ' . $result->get_error_message(), 'error' );
+
+				wp_send_json_error( array(
+					'message' => sprintf(
+						__( 'Fehler beim Synchronisieren der Termine: %s', 'repro-ct-suite' ),
+						$result->get_error_message()
+					),
+					'debug' => array(
+						'error_code'    => $result->get_error_code(),
+						'error_message' => $result->get_error_message(),
+					),
+				) );
+				return;
+			}
+
+			error_log('SCHRITT 8: OK - Events Found=' . $result['events_found'] . ', Inserted=' . $result['events_inserted'] . ', Updated=' . $result['events_updated']);
+		} catch (Exception $e) {
+			error_log('SCHRITT 8: EXCEPTION - ' . $e->getMessage());
+			error_log('SCHRITT 8: Stack Trace: ' . $e->getTraceAsString());
+			wp_send_json_error(array('message' => 'Sync-Fehler: ' . $e->getMessage()));
+			return;
+		} catch (Error $e) {
+			error_log('SCHRITT 8: PHP ERROR - ' . $e->getMessage());
+			error_log('SCHRITT 8: Stack Trace: ' . $e->getTraceAsString());
+			wp_send_json_error(array('message' => 'PHP Error: ' . $e->getMessage()));
+			return;
+		}
+
+		error_log('SCHRITT 9: Erfolgreicher Abschluss');
 		// Erfolg
-
 		Repro_CT_Suite_Logger::log( 'SYNC ERFOLGREICH ABGESCHLOSSEN', 'success' );
 
-
-
 		wp_send_json_success( array(
-
 			'message' => sprintf(
-
 				__( 'Synchronisation erfolgreich: %d Termine verarbeitet (%d neu, %d aktualisiert)', 'repro-ct-suite' ),
-
 				$result['events_found'],
-
 				$result['events_inserted'],
-
 				$result['events_updated']
-
 			),
 
 			'stats' => $result,

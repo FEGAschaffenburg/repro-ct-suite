@@ -7,7 +7,7 @@ $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $RepoRoot = Resolve-Path (Join-Path $ScriptDir "..") | Select-Object -ExpandProperty Path
 $TempDir = Join-Path $env:TEMP "repro-ct-suite-wp-$Version"
 $PluginDir = Join-Path $TempDir "repro-ct-suite"
-$OutputZip = Join-Path $RepoRoot "repro-ct-suite.zip"
+$OutputZip = Join-Path $RepoRoot "repro-ct-suite-$Version.zip"
 
 Write-Host "=== WordPress ZIP Creator ===" -ForegroundColor Cyan
 Write-Host "Version: $Version"

@@ -2,7 +2,7 @@
 /**
  * Einstellungen Tab Template
  *
- * Formular fÃ¼r ChurchTools-API-Konfiguration.
+ * Formular fü¼r ChurchTools-API-Konfiguration.
  *
  * @package    Repro_CT_Suite
  * @subpackage Repro_CT_Suite/admin/views/tabs
@@ -11,7 +11,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-// Repositories laden fÃ¼r Kalender-Verwaltung
+// Repositories laden fü¼r Kalender-Verwaltung
 require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-repository-base.php';
 require_once REPRO_CT_SUITE_PATH . 'includes/repositories/class-repro-ct-suite-calendars-repository.php';
 
@@ -67,7 +67,7 @@ if ( $test_result !== false ) {
 					<th scope="row"><label for="repro_ct_suite_ct_tenant"><?php esc_html_e( 'ChurchTools Tenant', 'repro-ct-suite' ); ?></label></th>
 					<td>
 						<input type="text" id="repro_ct_suite_ct_tenant" name="repro_ct_suite_ct_tenant" value="<?php echo esc_attr( $tenant ); ?>" class="regular-text" placeholder="gemeinde" />
-						<p class="description"><?php esc_html_e( 'Der Tenant-Name aus Ihrer ChurchTools-URL (z.B. "gemeinde" fÃ¼r gemeinde.church.tools)', 'repro-ct-suite' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Der Tenant-Name aus Ihrer ChurchTools-URL (z.B. "gemeinde" fü¼r gemeinde.church.tools)', 'repro-ct-suite' ); ?></p>
 						<?php if ( ! empty( $tenant ) ) : ?>
 							<p class="description"><strong><?php esc_html_e( 'Ihre URL:', 'repro-ct-suite' ); ?></strong> <code>https://<?php echo esc_html( $tenant ); ?>.church.tools</code></p>
 						<?php endif; ?>
@@ -84,7 +84,7 @@ if ( $test_result !== false ) {
 					<th scope="row"><label for="repro_ct_suite_ct_password"><?php esc_html_e( 'Passwort', 'repro-ct-suite' ); ?></label></th>
 					<td>
 						<input type="password" id="repro_ct_suite_ct_password" name="repro_ct_suite_ct_password" value="" class="regular-text" autocomplete="new-password" placeholder="<?php echo ! empty( $enc_pw ) ? esc_attr__( '(gespeichert)', 'repro-ct-suite' ) : ''; ?>" />
-						<p class="description"><?php esc_html_e( 'Wird verschlÃ¼sselt gespeichert. Leer lassen, um das bestehende Passwort beizubehalten.', 'repro-ct-suite' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Wird verschlü¼sselt gespeichert. Leer lassen, um das bestehende Passwort beizubehalten.', 'repro-ct-suite' ); ?></p>
 						<?php if ( ! empty( $enc_pw ) ) : ?>
 							<p class="description" style="color:#46b450;">âœ“ <?php esc_html_e( 'Ein Passwort ist gespeichert.', 'repro-ct-suite' ); ?></p>
 						<?php endif; ?>
@@ -99,7 +99,7 @@ if ( $test_result !== false ) {
 				<?php if ( ! empty( $tenant ) || ! empty( $username ) || ! empty( $enc_pw ) ) : ?>
 					<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-danger" id="reset-login-credentials" style="margin-left: 10px;">
 						<span class="dashicons dashicons-trash"></span>
-						<?php esc_html_e( 'Zugangsdaten lÃ¶schen', 'repro-ct-suite' ); ?>
+						<?php esc_html_e( 'Zugangsdaten lü¶schen', 'repro-ct-suite' ); ?>
 					</button>
 				<?php endif; ?>
 			</p>
@@ -116,7 +116,7 @@ if ( $test_result !== false ) {
 					<td>
 						<input type="number" id="repro_ct_suite_sync_from_days" name="repro_ct_suite_sync_from_days" value="<?php echo esc_attr( get_option( 'repro_ct_suite_sync_from_days', -7 ) ); ?>" class="small-text" />
 						<p class="description">
-							<?php esc_html_e( 'Negative Zahl = Tage in der Vergangenheit (z.B. -7 = 7 Tage zurÃ¼ck). Standard: -7', 'repro-ct-suite' ); ?>
+							<?php esc_html_e( 'Negative Zahl = Tage in der Vergangenheit (z.B. -7 = 7 Tage zurü¼ck). Standard: -7', 'repro-ct-suite' ); ?>
 						</p>
 					</td>
 				</tr>
@@ -148,7 +148,7 @@ if ( $test_result !== false ) {
 					<th scope="row"><?php esc_html_e( 'Logging: Syslog aktivieren', 'repro-ct-suite' ); ?></th>
 					<td>
 						<input type="checkbox" id="repro_ct_suite_syslog" name="repro_ct_suite_syslog" value="1" <?php checked( get_option( 'repro_ct_suite_syslog', 0 ), 1 ); ?> />
-						<p class="description"><?php esc_html_e( 'Bei Aktivierung werden Log-EintrÃ¤ge zusÃ¤tzlich an das System-Log (syslog) gesendet. Dies setzt entsprechende Serverrechte/Logging voraus.', 'repro-ct-suite' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Bei Aktivierung werden Log-Eintrü¤ge zusü¤tzlich an das System-Log (syslog) gesendet. Dies setzt entsprechende Serverrechte/Logging voraus.', 'repro-ct-suite' ); ?></p>
 					</td>
 				</tr>
 			</table>
@@ -164,7 +164,7 @@ if ( $test_result !== false ) {
 		<script>
 		jQuery(document).ready(function($) {
 			$('#reset-login-credentials').on('click', function() {
-				if (!confirm('<?php esc_html_e( 'MÃ¶chten Sie wirklich alle Zugangsdaten (Tenant, Benutzername, Passwort) lÃ¶schen?\n\nDiese Aktion kann nicht rÃ¼ckgÃ¤ngig gemacht werden.', 'repro-ct-suite' ); ?>')) {
+				if (!confirm('<?php esc_html_e( 'Mü¶chten Sie wirklich alle Zugangsdaten (Tenant, Benutzername, Passwort) lü¶schen?\n\nDiese Aktion kann nicht rü¼ckgü¤ngig gemacht werden.', 'repro-ct-suite' ); ?>')) {
 					return;
 				}
 				
@@ -177,10 +177,10 @@ if ( $test_result !== false ) {
 					},
 					success: function(response) {
 						if (response.success) {
-							// Erste Stufe erfolgreich - Frage nach vollstÃ¤ndigem Reset
+							// Erste Stufe erfolgreich - Frage nach vollstü¤ndigem Reset
 							if (response.data.ask_full_reset) {
-								if (confirm('<?php esc_html_e( 'Zugangsdaten wurden gelÃ¶scht.\n\nMÃ¶chten Sie auch ALLE anderen Daten lÃ¶schen?\n\nâš ï¸ WARNUNG: Dies lÃ¶scht:\nâ€¢ Alle Kalender-Einstellungen\nâ€¢ Alle synchronisierten Events\nâ€¢ Alle Termine (Appointments)\nâ€¢ Alle Service-Zuordnungen\nâ€¢ Alle Synchronisations-Zeitstempel\n\nDiese Aktion kann NICHT rÃ¼ckgÃ¤ngig gemacht werden!', 'repro-ct-suite' ); ?>')) {
-									// VollstÃ¤ndiger Reset
+								if (confirm('<?php esc_html_e( 'Zugangsdaten wurden gelü¶scht.\n\nMü¶chten Sie auch ALLE anderen Daten lü¶schen?\n\nâš ï¸ WARNUNG: Dies lü¶scht:\nâ€¢ Alle Kalender-Einstellungen\nâ€¢ Alle synchronisierten Events\nâ€¢ Alle Termine (Appointments)\nâ€¢ Alle Service-Zuordnungen\nâ€¢ Alle Synchronisations-Zeitstempel\n\nDiese Aktion kann NICHT rü¼ckgü¤ngig gemacht werden!', 'repro-ct-suite' ); ?>')) {
+									// Vollstü¤ndiger Reset
 									$.ajax({
 										url: ajaxurl,
 										type: 'POST',
@@ -190,10 +190,10 @@ if ( $test_result !== false ) {
 										},
 										success: function(response) {
 											if (response.success) {
-												alert('<?php esc_html_e( 'VollstÃ¤ndiger Reset durchgefÃ¼hrt. Alle Daten wurden gelÃ¶scht.', 'repro-ct-suite' ); ?>');
+												alert('<?php esc_html_e( 'Vollstü¤ndiger Reset durchgefü¼hrt. Alle Daten wurden gelü¶scht.', 'repro-ct-suite' ); ?>');
 												location.reload();
 											} else {
-												alert('<?php esc_html_e( 'Fehler beim vollstÃ¤ndigen Reset: ', 'repro-ct-suite' ); ?>' + (response.data.message || '<?php esc_html_e( 'Unbekannter Fehler', 'repro-ct-suite' ); ?>'));
+												alert('<?php esc_html_e( 'Fehler beim vollstü¤ndigen Reset: ', 'repro-ct-suite' ); ?>' + (response.data.message || '<?php esc_html_e( 'Unbekannter Fehler', 'repro-ct-suite' ); ?>'));
 											}
 										},
 										error: function() {
@@ -201,15 +201,15 @@ if ( $test_result !== false ) {
 										}
 									});
 								} else {
-									// Nur Zugangsdaten gelÃ¶scht, kein vollstÃ¤ndiger Reset
-									alert('<?php esc_html_e( 'Nur Zugangsdaten wurden gelÃ¶scht. Alle anderen Daten bleiben erhalten.', 'repro-ct-suite' ); ?>');
+									// Nur Zugangsdaten gelü¶scht, kein vollstü¤ndiger Reset
+									alert('<?php esc_html_e( 'Nur Zugangsdaten wurden gelü¶scht. Alle anderen Daten bleiben erhalten.', 'repro-ct-suite' ); ?>');
 									location.reload();
 								}
 							} else {
 								location.reload();
 							}
 						} else {
-							alert('<?php esc_html_e( 'Fehler beim LÃ¶schen der Zugangsdaten: ', 'repro-ct-suite' ); ?>' + (response.data.message || '<?php esc_html_e( 'Unbekannter Fehler', 'repro-ct-suite' ); ?>'));
+							alert('<?php esc_html_e( 'Fehler beim Lü¶schen der Zugangsdaten: ', 'repro-ct-suite' ); ?>' + (response.data.message || '<?php esc_html_e( 'Unbekannter Fehler', 'repro-ct-suite' ); ?>'));
 						}
 					},
 					error: function() {
@@ -254,7 +254,7 @@ if ( $test_result !== false ) {
 		<h3><?php esc_html_e( 'Kalender-Auswahl', 'repro-ct-suite' ); ?></h3>
 	</div>
 	<div class="repro-ct-suite-card-body">
-		<p><?php esc_html_e( 'WÃ¤hlen Sie, welche Kalender synchronisiert werden sollen. Nur Termine und Events aus ausgewÃ¤hlten Kalendern werden importiert.', 'repro-ct-suite' ); ?></p>
+		<p><?php esc_html_e( 'Wü¤hlen Sie, welche Kalender synchronisiert werden sollen. Nur Termine und Events aus ausgewü¤hlten Kalendern werden importiert.', 'repro-ct-suite' ); ?></p>
 		
 		<?php if ( empty( $all_calendars ) ) : ?>
 			<div class="repro-ct-suite-notice repro-ct-suite-notice-warning repro-ct-suite-mt-10">
@@ -277,7 +277,7 @@ if ( $test_result !== false ) {
 					<?php 
 					printf(
 						/* translators: 1: Number of selected calendars, 2: Total number of calendars */
-						esc_html__( '%1$d von %2$d Kalendern ausgewÃ¤hlt', 'repro-ct-suite' ),
+						esc_html__( '%1$d von %2$d Kalendern ausgewü¤hlt', 'repro-ct-suite' ),
 						$selected_count,
 						count( $all_calendars )
 					);
@@ -331,7 +331,7 @@ if ( $test_result !== false ) {
 								<td>
 									<?php if ( $calendar->is_public ) : ?>
 										<span class="repro-ct-suite-badge repro-ct-suite-badge-success">
-											<?php esc_html_e( 'Ã–ffentlich', 'repro-ct-suite' ); ?>
+											<?php esc_html_e( 'ü–ffentlich', 'repro-ct-suite' ); ?>
 										</span>
 									<?php else : ?>
 										<span class="repro-ct-suite-badge repro-ct-suite-badge-secondary">
@@ -396,13 +396,13 @@ if ( $test_result !== false ) {
 				<span class="dashicons dashicons-clipboard"></span>
 				<?php esc_html_e( 'Debug-Log kopieren', 'repro-ct-suite' ); ?>
 			</button>
-			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-secondary" onclick="jQuery('#repro-ct-suite-debug-content').html('<div style=\'color: #666;\'><?php esc_html_e( 'Debug-Log gelÃ¶scht', 'repro-ct-suite' ); ?></div>');">
+			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-secondary" onclick="jQuery('#repro-ct-suite-debug-content').html('<div style=\'color: #666;\'><?php esc_html_e( 'Debug-Log gelü¶scht', 'repro-ct-suite' ); ?></div>');">
 				<span class="dashicons dashicons-trash"></span>
-				<?php esc_html_e( 'Debug-Log lÃ¶schen', 'repro-ct-suite' ); ?>
+				<?php esc_html_e( 'Debug-Log lü¶schen', 'repro-ct-suite' ); ?>
 			</button>
 			<button type="button" class="repro-ct-suite-btn repro-ct-suite-btn-secondary" onclick="jQuery('#repro-ct-suite-debug-panel').hide();">
 				<span class="dashicons dashicons-no"></span>
-				<?php esc_html_e( 'Debug-Panel schlieÃŸen', 'repro-ct-suite' ); ?>
+				<?php esc_html_e( 'Debug-Panel schlieüŸen', 'repro-ct-suite' ); ?>
 			</button>
 		</p>
 		
@@ -441,7 +441,7 @@ if ( $test_result !== false ) {
 		</script>
 		
 		<p class="description">
-			<?php esc_html_e( 'Diese Informationen zeigen detailliert, was beim Kalender-Sync passiert. Ã–ffnen Sie auÃŸerdem die Browser-Konsole (F12) fÃ¼r weitere Details.', 'repro-ct-suite' ); ?>
+			<?php esc_html_e( 'Diese Informationen zeigen detailliert, was beim Kalender-Sync passiert. ü–ffnen Sie auüŸerdem die Browser-Konsole (F12) fü¼r weitere Details.', 'repro-ct-suite' ); ?>
 		</p>
 	</div>
 </div>
@@ -453,10 +453,10 @@ if ( $test_result !== false ) {
 	</div>
 	<div class="repro-ct-suite-card-body">
 		<ul style="padding-left: 20px;">
-			<li><?php esc_html_e( 'Ihr Passwort wird mit AES-256-CBC verschlÃ¼sselt in der Datenbank gespeichert.', 'repro-ct-suite' ); ?></li>
-			<li><?php esc_html_e( 'Die Session-Cookies werden in der Datenbank gespeichert und fÃ¼r API-Zugriffe wiederverwendet.', 'repro-ct-suite' ); ?></li>
+			<li><?php esc_html_e( 'Ihr Passwort wird mit AES-256-CBC verschlü¼sselt in der Datenbank gespeichert.', 'repro-ct-suite' ); ?></li>
+			<li><?php esc_html_e( 'Die Session-Cookies werden in der Datenbank gespeichert und fü¼r API-Zugriffe wiederverwendet.', 'repro-ct-suite' ); ?></li>
 			<li><?php esc_html_e( 'Bei abgelaufener Session erfolgt automatisch ein erneuter Login.', 'repro-ct-suite' ); ?></li>
-			<li><?php esc_html_e( 'Verwenden Sie einen dedizierten ChurchTools-Benutzer mit minimalen Rechten fÃ¼r die Synchronisation.', 'repro-ct-suite' ); ?></li>
+			<li><?php esc_html_e( 'Verwenden Sie einen dedizierten ChurchTools-Benutzer mit minimalen Rechten fü¼r die Synchronisation.', 'repro-ct-suite' ); ?></li>
 		</ul>
 	</div>
 </div>
@@ -514,7 +514,7 @@ $last_sync = get_option( 'repro_ct_suite_last_auto_sync', 0 );
 								<?php esc_html_e( 'Aktiviert', 'repro-ct-suite' ); ?>
 							</label>
 							<p class="description">
-								<?php esc_html_e( 'Wenn aktiviert, werden Termine automatisch im gewÃ¤hlten Intervall synchronisiert.', 'repro-ct-suite' ); ?>
+								<?php esc_html_e( 'Wenn aktiviert, werden Termine automatisch im gewü¤hlten Intervall synchronisiert.', 'repro-ct-suite' ); ?>
 			</p>
 						</td>
 					</tr>
@@ -543,7 +543,7 @@ $last_sync = get_option( 'repro_ct_suite_last_auto_sync', 0 );
 						</th>
 						<td>
 							<?php if ( $next_scheduled ) : ?>
-								<strong><?php esc_html_e( 'NÃ¤chster Sync:', 'repro-ct-suite' ); ?></strong>
+								<strong><?php esc_html_e( 'Nü¤chster Sync:', 'repro-ct-suite' ); ?></strong>
 								<?php echo esc_html( wp_date( 'd.m.Y H:i', $next_scheduled ) ); ?>
 								(<?php echo esc_html( human_time_diff( current_time( 'timestamp' ), $next_scheduled ) ); ?>)
 								<br>

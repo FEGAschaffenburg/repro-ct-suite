@@ -1414,7 +1414,7 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Event in die Datenbank speichern (Insert oder Update)
 
-		$exists = $this->events_repo->get_by_event_id( $event_data['event_id'] );
+		$exists = $this->events_repo->get_by_event_id( (int) $event_data['event_id'] );
 
 		
 
@@ -1614,7 +1614,7 @@ class Repro_CT_Suite_Sync_Service {
 
 		// Fall 1: Event wurde bereits aus diesem Appointment erstellt (gleiche event_id)
 
-		$exists = $this->events_repo->get_by_event_id( $event_data['event_id'] );
+		$exists = $this->events_repo->get_by_event_id( (int) $event_data['event_id'] );
 
 		
 
@@ -1622,7 +1622,7 @@ class Repro_CT_Suite_Sync_Service {
 
 		if ( ! $exists && ! empty( $event_data['appointment_id'] ) ) {
 
-			$exists = $this->events_repo->get_by_appointment_id( $event_data['appointment_id'] );
+			$exists = $this->events_repo->get_by_appointment_id( (int) $event_data['appointment_id'] );
 
 			if ( $exists ) {
 
