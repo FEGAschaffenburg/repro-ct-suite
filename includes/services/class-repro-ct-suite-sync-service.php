@@ -1048,27 +1048,57 @@ class Repro_CT_Suite_Sync_Service {
 
 		
 
-		Repro_CT_Suite_Logger::log( "Phase 2: {$appointments_found} Appointments gefunden" );
+	
 
+	Repro_CT_Suite_Logger::log( "Phase 2: {$appointments_found} Appointments gefunden" );
 
-
-		$stats = array(
-
-			'appointments_found' => $appointments_found,
-
-			'events_inserted' => 0,
-
-			'events_updated'  => 0,
-
-			'events_skipped'  => 0,
-
-		);
-
+	// Client-seitige Filterung nach Zeitraum (falls API-Filter nicht funktioniert)
+	$original_count = $appointments_found; // Speichere Original-Anzahl vor Filter
+	$from_timestamp = strtotime( $args['from'] );
+	$to_timestamp   = strtotime( $args['to'] . ' 23:59:59' );
+	$filtered_appointments = array();
+	
+	foreach ( $appointments as $appointment_data ) {
+		// Zeitstempel aus Appointment extrahieren
+		$appointment = isset( $appointment_data['appointment'] ) ? $appointment_data['appointment'] : $appointment_data;
+		$start_date = null;
 		
+		// Versuche startDate aus verschiedenen Strukturen zu extrahieren
+		if ( isset( $appointment['calculated']['startDate'] ) ) {
+			$start_date = $appointment['calculated']['startDate'];
+		} elseif ( isset( $appointment['base']['startDate'] ) ) {
+			$start_date = $appointment['base']['startDate'];
+		} elseif ( isset( $appointment_data['calculated']['startDate'] ) ) {
+			$start_date = $appointment_data['calculated']['startDate'];
+		}
+		
+		if ( $start_date ) {
+			$appointment_timestamp = strtotime( $start_date );
+			if ( $appointment_timestamp >= $from_timestamp && $appointment_timestamp <= $to_timestamp ) {
+				$filtered_appointments[] = $appointment_data;
+			}
+		} else {
+			// Kein Datum gefunden - sicherheitshalber überspringen
+			Repro_CT_Suite_Logger::log( 'Phase 2: Appointment ohne startDate - übersprungen', 'warning' );
+		}
+	}
+	
+	// Aktualisiere Appointments-Liste mit gefilterten Daten
+	$appointments = $filtered_appointments;
+	$appointments_found = count( $filtered_appointments );
+	
+	Repro_CT_Suite_Logger::log( 'Phase 2: Zeitraum-Filter (' . $args['from'] . ' bis ' . $args['to'] . '): ' . $appointments_found . ' / ' . $original_count . ' Appointments im Zeitraum' );
 
-		$skipped_already_imported = 0;
+	$stats = array(
+		'appointments_found' => $appointments_found,
+		'events_inserted' => 0,
+		'events_updated'  => 0,
+		'events_skipped'  => 0,
+	);
 
-		$skipped_wrong_calendar = 0;
+	$skipped_already_imported = 0;
+	$skipped_wrong_calendar = 0;
+	$skipped_outside_timerange = $original_count - $appointments_found;
 
 
 
@@ -1160,11 +1190,9 @@ class Repro_CT_Suite_Sync_Service {
 
 		}
 
-		
-
 		Repro_CT_Suite_Logger::log( "Phase 2 abgeschlossen: {$stats['events_inserted']} neu, {$stats['events_updated']} aktualisiert" );
 
-		Repro_CT_Suite_Logger::log( "Übersprungen: {$skipped_already_imported} bereits importiert, {$skipped_wrong_calendar} falscher Kalender" );
+		Repro_CT_Suite_Logger::log( "Übersprungen: {$skipped_already_imported} bereits importiert, {$skipped_wrong_calendar} falscher Kalender, {$skipped_outside_timerange} außerhalb Zeitraum" );
 
 		
 

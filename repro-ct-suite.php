@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
 
@@ -6,9 +6,9 @@
 
  * Plugin URI:        https://github.com/FEGAschaffenburg/repro-ct-suite
 
- * Description:       ChurchTools-Integration fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r WordPress. Synchronisiert Termine und Events aus ChurchTools.
+ * Description:       ChurchTools-Integration fäƒÆ’ä‚Âüüä‚Âür WordPress. Synchronisiert Termine und Events aus ChurchTools.
 
- * Version: 1.0.0.2
+ * Version: 1.0.0.10
 
  * Requires at least: 5.0
 
@@ -50,11 +50,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
  * Version mit 4 Zahlen: Major.Minor.Patch.Build
 
- * Build-Nummer erhÃ¶hen bei minimalen Ã„nderungen
+ * Build-Nummer erhöhen bei minimalen Änderungen
 
  */
 
-define( 'REPRO_CT_SUITE_VERSION', '1.0.0.2' );
+define( 'REPRO_CT_SUITE_VERSION', '1.0.0.7' );
 
 define( 'REPRO_CT_SUITE_FILE', __FILE__ );
 
@@ -116,7 +116,7 @@ require_once REPRO_CT_SUITE_PATH . 'includes/class-repro-ct-suite.php';
 
 /**
 
- * GitHub Updater fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r automatische Updates
+ * GitHub Updater fäƒÆ’ä‚Âüüä‚Âür automatische Updates
 
  */
 
@@ -134,7 +134,7 @@ if ( is_admin() ) {
 
 	add_action( 'admin_init', function() {
 
-		// Force-Check Parameter fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r manuelles Update-PrÃ¼fung
+		// Force-Check Parameter fäƒÆ’ä‚Âüüä‚Âür manuelles Update-Prüfung
 
 		if ( isset( $_GET['force-check'] ) && current_user_can( 'update_plugins' ) ) {
 
@@ -156,7 +156,7 @@ if ( is_admin() ) {
 
 			'repro-ct-suite',
 
-			'' // Leer fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¶ffentliche Repositories
+			'' // Leer fäƒÆ’ä‚Âüüä‚Âür äƒÆ’ä‚Âüüä‚Â¶ffentliche Repositories
 
 		);
 
@@ -168,21 +168,21 @@ if ( is_admin() ) {
 
 /**
 
- * Fix fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r private GitHub Repository Downloads
+ * Fix fäƒÆ’ä‚Âüüä‚Âür private GitHub Repository Downloads
 
  *
 
- * WordPress kann standardmÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¤Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¤Æ’Ã¢â‚¬Â¦Ã¤â€šÃ‚Â¸ig keine privaten GitHub Assets herunterladen,
+ * WordPress kann standardmäƒÆ’ä‚Âüüä‚Â¤äƒÆ’ä‚Âüäƒâ€¦ä‚Â¸ig keine privaten GitHub Assets herunterladen,
 
- * da die Download-URL eine Authentifizierung erfordert. Dieser Filter fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼gt
+ * da die Download-URL eine Authentifizierung erfordert. Dieser Filter fäƒÆ’ä‚Âüüä‚Âügt
 
  * den Authorization-Header hinzu, damit der Download funktioniert.
 
  *
 
- * Hinweis: Dieser Filter wird nur benÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¶tigt, wenn das Repository privat ist.
+ * Hinweis: Dieser Filter wird nur benäƒÆ’ä‚Âüüä‚Â¶tigt, wenn das Repository privat ist.
 
- * Bei Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¶ffentlichen Repositories kann dieser Code entfernt werden.
+ * Bei äƒÆ’ä‚Âüüä‚Â¶ffentlichen Repositories kann dieser Code entfernt werden.
 
  *
 
@@ -196,7 +196,7 @@ add_filter(
 
 	function ( $reply, $package, $upgrader ) {
 
-		// Nur fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r unsere GitHub Releases
+		// Nur fäƒÆ’ä‚Âüüä‚Âür unsere GitHub Releases
 
 		if ( strpos( $package, 'github.com/FEGAschaffenburg/repro-ct-suite' ) === false ) {
 
@@ -206,9 +206,9 @@ add_filter(
 
 
 
-		// GitHub Token (nur fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r private Repositories erforderlich)
+		// GitHub Token (nur fäƒÆ’ä‚Âüüä‚Âür private Repositories erforderlich)
 
-		$github_token = ''; // Leer lassen fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¶ffentliche Repositories
+		$github_token = ''; // Leer lassen fäƒÆ’ä‚Âüüä‚Âür äƒÆ’ä‚Âüüä‚Â¶ffentliche Repositories
 
 
 
@@ -222,7 +222,7 @@ add_filter(
 
 
 
-		// Download mit Authorization Header (nur fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r private Repos)
+		// Download mit Authorization Header (nur fäƒÆ’ä‚Âüüä‚Âür private Repos)
 
 		$temp_file = download_url(
 
@@ -270,13 +270,13 @@ add_filter(
 
 /**
 
- * Auto-Updates fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r dieses Plugin erlauben (opt-in Ã¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼ber Option)
+ * Auto-Updates fäƒÆ’ä‚Âüüä‚Âür dieses Plugin erlauben (opt-in äƒÆ’ä‚Âüüä‚Âüber Option)
 
  *
 
  * Wenn die Option 'repro_ct_suite_auto_update' aktiv ist, gibt dieser Filter
 
- * fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r dieses Plugin true zurÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼ck. Damit fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼hrt WordPress im Hintergrund automatische
+ * fäƒÆ’ä‚Âüüä‚Âür dieses Plugin true zuräƒÆ’ä‚Âüüä‚Âück. Damit fäƒÆ’ä‚Âüüä‚Âührt WordPress im Hintergrund automatische
 
  * Updates aus, sobald im Transient ein Update vorhanden ist.
 
@@ -352,7 +352,7 @@ function run_repro_ct_suite() {
 
 /**
 
- * Registriere Gutenberg Block fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r ChurchTools Events
+ * Registriere Gutenberg Block fäƒÆ’ä‚Âüüä‚Âür ChurchTools Events
 
  */
 
@@ -382,7 +382,7 @@ add_action( 'init', 'repro_ct_suite_register_block' );
 
 /**
 
- * Render-Callback fÃ¤Æ’Ã†â€™Ã¤â€šÃ‚Â¼Ã¼Ã¤â€šÃ‚Â¼r Gutenberg Block
+ * Render-Callback fäƒÆ’ä‚Âüüä‚Âür Gutenberg Block
 
  */
 

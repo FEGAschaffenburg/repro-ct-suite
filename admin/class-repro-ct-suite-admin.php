@@ -144,6 +144,9 @@ class Repro_CT_Suite_Admin {
 
 		add_action( 'wp_ajax_repro_ct_suite_load_preset', array( $this, 'ajax_load_preset' ) );
 		
+		// Connection Test AJAX Handler
+		add_action( 'wp_ajax_repro_ct_suite_test_connection', array( $this, 'ajax_test_connection' ) );
+		
 		// Modern Shortcode Manager AJAX Handlers sind in eigener Klasse registriert
 		// (siehe init_modern_shortcode_manager)
 
@@ -1610,7 +1613,7 @@ class Repro_CT_Suite_Admin {
 
 	 */
 
-	public function ajax_sync_calendars(): void {
+	public function ajax_sync_calendars() {
 
 		// Nonce-PrÃ¼fung
 
@@ -4449,6 +4452,38 @@ class Repro_CT_Suite_Admin {
 		wp_send_json_success( array(
 			'message' => sprintf( __( 'Eintrag #%d erfolgreich gelÃ¶scht.', 'repro-ct-suite' ), $entry_id )
 		) );
+	}
+
+	/**
+	 * AJAX Handler: Test ChurchTools Connection
+	 */
+	public function ajax_test_connection(): void {
+		// Check nonce
+		check_ajax_referer( 'repro_ct_suite_ajax_nonce', 'nonce' );
+
+		// Check permissions
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array(
+				'message' => 'Keine Berechtigung.'
+			) );
+		}
+
+		// Load CT Client
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ct-client.php';
+		
+		$client = new CT_Client();
+		$result = $client->test_connection();
+
+		if ( $result['success'] ) {
+			wp_send_json_success( array(
+				'message' => $result['message'],
+				'user_info' => $result['user_info'] ?? null
+			) );
+		} else {
+			wp_send_json_error( array(
+				'message' => $result['message']
+			) );
+		}
 	}
 
 }

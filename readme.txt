@@ -18,7 +18,7 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 
 
-WordPress-Plugin zur Integration von ChurchTools-Daten. Synchronisiert Termine und Veranstaltungen aus ChurchTools fÃ¼r die Anzeige auf WordPress-Websites.
+WordPress-Plugin zur Integration von ChurchTools-Daten. Synchronisiert Termine und Veranstaltungen aus ChurchTools fÃür die Anzeige auf WordPress-Websites.
 
 
 
@@ -26,7 +26,7 @@ WordPress-Plugin zur Integration von ChurchTools-Daten. Synchronisiert Termine u
 
 
 
-Repro CT-Suite erstellt eine BrÃ¼cke zwischen ChurchTools und WordPress. Das Plugin synchronisiert automatisch Termin- und Veranstaltungsdaten aus Ihrer ChurchTools-Instanz und macht sie Ã¼ber Shortcodes in WordPress verfÃ¼gbar.
+Repro CT-Suite erstellt eine BrÃücke zwischen ChurchTools und WordPress. Das Plugin synchronisiert automatisch Termin- und Veranstaltungsdaten aus Ihrer ChurchTools-Instanz und macht sie Ãüber Shortcodes in WordPress verfÃügbar.
 
 
 
@@ -34,9 +34,9 @@ Repro CT-Suite erstellt eine BrÃ¼cke zwischen ChurchTools und WordPress. Das P
 
 * **Events**: Veranstaltungen aus ChurchTools Events-API
 
-* **Termine (Appointments)**: Einfache Termine aus ChurchTools Appointments (ohne Event-VerknÃ¼pfung)
+* **Termine (Appointments)**: Einfache Termine aus ChurchTools Appointments (ohne Event-VerknÃüpfung)
 
-* **Terminkalender**: GesamtÃ¼bersicht aller Events und Termine
+* **Terminkalender**: GesamtÃübersicht aller Events und Termine
 
 
 
@@ -46,15 +46,15 @@ Repro CT-Suite erstellt eine BrÃ¼cke zwischen ChurchTools und WordPress. Das P
 
 * Automatische Synchronisation von ChurchTools Events
 
-* Synchronisation von Appointments (Termine ohne Event-VerknÃ¼pfung)
+* Synchronisation von Appointments (Termine ohne Event-VerknÃüpfung)
 
-* GesamtÃ¼bersicht im Terminkalender (Events + Termine)
+* GesamtÃübersicht im Terminkalender (Events + Termine)
 
 * Einfache Anzeige via Shortcodes
 
-* Admin-OberflÃ¤che fÃ¼r Konfiguration
+* Admin-OberflÃ¤che fÃür Konfiguration
 
-* WordPress Cron fÃ¼r automatische Updates
+* WordPress Cron fÃür automatische Updates
 
 * Sichere API-Verbindung
 
@@ -106,11 +106,11 @@ Das Plugin nutzt WordPress Cron und synchronisiert standardmÃ¤ÃŸig alle 6 St
 
 
 
-= Welche ChurchTools-Versionen werden unterstÃ¼tzt? =
+= Welche ChurchTools-Versionen werden unterstÃützt? =
 
 
 
-Das Plugin ist fÃ¼r aktuelle ChurchTools-Versionen mit REST API entwickelt.
+Das Plugin ist fÃür aktuelle ChurchTools-Versionen mit REST API entwickelt.
 
 
 
@@ -118,7 +118,7 @@ Das Plugin ist fÃ¼r aktuelle ChurchTools-Versionen mit REST API entwickelt.
 
 
 
-Beim Entfernen (LÃ¶schen) des Plugins Ã¼ber die WordPress-Pluginverwaltung werden automatisch alle zugehÃ¶rigen Daten bereinigt:
+Beim Entfernen (LÃ¶schen) des Plugins Ãüber die WordPress-Pluginverwaltung werden automatisch alle zugehÃ¶rigen Daten bereinigt:
 
 
 
@@ -223,7 +223,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.9.5.2 - 2024-12-08 =
 
-* Code-Verbesserungen: PHP 7.4+ Type Hints fÃ¼r bessere Code-QualitÃ¤t
+* Code-Verbesserungen: PHP 7.4+ Type Hints fÃür bessere Code-QualitÃ¤t
 
 * Refactoring: Repository- und Service-Klassen mit strikter Typisierung
 
@@ -235,7 +235,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.9.1.0 =
 
-* **Security Enhancement**: Rate Limiting fÃ¼r API-Calls implementiert
+* **Security Enhancement**: Rate Limiting fÃür API-Calls implementiert
 
 * **Security Enhancement**: Erweiterte Input-Validierung mit XSS-Schutz
 
@@ -267,13 +267,13 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * 1-Klick-Update direkt aus dem WordPress-Admin
 
-* Update-PrÃ¼fung alle 5 Minuten (mit Cache)
+* Update-PrÃüfung alle 5 Minuten (mit Cache)
 
-* UnterstÃ¼tzt Ã¶ffentliche und private GitHub-Repositories
+* UnterstÃützt Ã¶ffentliche und private GitHub-Repositories
 
 * Keine zusÃ¤tzlichen Plugins erforderlich
 
-* Optimiertes Cache-Management (keine Ã¼bermÃ¤ÃŸigen API-Anfragen)
+* Optimiertes Cache-Management (keine ÃübermÃ¤ÃŸigen API-Anfragen)
 
 
 
@@ -293,7 +293,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Grund: wp_rcts_calendars hat id (BIGINT, auto-increment) UND calendar_id (VARCHAR, ChurchTools-ID)
 
-* Events speichern calendar_id als VARCHAR, daher mÃ¼ssen JOIN und Filter VARCHAR-basiert sein
+* Events speichern calendar_id als VARCHAR, daher mÃüssen JOIN und Filter VARCHAR-basiert sein
 
 
 
@@ -325,9 +325,9 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * 5 vordefinierte Standard-Presets beim ersten Aktivieren
 
-* Repository-Klasse fÃ¼r CRUD-Operationen
+* Repository-Klasse fÃür CRUD-Operationen
 
-* AJAX-Handler fÃ¼r Preset-Verwaltung (save, load, update, delete)
+* AJAX-Handler fÃür Preset-Verwaltung (save, load, update, delete)
 
 * UI: Preset-Dropdown mit Laden/LÃ¶schen-Buttons
 
@@ -343,7 +343,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Shortcode Generator mit Live-Vorschau und Copy-Button
 
-* Visueller Konfigurator fÃ¼r alle Shortcode-Attribute
+* Visueller Konfigurator fÃür alle Shortcode-Attribute
 
 * Template-Varianten Ãœbersicht mit Dokumentation
 
@@ -355,19 +355,19 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * AJAX-basierte Vorschau ohne Seiten-Reload
 
-* Theme-Override Anleitung mit verfÃ¼gbaren Variablen
+* Theme-Override Anleitung mit verfÃügbaren Variablen
 
 
 
 = 0.7.4 =
 
-* FEATURE: WordPress-Zeitformat-UnterstÃ¼tzung in Templates
+* FEATURE: WordPress-Zeitformat-UnterstÃützung in Templates
 
 * Zeiten zeigen "Uhr" bei 24h-Format (z.B. "14:30 Uhr")
 
 * Zeiten zeigen AM/PM bei 12h-Format (z.B. "2:30 PM")
 
-* Automatische Erkennung Ã¼ber WordPress Einstellung (Settings â†’ General â†’ Time Format)
+* Automatische Erkennung Ãüber WordPress Einstellung (Settings â†’ General â†’ Time Format)
 
 * Betrifft alle 3 Templates: list-simple, list-grouped, cards
 
@@ -407,7 +407,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Sync-Zeitraum: 7 Tage Vergangenheit bis 90 Tage Zukunft
 
-* Behebt Fehler: "Keine Kalender fÃ¼r den Import ausgewÃ¤hlt"
+* Behebt Fehler: "Keine Kalender fÃür den Import ausgewÃ¤hlt"
 
 
 
@@ -433,11 +433,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.6.1.0 =
 
-* FEATURE: WordPress-Zeitzone fÃ¼r alle Datum/Uhrzeit-Anzeigen
+* FEATURE: WordPress-Zeitzone fÃür alle Datum/Uhrzeit-Anzeigen
 
-* wp_date() statt date_i18n() fÃ¼r korrekte Zeitzonenkonvertierung
+* wp_date() statt date_i18n() fÃür korrekte Zeitzonenkonvertierung
 
-* Dashboard: NÃ¤chster Sync, Letzte AusfÃ¼hrung in lokaler Zeit
+* Dashboard: NÃ¤chster Sync, Letzte AusfÃührung in lokaler Zeit
 
 * Settings: Cron-Status-Zeiten in WordPress-Zeitzone
 
@@ -447,7 +447,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.6.0.9 =
 
-* KRITISCHER FIX: Aggressive Update-Cache Clearing fÃ¼r wp-admin/plugins.php
+* KRITISCHER FIX: Aggressive Update-Cache Clearing fÃür wp-admin/plugins.php
 
 * WordPress Plugin-Seite zeigt Updates jetzt korrekt an
 
@@ -461,9 +461,9 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * KRITISCHER FIX: UTF-8 BOM aus 5 PHP-Dateien entfernt (JSON parse error behoben)
 
-* Login-Test: VollstÃ¤ndige Logging-UnterstÃ¼tzung hinzugefÃ¼gt
+* Login-Test: VollstÃ¤ndige Logging-UnterstÃützung hinzugefÃügt
 
-* Debug: Detaillierte Ausgaben fÃ¼r Login-Ablauf (Credentials, CT-Client, Login, whoami)
+* Debug: Detaillierte Ausgaben fÃür Login-Ablauf (Credentials, CT-Client, Login, whoami)
 
 * Verbesserte Fehlerdiagnose bei Verbindungsproblemen
 
@@ -471,19 +471,19 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.4.0.9 =
 
-* UPDATE-DETECTION: Aggressive Update-PrÃ¼fung mit Admin-Benachrichtigung
+* UPDATE-DETECTION: Aggressive Update-PrÃüfung mit Admin-Benachrichtigung
 
 * Zeigt aktuelle Plugin-Version im WordPress Admin an
 
 * LÃ¶scht alle Update-Caches bei jedem Admin-Besuch
 
-* Admin-Notice mit direktem Link zur Update-PrÃ¼fung
+* Admin-Notice mit direktem Link zur Update-PrÃüfung
 
 
 
 = 0.4.0.8 =
 
-* AUTO-UPDATE: Erzwungene Update-PrÃ¼fung fÃ¼r bessere Plugin-Erkennung
+* AUTO-UPDATE: Erzwungene Update-PrÃüfung fÃür bessere Plugin-Erkennung
 
 * Update-Cache wird bei Admin-Besuch geleert
 
@@ -495,7 +495,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.4.0.7 =
 
-* KRITISCHER FIX: Events API-Aufruf korrigiert fÃ¼r ChurchTools
+* KRITISCHER FIX: Events API-Aufruf korrigiert fÃür ChurchTools
 
 * Abrufen ALLER Events ohne calendar_ids Parameter
 
@@ -509,11 +509,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.4.0.6 =
 
-* DEBUG: Erweiterte Kalender-Debug-Logs fÃ¼r bessere Diagnose
+* DEBUG: Erweiterte Kalender-Debug-Logs fÃür bessere Diagnose
 
 * Detaillierte Ausgabe der calendar-Objekt Struktur in Events
 
-* Zeigt verfÃ¼gbare Keys und Werte fÃ¼r domainIdentifier/id
+* Zeigt verfÃügbare Keys und Werte fÃür domainIdentifier/id
 
 * Hilft bei der Identifikation von Struktur-Problemen
 
@@ -521,25 +521,25 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.4.0.5 =
 
-* KRITISCHER FIX: Events Filter-Logik korrigiert fÃ¼r ChurchTools API
+* KRITISCHER FIX: Events Filter-Logik korrigiert fÃür ChurchTools API
 
 * Events Kalender-ID wird jetzt korrekt aus calendar.domainIdentifier gelesen
 
-* Fallback-Support fÃ¼r Ã¤ltere calendar.id Struktur beibehalten
+* Fallback-Support fÃür Ã¤ltere calendar.id Struktur beibehalten
 
-* 5-stufige Kalender-PrÃ¼fung: domainIdentifier, id, calendars[], appointment.calendar
+* 5-stufige Kalender-PrÃüfung: domainIdentifier, id, calendars[], appointment.calendar
 
-* Behebt Problem dass alle Events Ã¼bersprungen wurden
+* Behebt Problem dass alle Events Ãübersprungen wurden
 
 
 
 = 0.4.0.4 =
 
-* **SIMPLIFICATION**: Sync-Prozess auf Phase 1 (Events API) beschrÃ¤nkt fÃ¼r bessere Diagnose
+* **SIMPLIFICATION**: Sync-Prozess auf Phase 1 (Events API) beschrÃ¤nkt fÃür bessere Diagnose
 
 * **Change**: Phase 2 (Appointments API) temporÃ¤r deaktiviert - fokussiert auf Events-Import
 
-* **Debug**: Vereinfachter Sync-Workflow fÃ¼r einfachere Fehlerdiagnose und Debugging
+* **Debug**: Vereinfachter Sync-Workflow fÃür einfachere Fehlerdiagnose und Debugging
 
 * **Logging**: Klarere Log-Ausgaben "EVENTS-ONLY SYNC" mit Hinweis auf deaktivierte Phase 2
 
@@ -547,7 +547,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * **Diagnosis**: ErmÃ¶glicht isolierte Analyse der Events-Filterlogik ohne Appointments-KomplexitÃ¤t
 
-* **Temporary**: Appointments-Sync wird in zukÃ¼nftiger Version wieder aktiviert
+* **Temporary**: Appointments-Sync wird in zukÃünftiger Version wieder aktiviert
 
 * Version: 0.4.0.4
 
@@ -555,17 +555,17 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.4.0.3 =
 
-* **CRITICAL FIX**: Events-Filterlogik korrigiert - alle Events wurden Ã¼bersprungen
+* **CRITICAL FIX**: Events-Filterlogik korrigiert - alle Events wurden Ãübersprungen
 
-* **Fix**: Erweiterte Kalender-Zuordnung prÃ¼ft multiple Event-Strukturen (`calendar.id`, `calendarId`, `appointment.calendar.id`)
+* **Fix**: Erweiterte Kalender-Zuordnung prÃüft multiple Event-Strukturen (`calendar.id`, `calendarId`, `appointment.calendar.id`)
 
-* **Debug**: Umfassendes Debug-Logging fÃ¼r Event-Kalender-Zuordnung zur Diagnose von Sync-Problemen
+* **Debug**: Umfassendes Debug-Logging fÃür Event-Kalender-Zuordnung zur Diagnose von Sync-Problemen
 
-* **Improvement**: 4-stufige PrÃ¼fung der Event-Kalender-VerknÃ¼pfung fÃ¼r maximale API-KompatibilitÃ¤t
+* **Improvement**: 4-stufige PrÃüfung der Event-Kalender-VerknÃüpfung fÃür maximale API-KompatibilitÃ¤t
 
-* **Logging**: Detaillierte Struktur-Analyse mit verfÃ¼gbaren Keys bei unbekannten Event-Formaten
+* **Logging**: Detaillierte Struktur-Analyse mit verfÃügbaren Keys bei unbekannten Event-Formaten
 
-* **Critical**: Behebt Problem wo "Event 2008 nicht relevant fÃ¼r Kalender 1" alle Events ausfilterte
+* **Critical**: Behebt Problem wo "Event 2008 nicht relevant fÃür Kalender 1" alle Events ausfilterte
 
 * Version: 0.4.0.3
 
@@ -577,7 +577,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * **Feature**: Automatische Erkennung von Plugin-Tabellen mit ungewÃ¶hnlichen WordPress-Prefixen
 
-* **Fix**: Diagnose-Tool fÃ¼r doppelte Event-Services Anzeige hinzugefÃ¼gt
+* **Fix**: Diagnose-Tool fÃür doppelte Event-Services Anzeige hinzugefÃügt
 
 * **UI**: Debug-Warnung wird nur angezeigt, wenn mehr als 5 Plugin-Tabellen gefunden werden
 
@@ -591,11 +591,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.4.0.1 =
 
-* **Fix**: Debug-Seite zeigt jetzt alle korrekten Tabellen fÃ¼r DB Version 6
+* **Fix**: Debug-Seite zeigt jetzt alle korrekten Tabellen fÃür DB Version 6
 
-* **Feature**: rcts_schedule Tabelle in Debug-Ãœbersicht hinzugefÃ¼gt
+* **Feature**: rcts_schedule Tabelle in Debug-Ãœbersicht hinzugefÃügt
 
-* **Fix**: AJAX-Handler fÃ¼r Tabellen-Reset vollstÃ¤ndig mit neuer Schedule-Tabelle kompatibel
+* **Fix**: AJAX-Handler fÃür Tabellen-Reset vollstÃ¤ndig mit neuer Schedule-Tabelle kompatibel
 
 * **UI**: Debug-Seite zeigt "Terminkalender (Schedule)" mit admin-page Icon
 
@@ -619,21 +619,21 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * **Architecture**: Simplified codebase - von 600+ Zeilen dual sync auf 304 Zeilen unified sync reduziert
 
-* **UX**: Admin-UI-AufrÃ¤umung - redundante Appointment-Handler entfernt, konsolidierte MenÃ¼-Struktur
+* **UX**: Admin-UI-AufrÃ¤umung - redundante Appointment-Handler entfernt, konsolidierte MenÃü-Struktur
 
-* **Migration**: Automatische Bereinigung von verwaisten Appointments (bis zu 50 automatisch, manuelle Migration fÃ¼r grÃ¶ÃŸere Datenmengen)
+* **Migration**: Automatische Bereinigung von verwaisten Appointments (bis zu 50 automatisch, manuelle Migration fÃür grÃ¶ÃŸere Datenmengen)
 
-* **Logging**: Umfassendes Logging fÃ¼r beide Sync-Phasen mit detaillierter Statistik
+* **Logging**: Umfassendes Logging fÃür beide Sync-Phasen mit detaillierter Statistik
 
-* **Admin**: Neue Admin-Benachrichtigung fÃ¼r V6-Upgrade mit Dismissal-FunktionalitÃ¤t
+* **Admin**: Neue Admin-Benachrichtigung fÃür V6-Upgrade mit Dismissal-FunktionalitÃ¤t
 
 * **Workflow**: Phase 1 (Events API) sammelt appointment_ids, Phase 2 (Appointments API) importiert zusÃ¤tzliche Termine
 
 * **Performance**: Reduzierte Code-KomplexitÃ¤t und verbesserte Wartbarkeit
 
-* **Safety**: Umfangreiche Migrations-SicherheitsprÃ¼fungen mit automatischem Rollback bei Fehlern
+* **Safety**: Umfangreiche Migrations-SicherheitsprÃüfungen mit automatischem Rollback bei Fehlern
 
-* WICHTIG: Nach Update ersten Sync ausfÃ¼hren, um neues einheitliches System zu aktivieren
+* WICHTIG: Nach Update ersten Sync ausfÃühren, um neues einheitliches System zu aktivieren
 
 * Version: 0.4.0.0
 
@@ -641,13 +641,13 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.7.0 =
 
-* Feature: Neue DB-Tabelle rcts_schedule als konsolidierte TerminÃ¼bersicht (Events + Appointments)
+* Feature: Neue DB-Tabelle rcts_schedule als konsolidierte TerminÃübersicht (Events + Appointments)
 
-* Feature: Neue Admin-Seite "TerminÃ¼bersicht" mit Filtern (Zeitraum, Kalender, Typ)
+* Feature: Neue Admin-Seite "TerminÃübersicht" mit Filtern (Zeitraum, Kalender, Typ)
 
 * Ã„nderung: Appointments-Sync setzt calendar_id jetzt strikt aus dem aufrufenden Endpoint (/calendars/{calendarId}/appointments)
 
-* Ã„nderung: Beide Sync-Services (Events & Appointments) befÃ¼llen die neue TerminÃ¼bersicht automatisch
+* Ã„nderung: Beide Sync-Services (Events & Appointments) befÃüllen die neue TerminÃübersicht automatisch
 
 * Wartung: Uninstall bereinigt nun auch rcts_schedule-Tabelle
 
@@ -659,9 +659,9 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Fix: Strengere Kalender-Filterung bei Events - Events ohne `calendar_id` werden beim Einsatz eines Kalender-Filters nun verworfen, um Import von nicht-ausgewÃ¤hlten Kalendern zu vermeiden.
 
-* Fix: Appointments-Statistiken (inserted/updated) werden jetzt korrekt ermittelt (Existenz vor Upsert geprÃ¼ft).
+* Fix: Appointments-Statistiken (inserted/updated) werden jetzt korrekt ermittelt (Existenz vor Upsert geprÃüft).
 
-* Wartung: Kleine Logging-Verbesserungen fÃ¼r den Sync-Prozess.
+* Wartung: Kleine Logging-Verbesserungen fÃür den Sync-Prozess.
 
 * Version: 0.3.7.1
 
@@ -669,7 +669,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.8.0 =
 
-* Feature: Optionales Syslog-Output fÃ¼r Debug-Logging (aktivierbar in den Plugin-Einstellungen).
+* Feature: Optionales Syslog-Output fÃür Debug-Logging (aktivierbar in den Plugin-Einstellungen).
 
 * Feature: Logs-Tab zeigt nun den Inhalt von `wp-content/repro-ct-suite-debug.log` (letzte 100 Zeilen) inkl. Clear/Refresh-Buttons.
 
@@ -723,7 +723,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Fix: NachtrÃ¤gliche Filterung von Events nach ausgewÃ¤hlten Kalendern
 
-* Feature: Externe Calendar-IDs werden aus lokalen IDs konvertiert fÃ¼r Events-Filter
+* Feature: Externe Calendar-IDs werden aus lokalen IDs konvertiert fÃür Events-Filter
 
 * Logging: Neue Log-EintrÃ¤ge zeigen gefilterte vs. verarbeitete Events
 
@@ -731,7 +731,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Performance: Nur Events von ausgewÃ¤hlten Kalendern werden importiert
 
-* WICHTIG: Nach Update Synchronisation ausfÃ¼hren, um alte Events aus nicht-ausgewÃ¤hlten Kalendern zu bereinigen
+* WICHTIG: Nach Update Synchronisation ausfÃühren, um alte Events aus nicht-ausgewÃ¤hlten Kalendern zu bereinigen
 
 * Version: 0.3.6.2
 
@@ -739,11 +739,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.6.1 =
 
-* Feature: CRUD-Funktionen fÃ¼r einzelne Events und Appointments
+* Feature: CRUD-Funktionen fÃür einzelne Events und Appointments
 
 * Feature: LÃ¶sch-Buttons in Terminkalender-Ãœbersicht und Events-Ãœbersicht
 
-* Feature: AJAX-Handler fÃ¼r Delete und Update (ajax_delete_event, ajax_delete_appointment, ajax_update_event, ajax_update_appointment)
+* Feature: AJAX-Handler fÃür Delete und Update (ajax_delete_event, ajax_delete_appointment, ajax_update_event, ajax_update_appointment)
 
 * Repository: Neue Basisfunktionen in Repository-Base (get_by_id, delete_by_id, update_by_id, exists)
 
@@ -751,11 +751,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * UX: BestÃ¤tigungsdialog vor dem LÃ¶schen mit Titel-Anzeige
 
-* JavaScript: initDeleteButtons() fÃ¼r Event-Delegation der LÃ¶sch-Buttons
+* JavaScript: initDeleteButtons() fÃür Event-Delegation der LÃ¶sch-Buttons
 
-* JavaScript: AJAX-Handler fÃ¼r Migrations- und Calendar-ID-Fix-Buttons hinzugefÃ¼gt
+* JavaScript: AJAX-Handler fÃür Migrations- und Calendar-ID-Fix-Buttons hinzugefÃügt
 
-* Sicherheit: Nonce-PrÃ¼fung und BerechtigungsprÃ¼fung fÃ¼r alle AJAX-Handler
+* Sicherheit: Nonce-PrÃüfung und BerechtigungsprÃüfung fÃür alle AJAX-Handler
 
 * Version: 0.3.6.1
 
@@ -775,7 +775,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Datenbank: Automatische Migration bei Plugin-Update
 
-* WICHTIG: Nach Update einmal Synchronisation ausfÃ¼hren, um calendar_id zu fÃ¼llen
+* WICHTIG: Nach Update einmal Synchronisation ausfÃühren, um calendar_id zu fÃüllen
 
 * Version: 0.3.6.0
 
@@ -793,7 +793,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * UI: Kalender in eigener Spalte (nicht mehr unter Titel)
 
-* UX: Beschreibung wird gekÃ¼rzt angezeigt (10 WÃ¶rter)
+* UX: Beschreibung wird gekÃürzt angezeigt (10 WÃ¶rter)
 
 * Spaltenbreiten: Anfang (12%), Ende (12%), Titel (25%), Beschreibung (25%), Kalender (16%), Typ (10%)
 
@@ -817,11 +817,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Feature: Zweistufiger Reset-Prozess
 
-* UX: Nach LÃ¶schen der Zugangsdaten Abfrage fÃ¼r vollstÃ¤ndigen Reset
+* UX: Nach LÃ¶schen der Zugangsdaten Abfrage fÃür vollstÃ¤ndigen Reset
 
 * Feature: VollstÃ¤ndiger Reset lÃ¶scht alle Daten (Kalender, Events, Appointments, Services)
 
-* AJAX: Neuer Handler ajax_full_reset() fÃ¼r kompletten Datenbankreset
+* AJAX: Neuer Handler ajax_full_reset() fÃür kompletten Datenbankreset
 
 * Sicherheit: Deutliche Warnhinweise bei vollstÃ¤ndigem Reset
 
@@ -851,7 +851,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * UI: Synchronisation komplett im Dashboard-Tab integriert
 
-* UX: Noch weiter vereinfachte MenÃ¼-Struktur
+* UX: Noch weiter vereinfachte MenÃü-Struktur
 
 * Navigation: Nur noch Dashboard (mit Tabs) + Terminkalender + Update + Debug
 
@@ -861,9 +861,9 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.5.3 =
 
-* Feature: Reset-Button fÃ¼r Zugangsdaten im Einstellungen-Tab
+* Feature: Reset-Button fÃür Zugangsdaten im Einstellungen-Tab
 
-* UI: Separate Einstellungen-Seite entfernt - alles zurÃ¼ck im Dashboard
+* UI: Separate Einstellungen-Seite entfernt - alles zurÃück im Dashboard
 
 * UI: Vereinfachte Navigation - nur noch Dashboard + bedingte Seiten
 
@@ -877,11 +877,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.5.2 =
 
-* UI: Kalender-Auswahl zurÃ¼ck in Einstellungen-Seite integriert
+* UI: Kalender-Auswahl zurÃück in Einstellungen-Seite integriert
 
 * UI: Separate Kalender-Seite entfernt (redundant)
 
-* UX: Vereinfachte Navigation - weniger MenÃ¼punkte
+* UX: Vereinfachte Navigation - weniger MenÃüpunkte
 
 * Version: 0.3.5.2
 
@@ -889,7 +889,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.5.1 =
 
-* Fix: GitHub Release ZIP-Struktur korrigiert fÃ¼r WordPress-Installation
+* Fix: GitHub Release ZIP-Struktur korrigiert fÃür WordPress-Installation
 
 * Version: 0.3.5.1
 
@@ -899,7 +899,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * UI: Komplette Umstrukturierung der Admin-OberflÃ¤che
 
-* Menu: Tabs jetzt als separate MenÃ¼punkte mit bedingter Sichtbarkeit
+* Menu: Tabs jetzt als separate MenÃüpunkte mit bedingter Sichtbarkeit
 
 * Menu: Kalender-Tab erscheint nur bei konfigurierter Verbindung
 
@@ -907,9 +907,9 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Settings: Einstellungen aufgeteilt in 3 Sektionen (Verbindung, Abrufzeitraum, Automatisierung)
 
-* Kalender: Eigene Seite fÃ¼r Kalender-Sync und Auswahl
+* Kalender: Eigene Seite fÃür Kalender-Sync und Auswahl
 
-* Sync: Eigene Seite fÃ¼r Termine-Synchronisation mit Ãœbersicht
+* Sync: Eigene Seite fÃür Termine-Synchronisation mit Ãœbersicht
 
 * Feature: Letzter Sync-Zeitpunkt wird gespeichert und angezeigt
 
@@ -927,11 +927,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Sync: Events werden zuerst synchronisiert (aus /events)
 
-* Sync: Appointments-Sync Ã¼berspringt Appointments, die bereits als Event existieren (prÃ¼ft appointment_id)
+* Sync: Appointments-Sync Ãüberspringt Appointments, die bereits als Event existieren (prÃüft appointment_id)
 
 * Sync: Events extrahieren appointment_id aus API-Response
 
-* Stats: Neue Statistik 'skipped_has_event' fÃ¼r Ã¼bersprungene Appointments
+* Stats: Neue Statistik 'skipped_has_event' fÃür Ãübersprungene Appointments
 
 * Version: 0.3.4.1
 
@@ -941,13 +941,13 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Feature: Eigene Debug-Seite mit erweiterten Funktionen
 
-* Debug: Einzelne oder alle Tabellen zurÃ¼cksetzen (mit BestÃ¤tigung)
+* Debug: Einzelne oder alle Tabellen zurÃücksetzen (mit BestÃ¤tigung)
 
 * Debug: Debug-Log-Anzeige mit Syntax-Highlighting (letzte 100 Zeilen)
 
 * Debug: Log leeren und aktualisieren
 
-* Debug: Datenbank-Migrationen manuell ausfÃ¼hren
+* Debug: Datenbank-Migrationen manuell ausfÃühren
 
 * Debug: System-Informationen (WordPress, PHP, MySQL, Memory Limit)
 
@@ -961,17 +961,17 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.3.8 =
 
-* Schema: `rcts_events` hat jetzt `appointment_id` fÃ¼r Verlinkung zu Appointments (DB_VERSION 3)
+* Schema: `rcts_events` hat jetzt `appointment_id` fÃür Verlinkung zu Appointments (DB_VERSION 3)
 
 * Appointments-Sync: Speichert sowohl Events als auch Appointments-EintrÃ¤ge (vollstÃ¤ndige Datenstruktur)
 
-* Terminkalender: Zeigt Events (aus Events-API) + Termine (Appointments ohne Event-VerknÃ¼pfung)
+* Terminkalender: Zeigt Events (aus Events-API) + Termine (Appointments ohne Event-VerknÃüpfung)
 
-* Wording: "Terminkalender" mit Art-Badge: Event (blau) vs Termin (grÃ¼n)
+* Wording: "Terminkalender" mit Art-Badge: Event (blau) vs Termin (grÃün)
 
-* UI: Dashboard zeigt "Termine gesamt", MenÃ¼ "Terminkalender"
+* UI: Dashboard zeigt "Termine gesamt", MenÃü "Terminkalender"
 
-* Appointments mit event_id werden in Events gespeichert und mit Appointment verknÃ¼pft
+* Appointments mit event_id werden in Events gespeichert und mit Appointment verknÃüpft
 
 
 
@@ -979,7 +979,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Appointments: Umgestellt auf pro-Kalender-Abruf `GET /calendars/{id}/appointments?from&to` (Aggregation aller ausgewÃ¤hlten Kalender)
 
-* Robust: Besseres Logging je Kalenderabruf; weiche WeiterfÃ¼hrung bei 400/404/405
+* Robust: Besseres Logging je Kalenderabruf; weiche WeiterfÃührung bei 400/404/405
 
 
 
@@ -1005,17 +1005,17 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Fix: Appointments-API akzeptiert jetzt JSON-Body mit `calendar_ids` (POST-Fallback), wenn GET-Varianten 400/404 liefern
 
-* Log: AusfÃ¼hrliche Logs fÃ¼r GET/POST-Versuche inkl. Parameternamen
+* Log: AusfÃührliche Logs fÃür GET/POST-Versuche inkl. Parameternamen
 
 
 
 = 0.3.3.3 =
 
-* Fix: "Cannot use object of type WP_Error as array" im Termine-AJAX-Handler behoben (robuste is_wp_error()-PrÃ¼fung und strukturierte FehlerrÃ¼ckgabe)
+* Fix: "Cannot use object of type WP_Error as array" im Termine-AJAX-Handler behoben (robuste is_wp_error()-PrÃüfung und strukturierte FehlerrÃückgabe)
 
 * DX: Sicherere Erfolgs-Statistik (Default-Werte bei fehlenden Keys)
 
-* Packaging: ZIP-EintrÃ¤ge nutzen konsistent "/"-Pfadtrenner fÃ¼r maximale WP-KompatibilitÃ¤t
+* Packaging: ZIP-EintrÃ¤ge nutzen konsistent "/"-Pfadtrenner fÃür maximale WP-KompatibilitÃ¤t
 
 
 
@@ -1023,7 +1023,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Diagnostics: Robustere Fehlerbehandlung im Termine-AJAX-Handler (Logger, try/catch, Debug-Kontext)
 
-* Debug: ZusÃ¤tzliche Log-Ausgaben (Tenant, Kalenderauswahl, Zeitraum) fÃ¼r schnellere Ursachenanalyse
+* Debug: ZusÃ¤tzliche Log-Ausgaben (Tenant, Kalenderauswahl, Zeitraum) fÃür schnellere Ursachenanalyse
 
 * Maintenance: Bereinigung des Repos â€“ nur runtime-relevante Dateien in Distribution
 
@@ -1031,7 +1031,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.3.1 =
 
-* Verbesserung: Umfassendes Debug-Logging fÃ¼r Termine-Synchronisation
+* Verbesserung: Umfassendes Debug-Logging fÃür Termine-Synchronisation
 
 * Bugfix: AJAX-Fehler bei Sync werden jetzt detailliert im Debug-Panel angezeigt
 
@@ -1049,11 +1049,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Feature: Kalenderauswahl direkt im Sync-Tab (mit Select-All-Funktion)
 
-* Feature: Zeitraum-Konfiguration fÃ¼r Sync (Vergangenheit/Zukunft in Tagen)
+* Feature: Zeitraum-Konfiguration fÃür Sync (Vergangenheit/Zukunft in Tagen)
 
 * Feature: Events-Sync-Service mit Fallback-Endpunkten
 
-* Feature: Appointments-Sync-Service mit Kalendermapping und Event-VerknÃ¼pfung
+* Feature: Appointments-Sync-Service mit Kalendermapping und Event-VerknÃüpfung
 
 * Refactor: Dashboard zeigt nur noch Status-Informationen (keine Sync-Buttons)
 
@@ -1063,7 +1063,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Verbessert: AJAX-Handler nutzt konfigurierte Zeitraum-Einstellungen
 
-* Neu: Repository-Hilfsmethoden fÃ¼r Kalender- und Event-Zuordnung
+* Neu: Repository-Hilfsmethoden fÃür Kalender- und Event-Zuordnung
 
 
 
@@ -1073,21 +1073,21 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Fix: Behebt "Too few arguments to function" Fehler bei Kalender-Synchronisation
 
-* Feature: Kopierfunktion fÃ¼r Debug-Log im Admin-Panel hinzugefÃ¼gt
+* Feature: Kopierfunktion fÃür Debug-Log im Admin-Panel hinzugefÃügt
 
-* Feature: Fallback-Kopiermethode fÃ¼r Ã¤ltere Browser
+* Feature: Fallback-Kopiermethode fÃür Ã¤ltere Browser
 
-* Verbessert: Passwort-EntschlÃ¼sselung wird im AJAX-Handler durchgefÃ¼hrt
+* Verbessert: Passwort-EntschlÃüsselung wird im AJAX-Handler durchgefÃührt
 
 
 
 = 0.3.2.4 =
 
-* Debug: Erweiterte Fehlerbehandlung mit Try-Catch fÃ¼r Dependencies und PHP Errors
+* Debug: Erweiterte Fehlerbehandlung mit Try-Catch fÃür Dependencies und PHP Errors
 
 * Debug: Detaillierte error_log Ausgaben an jedem Schritt des AJAX-Handlers
 
-* Debug: Separate Fehlerbehandlung fÃ¼r Exception und Error (PHP 7+)
+* Debug: Separate Fehlerbehandlung fÃür Exception und Error (PHP 7+)
 
 * Debug: File, Line und vollstÃ¤ndiger Stack Trace bei Fehlern
 
@@ -1107,15 +1107,15 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.3.2.2 =
 
-* Feature: Zentrale Logger-Klasse fÃ¼r einheitliches Debug-Logging
+* Feature: Zentrale Logger-Klasse fÃür einheitliches Debug-Logging
 
 * Direktes Schreiben ins wp-content/debug.log (unabhÃ¤ngig von WP_DEBUG)
 
-* Kompatibel mit Debug-Log-Manager-Plugins fÃ¼r einfache Log-Anzeige
+* Kompatibel mit Debug-Log-Manager-Plugins fÃür einfache Log-Anzeige
 
 * Millisekunden-genaue Timestamps in allen Log-EintrÃ¤gen
 
-* Farbcodierte Icons (âœ… âœ— âš ï¸ â„¹ï¸) fÃ¼r bessere Lesbarkeit in Logs
+* Farbcodierte Icons (âœ… âœ— âš ï¸ â„¹ï¸) fÃür bessere Lesbarkeit in Logs
 
 * Strukturierte Logs: header(), separator(), dump() Helper-Methoden
 
@@ -1123,7 +1123,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Automatische Aktivierung von error_log falls nicht konfiguriert
 
-* Log-EintrÃ¤ge mit Prefix "[REPRO CT-SUITE]" fÃ¼r einfaches Filtern
+* Log-EintrÃ¤ge mit Prefix "[REPRO CT-SUITE]" fÃür einfaches Filtern
 
 
 
@@ -1135,7 +1135,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Detaillierte Ausgaben: API-Request-URL, Response-Status, Statistiken, Fehler-Details
 
-* Farbcodierte Logs: Info (blau), Erfolg (grÃ¼n), Warnung (orange), Fehler (rot)
+* Farbcodierte Logs: Info (blau), Erfolg (grÃün), Warnung (orange), Fehler (rot)
 
 * Timestamp: Jede Log-Nachricht mit Millisekunden-genauem Zeitstempel
 
@@ -1145,13 +1145,13 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Keine WP_DEBUG erforderlich: Funktioniert out-of-the-box ohne wp-config.php Ã„nderungen
 
-* Browser-Konsole: Parallele Ausgabe in Browser-Konsole (F12) fÃ¼r technische Details
+* Browser-Konsole: Parallele Ausgabe in Browser-Konsole (F12) fÃür technische Details
 
 
 
 = 0.3.2.0 =
 
-* DEBUG: Umfangreiche Debug-Ausgaben fÃ¼r Kalender-Synchronisation hinzugefÃ¼gt
+* DEBUG: Umfangreiche Debug-Ausgaben fÃür Kalender-Synchronisation hinzugefÃügt
 
 * Browser-Konsole: Detaillierte AJAX-Request/Response-Logs mit Debug-Informationen
 
@@ -1163,11 +1163,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * AJAX Handler: Request-URL, Tenant, Zeitstempel, vollstÃ¤ndige Statistiken und Fehler-Traces
 
-* DEBUG.md: AusfÃ¼hrliche Dokumentation fÃ¼r Fehlerdiagnose und Support
+* DEBUG.md: AusfÃührliche Dokumentation fÃür Fehlerdiagnose und Support
 
-* Debug-Informationen werden in AJAX-Response zurÃ¼ckgegeben fÃ¼r Frontend-Anzeige
+* Debug-Informationen werden in AJAX-Response zurÃückgegeben fÃür Frontend-Anzeige
 
-* Alle Logs verwenden Prefix "[REPRO CT-SUITE DEBUG]" fÃ¼r einfaches Filtern
+* Alle Logs verwenden Prefix "[REPRO CT-SUITE DEBUG]" fÃür einfaches Filtern
 
 
 
@@ -1177,7 +1177,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Automatische Updates funktionieren jetzt vollstÃ¤ndig bei privaten Repositories
 
-* Download-Filter mit Authorization-Header fÃ¼r sichere Asset-Downloads
+* Download-Filter mit Authorization-Header fÃür sichere Asset-Downloads
 
 
 
@@ -1187,7 +1187,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Entfernt alte Ordner wie "repro-ct-suite-clean", "-old", "-backup" automatisch
 
-* SicherheitsprÃ¼fungen: Nur inaktive Duplikate werden gelÃ¶scht
+* SicherheitsprÃüfungen: Nur inaktive Duplikate werden gelÃ¶scht
 
 * Verbesserte InstallationsstabilitÃ¤t
 
@@ -1205,9 +1205,9 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.2.4 =
 
-* Fix: GitHub-Token fÃ¼r Updates bei privatem Repository hinzugefÃ¼gt
+* Fix: GitHub-Token fÃür Updates bei privatem Repository hinzugefÃügt
 
-* Automatische Updates funktionieren jetzt auch fÃ¼r private GitHub-Repositories
+* Automatische Updates funktionieren jetzt auch fÃür private GitHub-Repositories
 
 * Hinweis: Dieses Update muss manuell installiert werden, danach funktionieren alle Updates automatisch
 
@@ -1219,7 +1219,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Bugfix: Dashboard zeigt korrekten Verbindungsstatus basierend auf gespeicherten Credentials
 
-* UI: Status-Punkt wechselt von gelb (nicht konfiguriert) zu grÃ¼n (konfiguriert)
+* UI: Status-Punkt wechselt von gelb (nicht konfiguriert) zu grÃün (konfiguriert)
 
 * UI: Button-Text passt sich dynamisch an ("Jetzt einrichten" vs "Einstellungen Ã¤ndern")
 
@@ -1229,9 +1229,9 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Bugfix: Headers-Already-Sent-Fehler beim Connection-Test behoben
 
-* Connection-Test nutzt jetzt admin_init Hook statt direkte Template-AusfÃ¼hrung
+* Connection-Test nutzt jetzt admin_init Hook statt direkte Template-AusfÃührung
 
-* Post-Redirect-Get Pattern fÃ¼r Test-Ergebnisse via Transient
+* Post-Redirect-Get Pattern fÃür Test-Ergebnisse via Transient
 
 
 
@@ -1253,11 +1253,11 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 = 0.2.0 =
 
-* Datenbankschema: benutzerdefinierte Tabellen fÃ¼r Events, Appointments und Services
+* Datenbankschema: benutzerdefinierte Tabellen fÃür Events, Appointments und Services
 
 * Repository-Pattern: Event, Appointment, EventServices Repositories mit Upsert-Logik
 
-* Sichere Credentials: verschlÃ¼sseltes Speichern von ChurchTools-PasswÃ¶rtern (Crypto-Klasse)
+* Sichere Credentials: verschlÃüsseltes Speichern von ChurchTools-PasswÃ¶rtern (Crypto-Klasse)
 
 * Admin-Seite "Termine": konsolidierte Ãœbersicht aller Events und Appointments ohne Event-Zuordnung
 
@@ -1265,17 +1265,17 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * DB-Migrationen: automatische Schema-Installation und Upgrade-Hooks
 
-* Vorbereitung fÃ¼r Sync-Service: Repository-Schicht implementiert
+* Vorbereitung fÃür Sync-Service: Repository-Schicht implementiert
 
 
 
 = 0.1.0.3 =
 
-* Auto-Update-Funktion hinzugefÃ¼gt (opt-in via Admin-UI)
+* Auto-Update-Funktion hinzugefÃügt (opt-in via Admin-UI)
 
 * Update-Info-Seite mit Statusanzeige und Auto-Update-Toggle
 
-* Versionsnummer-Support fÃ¼r 4-stellige Versionen (Major.Minor.Patch.Build)
+* Versionsnummer-Support fÃür 4-stellige Versionen (Major.Minor.Patch.Build)
 
 
 
@@ -1283,7 +1283,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * i18n-KompatibilitÃ¤t mit WordPress 6.7.0 (Textdomain auf init geladen)
 
-* GitHub-Updater: Versionsnormalisierung und PrÃ¤ferenz fÃ¼r Release-ZIP-Assets
+* GitHub-Updater: Versionsnormalisierung und PrÃ¤ferenz fÃür Release-ZIP-Assets
 
 
 
@@ -1291,7 +1291,7 @@ In Multisite-Installationen werden die Daten auf allen Sites bereinigt.
 
 * Initiales Release
 
-* GitHub-Updater fÃ¼r automatische Plugin-Updates
+* GitHub-Updater fÃür automatische Plugin-Updates
 
 * Material Design-inspirierte Admin-OberflÃ¤che
 

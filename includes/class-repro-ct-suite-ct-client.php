@@ -38,7 +38,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * ChurchTools Tenant (z.B. "gemeinde" fä¼r gemeinde.church.tools)
+	 * ChurchTools Tenant (z.B. "gemeinde" fäür gemeinde.church.tools)
 
 	 *
 
@@ -80,7 +80,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Gespeicherte Cookies fä¼r Session-Wiederverwendung
+	 * Gespeicherte Cookies fäür Session-Wiederverwendung
 
 	 *
 
@@ -94,7 +94,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Option-Key fä¼r Cookie-Speicherung
+	 * Option-Key fäür Cookie-Speicherung
 
 	 */
 
@@ -145,7 +145,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Basis-URL fä¼r ChurchTools API
+	 * Basis-URL fäür ChurchTools API
 
 	 *
 
@@ -261,7 +261,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Prä¼ft, ob eine gä¼ltige Session vorhanden ist (via gespeicherte Cookies)
+	 * Präüft, ob eine gäültige Session vorhanden ist (via gespeicherte Cookies)
 
 	 *
 
@@ -279,9 +279,9 @@ class Repro_CT_Suite_CT_Client {
 
 
 
-		// Optionaler Whoami-Check (kann hinzugefä¼gt werden)
+		// Optionaler Whoami-Check (kann hinzugefäügt werden)
 
-		// Fä¼r jetzt: wenn Cookies da sind, annehmen dass Session aktiv ist
+		// Fäür jetzt: wenn Cookies da sind, annehmen dass Session aktiv ist
 
 		return true;
 
@@ -635,7 +635,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Headers fä¼r API-Requests (inkl. Cookies)
+	 * Headers fäür API-Requests (inkl. Cookies)
 
 	 *
 
@@ -661,7 +661,7 @@ class Repro_CT_Suite_CT_Client {
 
 			foreach ( $this->cookies as $name => $value ) {
 
-				// Gekä¼rzte Cookie-Werte fä¼r Debug-Log (erste 20 + letzte 10 Zeichen)
+				// Gekäürzte Cookie-Werte fäür Debug-Log (erste 20 + letzte 10 Zeichen)
 
 				$masked_value = strlen( $value ) > 30 ? substr( $value, 0, 20 ) . '...' . substr( $value, -10 ) : $value;
 
@@ -746,7 +746,7 @@ class Repro_CT_Suite_CT_Client {
 
 	/**
 
-	 * Hilfsmethode: Whoami-Check (optional fä¼r is_authenticated)
+	 * Hilfsmethode: Whoami-Check (optional fäür is_authenticated)
 
 	 *
 

@@ -1,5 +1,5 @@
 ﻿/**
- * Debug-Seite JavaScript - Erweiterungen fÃ¼r EinzellÃ¶schung und Plugin-Reset
+ * Debug-Seite JavaScript - Erweiterungen fÃür EinzellÃ¶schung und Plugin-Reset
  *
  * @package Repro_CT_Suite
  * @version 0.9.5.3
@@ -8,7 +8,7 @@
 (function( $ ) {
 	'use strict';
 
-	// Warte bis ReproCTSuiteDebug verfÃ¼gbar ist
+	// Warte bis ReproCTSuiteDebug verfÃügbar ist
 	$(function() {
 		console.log('=== DEBUG EXTENSIONS WIRD GELADEN ===');
 		console.log('window.ReproCTSuiteDebug vorhanden:', typeof window.ReproCTSuiteDebug !== 'undefined');
@@ -40,7 +40,7 @@
 		console.log('Debug Objekt:', Debug);
 
 		/**
-		 * Handler fÃ¼r TabelleneintrÃ¤ge anzeigen
+		 * Handler fÃür TabelleneintrÃ¤ge anzeigen
 		 */
 		Debug.initViewTableEntriesHandler = function() {
 			const self = this;
@@ -131,12 +131,12 @@
 			
 			$('#repro-ct-suite-entries-content').html(html).show();
 			
-			// Event-Handler fÃ¼r LÃ¶schen-Buttons
+			// Event-Handler fÃür LÃ¶schen-Buttons
 			this.initDeleteEntryHandlers();
 		};
 
 		/**
-		 * Handler fÃ¼r einzelne EintrÃ¤ge lÃ¶schen
+		 * Handler fÃür einzelne EintrÃ¤ge lÃ¶schen
 		 */
 		Debug.initDeleteEntryHandlers = function() {
 			const self = this;
@@ -169,7 +169,7 @@
 							$button.closest('tr').fadeOut(300, function() {
 								$(this).remove();
 								
-								// PrÃ¼fen ob Tabelle leer ist
+								// PrÃüfen ob Tabelle leer ist
 								if ($('#repro-ct-suite-entries-content table tbody tr:visible').length === 0) {
 									$('#repro-ct-suite-entries-content').html('<p>Alle EintrÃ¤ge gelÃ¶scht.</p>');
 									
@@ -194,7 +194,7 @@
 		};
 
 		/**
-		 * Handler fÃ¼r vollstÃ¤ndigen Plugin-Reset
+		 * Handler fÃür vollstÃ¤ndigen Plugin-Reset
 		 */
 		Debug.initFullResetHandler = function() {
 			const self = this;
@@ -205,12 +205,12 @@
 				const $button = $(this);
 				const nonce = $button.data('nonce');
 				
-				if (!confirm('âš ï¸ ACHTUNG: Dies setzt das gesamte Plugin zurÃ¼ck!\n\nFolgende Daten werden gelÃ¶scht:\n- Alle Tabellendaten (Kalender, Events, Services, Schedule)\n- ChurchTools Zugangsdaten\n- Synchronisations-Zeitstempel\n- Alle Plugin-Einstellungen\n\nDieser Vorgang kann NICHT rÃ¼ckgÃ¤ngig gemacht werden!\n\nMÃ¶chten Sie wirklich fortfahren?')) {
+				if (!confirm('âš ï¸ ACHTUNG: Dies setzt das gesamte Plugin zurÃück!\n\nFolgende Daten werden gelÃ¶scht:\n- Alle Tabellendaten (Kalender, Events, Services, Schedule)\n- ChurchTools Zugangsdaten\n- Synchronisations-Zeitstempel\n- Alle Plugin-Einstellungen\n\nDieser Vorgang kann NICHT rÃückgÃ¤ngig gemacht werden!\n\nMÃ¶chten Sie wirklich fortfahren?')) {
 					return;
 				}
 				
 				// Zweite BestÃ¤tigung
-				if (!confirm('ðŸš¨ Sind Sie ABSOLUT SICHER?\n\nDas Plugin wird komplett zurÃ¼ckgesetzt und Sie mÃ¼ssen alle Einstellungen neu vornehmen!')) {
+				if (!confirm('ðŸš¨ Sind Sie ABSOLUT SICHER?\n\nDas Plugin wird komplett zurÃückgesetzt und Sie mÃüssen alle Einstellungen neu vornehmen!')) {
 					return;
 				}
 				

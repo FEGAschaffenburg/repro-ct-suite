@@ -113,13 +113,13 @@ Versions-Historie und Änderungsprotokoll.
 ## v0.9.7.6 (2025-12-09) - UMLAUT-FIX (KRITISCH)
 
 ### 🔴 Kritischer Encoding-Fehler behoben
-- **Problem**: Alle Umlaute waren kaputt ("verfügbaren" → "verfÃ¼gbaren")
+- **Problem**: Alle Umlaute waren kaputt ("verfügbaren" → "verfÃügbaren")
   - Ursache: BOM-Entfernung in v0.9.7.2 hat Encoding beschädigt
   - Betroffen: Alle PHP-Dateien mit deutschen Texten
   
 ### Lösung
 - **Umlaute systematisch repariert**:
-  - `Ã¼` → `ü`
+  - `Ãü` → `ü`
   - `Ã¤` → `ä`  
   - `Ã¶` → `ö`
   - `Ã<` → `Ü`

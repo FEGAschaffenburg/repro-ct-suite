@@ -18,10 +18,10 @@ def fix_encoding(filepath):
     
     # Define replacements for corrupted strings
     replacements = [
-        (r'unerwÃƒÆ.Ã‚Â¤Ãƒâ€šÃ‚Â¼nschte', 'unerwünschte'),
-        (r'PrÃƒÆ.Ã‚Â¤Ãƒâ€šÃ‚Â¼fung', 'Prüfung'),
-        (r'BerechtigungsPrÃƒÆ.Ã‚Â¤Ãƒâ€šÃ‚Â¼fung', 'Berechtigungsprüfung'),
-        (r'fÃƒÆ.Ã‚Â¤Ãƒâ€šÃ‚Â¼r', 'für'),
+        (r'unerwÃƒÆ.Ã‚Â¤Ãƒâ€šÃ‚Âünschte', 'unerwünschte'),
+        (r'PrÃƒÆ.Ã‚Â¤Ãƒâ€šÃ‚Âüfung', 'Prüfung'),
+        (r'BerechtigungsPrÃƒÆ.Ã‚Â¤Ãƒâ€šÃ‚Âüfung', 'Berechtigungsprüfung'),
+        (r'fÃƒÆ.Ã‚Â¤Ãƒâ€šÃ‚Âür', 'für'),
     ]
     
     changed = False

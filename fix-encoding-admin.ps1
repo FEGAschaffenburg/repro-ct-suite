@@ -10,11 +10,11 @@ $content = [System.Text.Encoding]::UTF8.GetString($bytes)
 
 # Ersetze korrupte Zeichen
 $replacements = @{
-    'unerwÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Â¼nschte' = 'unerwünschte'
-    'PrÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Â¼fung' = 'Prüfung'
-    'BerechtigungsPrÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Â¼fung' = 'Berechtigungsprüfung'
-    'fÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Â¼r' = 'für'
-    'Keine Berechtigung fÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Â¼r diese Aktion.' = 'Keine Berechtigung für diese Aktion.'
+    'unerwÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Âünschte' = 'unerwünschte'
+    'PrÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Âüfung' = 'Prüfung'
+    'BerechtigungsPrÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Âüfung' = 'Berechtigungsprüfung'
+    'fÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Âür' = 'für'
+    'Keine Berechtigung fÃƒÆ''Ã‚Â¤Ãƒâ€šÃ‚Âür diese Aktion.' = 'Keine Berechtigung für diese Aktion.'
 }
 
 $changed = $false
